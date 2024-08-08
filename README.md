@@ -2,6 +2,47 @@
 
 Este repositorio contiene los talleres organizados por cursos de la universidad. Cada curso tiene su propia carpeta y dentro de cada carpeta de curso se encuentran las carpetas de los talleres. Los archivos de las tareas se encuentran dentro de las carpetas de los talleres.
 
+## Configuración del Entorno Virtual
+
+Para garantizar que todas las dependencias necesarias están instaladas y evitar conflictos con otras librerías de Python en tu sistema, es recomendable usar un entorno virtual. A continuación, se muestra cómo configurar un entorno virtual y instalar las librerías necesarias:
+
+1. **Instalar `virtualenv` si no lo tienes:**
+
+   ```bash
+   pip install virtualenv
+   ```
+
+2. **Crear un entorno virtual:**
+   ```bash
+   virtualenv venv
+   ```
+
+3. **Activar el entorno virtual:**
+    - **En Windows**
+    ```bash
+    venv\Scripts\activate
+    ```
+
+    - **En macOS y Linux:**
+    ```bash
+    source venv/bin/activate
+    ```
+
+4. **Instalar las librerías necesarias desde requirements.txt:**
+    ```python
+    pip install -r requirements.txt
+    ```
+
+5. **Desactivar el entorno virtual:**
+    Una vez que hayas terminado de trabajar, puedes desactivar el entorno virtual con el siguiente comando:
+    ```bash
+    deactivate
+    ```
+
+De esta manera, los colaboradores del proyecto podrán instalar todas las dependencias necesarias de forma rápida y sencilla.
+
+
+
 ## Estructura del Repositorio
 
 La estructura del repositorio es la siguiente:
@@ -48,7 +89,7 @@ Este repositorio ha sido creado y es mantenido por los siguientes estudiantes:
 
 1. Haz un fork del proyecto.
 2. Crea una nueva rama (`git checkout -b nueva-rama`).
-3. Realiza los cambios necesarios y haz commit (`git commit -am 'Añadir nueva característica'`).
+3. Realiza los cambios necesarios y haz commit (`git commit -m 'Añadir nueva característica'`).
 4. Envía los cambios a tu fork (`git push origin nueva-rama`).
 5. Abre un Pull Request.
 
