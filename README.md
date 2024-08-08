@@ -1,4 +1,4 @@
-# Repositorio de Talleres de la Universidad
+# Repositorio de Talleres de la Universidad ECCI
 
 Este repositorio contiene los talleres organizados por cursos de la universidad. Cada curso tiene su propia carpeta y dentro de cada carpeta de curso se encuentran las carpetas de los talleres. Los archivos de las tareas se encuentran dentro de las carpetas de los talleres.
 
