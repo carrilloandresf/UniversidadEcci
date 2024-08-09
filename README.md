@@ -81,9 +81,10 @@ La estructura del repositorio es la siguiente:
 
 Este repositorio ha sido creado y es mantenido por los siguientes estudiantes:
 
-1. [Andrés Felipe Carrillo Rodríguez](mailto:andresf.carillor@ecci.edu.co)
+1. [Andrés Felipe Carrillo Rodríguez](mailto:daniela.rodriguezpe@ecci.edu.co)
 2. [Daniela Rodríguez Pelaez](mailto:andresf.carillor@ecci.edu.co)
-3. [Jeisson Gutierrez Sanchez](mailto:andresf.carillor@ecci.edu.co)
+3. [Jeisson Gutierrez Sanchez](mailto:jeisson.gutierrezs@ecci.edu.co)
+4. [William Alejandro Fernandez Pinzon](williama.fernandezp@ecci.edu.co)
 
 ## Cómo Contribuir
 
