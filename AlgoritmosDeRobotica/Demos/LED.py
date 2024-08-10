@@ -11,6 +11,6 @@ led = LED(17)
 
 while True:
     led.on()
-    sleep(0.5)
+    sleep(3)
     led.off()
-    sleep(0.5)
+    sleep(3)
