@@ -3,19 +3,27 @@ import numpy as np
 
 def resistencia_pt100(temperatura):
     """
-    Calcula la resistencia del sensor PT100 en función de la temperatura.
+    Calcula la resistencia del sensor PT100 en función de la temperatura
+    utilizando las fórmulas específicas para temperaturas mayores o iguales a 0°C
+    y menores a 0°C.
     
     :param temperatura: Temperatura en grados Celsius.
     :return: Resistencia en ohmios.
     """
-    resistencia_0 = 100  # Resistencia a 0°C
-    coeficiente = 0.385  # Coeficiente de temperatura en ohmios/°C
-    return resistencia_0 * (1 + coeficiente * temperatura)
+    R0 = 100  # Resistencia a 0°C
+    A = 3.9083e-3  # Coeficiente A en °C⁻¹
+    B = -5.775e-7  # Coeficiente B en °C⁻²
+    C = -4.183e-12  # Coeficiente C en °C⁻⁴, solo para t < 0°C
+    
+    if temperatura >= 0:
+        return R0 * (1 + A * temperatura + B * temperatura**2)
+    else:
+        return R0 * (1 + A * temperatura + B * temperatura**2 + C * (temperatura - 100) * temperatura**3)
 
 def main():
     # Generar un rango de temperaturas de -200°C a 200°C
     temperaturas = np.linspace(-200, 200, 400)
-    resistencias = resistencia_pt100(temperaturas)
+    resistencias = [resistencia_pt100(t) for t in temperaturas]
     
     # Crear la gráfica
     plt.figure(figsize=(10, 6))

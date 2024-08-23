@@ -13,12 +13,20 @@ def obtener_contornos(imagen_path):
 
     # Aplicar umbral adaptativo para binarizar la imagen
     imagen_binaria = cv2.adaptiveThreshold(imagen_blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                          cv2.THRESH_BINARY_INV, 11, 2)
+                                           cv2.THRESH_BINARY_INV, 11, 2)
 
     # Encontrar contornos en la imagen binaria
     contornos, _ = cv2.findContours(imagen_binaria, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     return contornos
+
+def imprimir_coordenadas(contornos, titulo_imagen):
+    print(f"Coordenadas de los contornos en {titulo_imagen}:")
+    for i, contorno in enumerate(contornos):
+        print(f"  Contorno {i + 1}:")
+        for punto in contorno:
+            x, y = punto[0]
+            print(f"    (x, y) = ({x}, {y})")
 
 def dibujar_contornos(imagen, contornos, color, nombre_ventana):
     # Crear una copia de la imagen original para dibujar los contornos
@@ -45,8 +53,8 @@ def centrar_ventana(nombre_ventana):
 
 def main():
     # Rutas de las imágenes de los logos
-    imagen_logo1_path = 'src\img\Hyundai logo.png'  # Ruta a la imagen del primer logo
-    imagen_logo2_path = 'src/img/Suzuki logo.png'  # Ruta a la imagen del segundo logo
+    imagen_logo1_path = '../../src/img/Hyundai logo.png'  # Ruta a la imagen del primer logo
+    imagen_logo2_path = '../../src/img/Suzuki logo.png'  # Ruta a la imagen del segundo logo
 
     # Leer las imágenes originales
     imagen_logo1 = cv2.imread(imagen_logo1_path)
@@ -55,6 +63,10 @@ def main():
     # Obtener contornos de los logos
     contornos_logo1 = obtener_contornos(imagen_logo1_path)
     contornos_logo2 = obtener_contornos(imagen_logo2_path)
+
+    # Imprimir las coordenadas de los puntos de los contornos
+    imprimir_coordenadas(contornos_logo1, "Hyundai Logo")
+    imprimir_coordenadas(contornos_logo2, "Suzuki Logo")
 
     # Mostrar las imágenes originales en ventanas separadas
     cv2.imshow('Imagen Logo 1 Original', imagen_logo1)

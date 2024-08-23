@@ -18,11 +18,12 @@ def tipo_sistema(zeta):
 
 def main():
     # Solicitar coeficientes al usuario
+    K = float(input("Ingrese el coeficiente de ganancia (K): "))
     omega_n = float(input("Ingrese la frecuencia natural (omega_n): "))
     zeta = float(input("Ingrese el coeficiente de amortiguamiento (zeta): "))
     
     # Crear la función de transferencia
-    num = [1]
+    num = [K * omega_n**2]  # Numerador con el coeficiente K
     den = [1, 2*zeta*omega_n, omega_n**2]
     
     sistema = signal.TransferFunction(num, den)
@@ -33,9 +34,10 @@ def main():
     # Graficar la respuesta
     plt.figure(figsize=(10, 6))
     plt.plot(tiempo, respuesta, label='Respuesta al escalón')
-    plt.title('Respuesta al Escalón de una Función de Transferencia de Segundo Orden')
+    plt.title(f'Respuesta al Escalón (K={K}, ωn={omega_n}, ζ={zeta})')
     plt.xlabel('Tiempo (s)')
     plt.ylabel('Respuesta')
+    plt.ylim([-0.2, 1.2] if K == 1 else [0, 1.2*K])  # Ajuste de límites basado en K
     plt.grid(True)
     plt.legend()
     plt.show()
