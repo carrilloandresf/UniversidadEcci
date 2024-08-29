@@ -1,25 +1,25 @@
-import RPi.GPIO as GPIO
+import gpiod
 import time
 
-GPIO.setwarnings(False)
-# Configurar la numeración de los pines
-GPIO.setmode(GPIO.BCM)
+# Seleccionar el chip GPIO, usualmente /dev/gpiochip0
+chip = gpiod.Chip('gpiochip0')
 
-# Lista de pines GPIO a utilizar (del 2 al 27)
-pins = list(range(2, 28))
+# Seleccionar la línea GPIO (por ejemplo, GPIO 17)
+line = chip.get_line(17)
 
-# Configurar cada pin como salida
-for pin in pins:
-    GPIO.setup(pin, GPIO.OUT)
+# Configurar la línea como salida
+config = gpiod.LineRequest()
+config.consumer = "blink"
+config.request_type = gpiod.LineRequest.DIRECTION_OUTPUT
 
-# Encender los LEDs uno por uno con un retardo de 0.5 segundos
+line.request(config)
+
+# Controlar el LED encendiéndolo y apagándolo
 try:
-    for pin in pins:
-        GPIO.output(pin, GPIO.HIGH)  # Encender el LED
-        time.sleep(0.5)              # Esperar 0.5 segundos
-        GPIO.output(pin, GPIO.LOW)  # Encender el LED
-        time.sleep(0.5)              # Esperar 0.5 segundos
-
+    while True:
+        line.set_value(1)  # Encender
+        time.sleep(1)
+        line.set_value(0)  # Apagar
+        time.sleep(1)
 finally:
-    # Limpiar la configuración de los pines
-    GPIO.cleanup()
+    line.release()
