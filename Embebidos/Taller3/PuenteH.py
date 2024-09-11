@@ -27,6 +27,14 @@ def setup_lines():
     avance_line = chip.get_line(Avance)
     retroceso_line = chip.get_line(Retroceso)
     
+    # Asegúrate de que las líneas no estén solicitadas antes
+    toggle_1_line.release() if toggle_1_line.is_requested() else None
+    toggle_2_line.release() if toggle_2_line.is_requested() else None
+    lcd_lines.release() if lcd_lines.is_requested() else None
+    avance_line.release() if avance_line.is_requested() else None
+    retroceso_line.release() if retroceso_line.is_requested() else None
+    
+    # Solicitar las líneas GPIO
     toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
     toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
     lcd_lines.request(consumer="lcd_program", type=gpiod.LINE_REQ_DIR_OUT)
