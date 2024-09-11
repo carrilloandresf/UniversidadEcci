@@ -19,7 +19,7 @@ bits_datos = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
 print("Puente H")
 
 # Obtener el chip y los pines
-chip = gpiod.Chip('/dev/gpiochip0')  # Ajusta si es necesario
+chip = gpiod.Chip('/dev/gpiochip4')  # Ajusta si es necesario
 pins = {pin: chip.get_line(pin) for pin in [TOGGLE_1, TOGGLE_2, LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7, Avance, Retroceso]}
 
 # Configuración de pines (solo una vez)
