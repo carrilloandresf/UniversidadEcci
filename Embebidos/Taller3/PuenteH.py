@@ -27,6 +27,7 @@ def setup_input(pins):
     lines = chip.get_lines(pins)
     lines.request(consumer="lcd_program", type=gpiod.LINE_REQ_DIR_IN)
 
+# Solicita las líneas para los pines de entrada y salida
 setup_input([TOGGLE_1, TOGGLE_2])
 setup_output(bits_datos)
 setup_output([Avance, Retroceso])
@@ -105,12 +106,14 @@ def Movimiento(AR):
         retroceso_line.set_value(0)
 
 try:
-    while True:
-        toggle_1_line = chip.get_line(TOGGLE_1)
-        toggle_2_line = chip.get_line(TOGGLE_2)
-        toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
-        toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+    # Solicita las líneas de TOGGLE_1 y TOGGLE_2 una vez antes del ciclo
+    toggle_1_line = chip.get_line(TOGGLE_1)
+    toggle_2_line = chip.get_line(TOGGLE_2)
+    toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+    toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
 
+    while True:
+        # Lee el valor de las líneas ya solicitadas
         if toggle_1_line.get_value() == 1:  # Si TOGGLE_1 está activado
             LCD("Giro izquierda")
             Movimiento(1)
@@ -123,4 +126,4 @@ try:
         sleep(0.5)
 
 except KeyboardInterrupt:
-    pass  # El cleanup en gpiod no es necesario como en RPi.GPIO
+    pass  # No es necesario el cleanup en gpiod
