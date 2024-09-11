@@ -7,7 +7,7 @@ chip = gpiod.Chip('gpiochip4')
 # Definición de pines en formato GPIO (BCM)
 TOGGLE_1 = 2    # GPIO 5
 TOGGLE_2 = 3    # GPIO 6
-LCD_RS = 4     # GPIO 10
+LCD_RS = 5     # GPIO 10
 LCD_E = 17       # GPIO 9
 LCD_D4 = 27     # GPIO 22
 LCD_D5 = 22     # GPIO 23
