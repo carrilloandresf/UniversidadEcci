@@ -5,15 +5,15 @@ from time import sleep
 chip = gpiod.Chip('gpiochip4')
 
 # Definición de pines en formato GPIO (BCM)
-TOGGLE_1 = 5    # GPIO 5
-TOGGLE_2 = 6    # GPIO 6
-LCD_RS = 10     # GPIO 10
-LCD_E = 9       # GPIO 9
-LCD_D4 = 22     # GPIO 22
-LCD_D5 = 23     # GPIO 23
-LCD_D6 = 24     # GPIO 24
-LCD_D7 = 25     # GPIO 25
-Avance = 17     # GPIO 17
+TOGGLE_1 = 2    # GPIO 5
+TOGGLE_2 = 3    # GPIO 6
+LCD_RS = 4     # GPIO 10
+LCD_E = 17       # GPIO 9
+LCD_D4 = 27     # GPIO 22
+LCD_D5 = 22     # GPIO 23
+LCD_D6 = 10     # GPIO 24
+LCD_D7 = 9     # GPIO 25
+Avance = 11     # GPIO 17
 Retroceso = 18  # GPIO 18
 
 bits_datos = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
