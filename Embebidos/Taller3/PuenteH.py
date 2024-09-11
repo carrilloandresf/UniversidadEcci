@@ -15,6 +15,8 @@ Retroceso = 26
 
 bits_datos = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
 
+print("Puente H")
+
 # Obtener el chip y los pines
 chip = gpiod.Chip('/dev/gpiochip0')  # Ajusta si es necesario
 pins = {pin: chip.get_line(pin) for pin in [TOGGLE_1, TOGGLE_2, LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7, Avance, Retroceso]}
@@ -85,13 +87,16 @@ try:
         if pins[TOGGLE_1].get_value() == 1:  # Si TOGGLE_1 está activado
             LCD("Giro izquierda")
             Movimiento(1)
+            print("Giro izquierda")
         elif pins[TOGGLE_2].get_value() == 1:  # Si TOGGLE_2 está activado
             LCD("Giro derecha")
             Movimiento(0)
+            print("Giro derecha")
         else:
             LCD("Detenido | ECCI")
+            print("Detenido")
             Movimiento(-1)  # Asegurarse de detener el movimiento si no hay entradas activadas
-        sleep(0.5)
+        sleep(1)
 
 except KeyboardInterrupt:
     pass  # No es necesario limpiar pines con gpiod, ya que el manejador de interrupciones se encarga automáticamente
