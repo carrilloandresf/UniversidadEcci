@@ -1,5 +1,6 @@
 import gpiod
 from time import sleep
+import datetime
 
 # Definición de pines en formato GPIO
 TOGGLE_1 = 2
@@ -87,7 +88,7 @@ try:
         if pins[TOGGLE_1].get_value() == 1:  # Si TOGGLE_1 está activado
             LCD("Giro izquierda")
             Movimiento(1)
-            print("Giro izquierda")
+            print("Giro izquierda", pins[TOGGLE_1].get_value(), "|", pins[TOGGLE_2].get_value(), "|", str(datetime.datetime.now()))
         elif pins[TOGGLE_2].get_value() == 1:  # Si TOGGLE_2 está activado
             LCD("Giro derecha")
             Movimiento(0)
