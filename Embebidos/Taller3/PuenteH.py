@@ -4,17 +4,17 @@ from time import sleep
 # Definir el chip GPIO (gpiochip4)
 chip = gpiod.Chip('gpiochip4')
 
-# Definición de pines en formato GPIO (BCM)
-TOGGLE_1 = 2    # GPIO 5
-TOGGLE_2 = 3    # GPIO 6
-LCD_RS = 4      # GPIO 7 (anteriormente GPIO 10)
-LCD_E = 17      # GPIO 9
-LCD_D4 = 18     # GPIO 10 (anteriormente GPIO 22)
-LCD_D5 = 22     # GPIO 23 (anteriormente GPIO 23)
-LCD_D6 = 23     # GPIO 24 (anteriormente GPIO 24)
-LCD_D7 = 24     # GPIO 25 (anteriormente GPIO 25)
-Avance = 25     # GPIO 27
-Retroceso = 26  # GPIO 28
+# Definición de pines en formato GPIO
+TOGGLE_1 = 2
+TOGGLE_2 = 3
+LCD_RS = 4
+LCD_E = 17
+LCD_D4 = 18
+LCD_D5 = 22
+LCD_D6 = 23
+LCD_D7 = 24
+Avance = 25
+Retroceso = 26 
 
 bits_datos = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
 
