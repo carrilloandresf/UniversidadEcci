@@ -85,17 +85,17 @@ def Movimiento(AR):
 
 try:
     while True:
-        if pins[TOGGLE_1].get_value() == 1:  # Si TOGGLE_1 está activado
+        if pins[TOGGLE_1].get_value() == 0:  # Si TOGGLE_1 está activado
             LCD("Giro izquierda")
             Movimiento(1)
             print("Giro izquierda", pins[TOGGLE_1].get_value(), "|", pins[TOGGLE_2].get_value(), "|", str(datetime.datetime.now()))
-        elif pins[TOGGLE_2].get_value() == 1:  # Si TOGGLE_2 está activado
+        elif pins[TOGGLE_2].get_value() == 0:  # Si TOGGLE_2 está activado
             LCD("Giro derecha")
             Movimiento(0)
-            print("Giro derecha")
+            print("Giro derecha, ", pins[TOGGLE_1].get_value(), "|", pins[TOGGLE_2].get_value(), "|", str(datetime.datetime.now()))
         else:
             LCD("Detenido | ECCI")
-            print("Detenido")
+            print("Detenido", pins[TOGGLE_1].get_value(), "|", pins[TOGGLE_2].get_value(), "|", str(datetime.datetime.now()))
             Movimiento(-1)  # Asegurarse de detener el movimiento si no hay entradas activadas
         sleep(1)
 
