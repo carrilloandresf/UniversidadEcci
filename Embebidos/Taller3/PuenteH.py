@@ -7,29 +7,28 @@ chip = gpiod.Chip('gpiochip4')
 # Definición de pines en formato GPIO (BCM)
 TOGGLE_1 = 2    # GPIO 5
 TOGGLE_2 = 3    # GPIO 6
-LCD_RS = 5     # GPIO 10
-LCD_E = 17       # GPIO 9
-LCD_D4 = 27     # GPIO 22
-LCD_D5 = 22     # GPIO 23
-LCD_D6 = 10     # GPIO 24
-LCD_D7 = 9     # GPIO 25
-Avance = 11     # GPIO 17
-Retroceso = 18  # GPIO 18
+LCD_RS = 4      # GPIO 7 (anteriormente GPIO 10)
+LCD_E = 17      # GPIO 9
+LCD_D4 = 18     # GPIO 10 (anteriormente GPIO 22)
+LCD_D5 = 22     # GPIO 23 (anteriormente GPIO 23)
+LCD_D6 = 23     # GPIO 24 (anteriormente GPIO 24)
+LCD_D7 = 24     # GPIO 25 (anteriormente GPIO 25)
+Avance = 25     # GPIO 27
+Retroceso = 26  # GPIO 28
 
 bits_datos = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
 
-# Solicitar líneas GPIO al inicio
 def setup_lines():
     global toggle_1_line, toggle_2_line, lcd_lines, avance_line, retroceso_line
     
-    # Configuración de pines de entrada
+    # Configuración de pines
     toggle_1_line = chip.get_line(TOGGLE_1)
     toggle_2_line = chip.get_line(TOGGLE_2)
     
-    # Configuración de pines de salida para LCD
+    # Configuración de pines para LCD
     lcd_lines = [chip.get_line(pin) for pin in bits_datos + [LCD_E]]
     
-    # Configuración de pines de salida para motores
+    # Configuración de pines para motores
     avance_line = chip.get_line(Avance)
     retroceso_line = chip.get_line(Retroceso)
     
@@ -38,22 +37,27 @@ def setup_lines():
         if line.is_requested():
             line.release()
     
-    # Solicitar las líneas GPIO
-    toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
-    toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+    # Solicitar líneas GPIO
+    try:
+        toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+        toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+        
+        for line in lcd_lines:
+            line.request(consumer="lcd_program", type=gpiod.LINE_REQ_DIR_OUT)
+        
+        avance_line.request(consumer="motor_control", type=gpiod.LINE_REQ_DIR_OUT)
+        retroceso_line.request(consumer="motor_control", type=gpiod.LINE_REQ_DIR_OUT)
     
-    for line in lcd_lines:
-        line.request(consumer="lcd_program", type=gpiod.LINE_REQ_DIR_OUT)
-    
-    avance_line.request(consumer="motor_control", type=gpiod.LINE_REQ_DIR_OUT)
-    retroceso_line.request(consumer="motor_control", type=gpiod.LINE_REQ_DIR_OUT)
+    except Exception as e:
+        print(f"Error al solicitar líneas GPIO: {e}")
 
 def release_lines():
     global toggle_1_line, toggle_2_line, lcd_lines, avance_line, retroceso_line
     
     # Liberar líneas GPIO
     for line in [toggle_1_line, toggle_2_line] + lcd_lines + [avance_line, retroceso_line]:
-        line.release()
+        if line.is_requested():
+            line.release()
 
 # Configuración de pines (solo una vez)
 setup_lines()
