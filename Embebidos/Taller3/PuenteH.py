@@ -18,23 +18,31 @@ Retroceso = 18  # GPIO 18
 
 bits_datos = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
 
+# Solicitar líneas GPIO al inicio
+def setup_lines():
+    global toggle_1_line, toggle_2_line, lcd_lines, avance_line, retroceso_line
+    toggle_1_line = chip.get_line(TOGGLE_1)
+    toggle_2_line = chip.get_line(TOGGLE_2)
+    lcd_lines = chip.get_lines(bits_datos + [LCD_E])
+    avance_line = chip.get_line(Avance)
+    retroceso_line = chip.get_line(Retroceso)
+    
+    toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+    toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+    lcd_lines.request(consumer="lcd_program", type=gpiod.LINE_REQ_DIR_OUT)
+    avance_line.request(consumer="motor_control", type=gpiod.LINE_REQ_DIR_OUT)
+    retroceso_line.request(consumer="motor_control", type=gpiod.LINE_REQ_DIR_OUT)
+
+def release_lines():
+    global toggle_1_line, toggle_2_line, lcd_lines, avance_line, retroceso_line
+    toggle_1_line.release()
+    toggle_2_line.release()
+    lcd_lines.release()
+    avance_line.release()
+    retroceso_line.release()
+
 # Configuración de pines (solo una vez)
-def setup_output(pins):
-    lines = chip.get_lines(pins)
-    lines.request(consumer="lcd_program", type=gpiod.LINE_REQ_DIR_OUT)
-
-def setup_input(pins):
-    lines = chip.get_lines(pins)
-    lines.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
-
-def release_lines(pins):
-    lines = chip.get_lines(pins)
-    lines.release()
-
-# Solicita las líneas para los pines de salida y entrada
-setup_output(bits_datos)
-setup_output([Avance, Retroceso])
-setup_input([TOGGLE_1, TOGGLE_2])
+setup_lines()
 
 # Función para escribir en el LCD
 def lcd_write(bits, mode):
@@ -45,8 +53,7 @@ def lcd_write(bits, mode):
         (bits & 0x40) >> 6,
         (bits & 0x80) >> 7
     ]
-    lines = chip.get_lines([LCD_RS, LCD_D4, LCD_D5, LCD_D6, LCD_D7])
-    lines.set_values(values)
+    lcd_lines.set_values(values)
     lcd_toggle_enable()
 
     values = [
@@ -56,14 +63,12 @@ def lcd_write(bits, mode):
         (bits & 0x04) >> 2,
         (bits & 0x08) >> 3
     ]
-    lines.set_values(values)
+    lcd_lines.set_values(values)
     lcd_toggle_enable()
 
 # Función para activar/desactivar el pin de habilitación del LCD
 def lcd_toggle_enable():
     line = chip.get_line(LCD_E)
-    line.request(consumer="lcd_program", type=gpiod.LINE_REQ_DIR_OUT)
-    sleep(0.0005)
     line.set_value(1)
     sleep(0.0005)
     line.set_value(0)
@@ -94,11 +99,6 @@ def LCD(hora):
 
 # Función para controlar movimiento (Avance y Retroceso)
 def Movimiento(AR):
-    avance_line = chip.get_line(Avance)
-    retroceso_line = chip.get_line(Retroceso)
-    avance_line.request(consumer="motor_control", type=gpiod.LINE_REQ_DIR_OUT)
-    retroceso_line.request(consumer="motor_control", type=gpiod.LINE_REQ_DIR_OUT)
-
     if AR == 1:
         avance_line.set_value(1)
         retroceso_line.set_value(0)
@@ -111,14 +111,6 @@ def Movimiento(AR):
 
 try:
     while True:
-        toggle_1_line = chip.get_line(TOGGLE_1)
-        toggle_2_line = chip.get_line(TOGGLE_2)
-
-        if not toggle_1_line.is_requested():
-            toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
-        if not toggle_2_line.is_requested():
-            toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
-
         # Lee el valor de las líneas ya solicitadas
         if toggle_1_line.get_value() == 1:  # Si TOGGLE_1 está activado
             LCD("Giro izquierda")
@@ -133,5 +125,5 @@ try:
 
 except KeyboardInterrupt:
     # Libera las líneas GPIO antes de salir
-    release_lines([TOGGLE_1, TOGGLE_2, Avance, Retroceso])
+    release_lines()
     print("Interrupción del teclado detectada. Limpieza y salida.")
