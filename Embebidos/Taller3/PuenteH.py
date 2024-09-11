@@ -25,12 +25,16 @@ def setup_output(pins):
 
 def setup_input(pins):
     lines = chip.get_lines(pins)
-    lines.request(consumer="lcd_program", type=gpiod.LINE_REQ_DIR_IN)
+    lines.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
 
-# Solicita las líneas para los pines de entrada y salida
-setup_input([TOGGLE_1, TOGGLE_2])
+def release_lines(pins):
+    lines = chip.get_lines(pins)
+    lines.release()
+
+# Solicita las líneas para los pines de salida y entrada
 setup_output(bits_datos)
 setup_output([Avance, Retroceso])
+setup_input([TOGGLE_1, TOGGLE_2])
 
 # Función para escribir en el LCD
 def lcd_write(bits, mode):
@@ -106,13 +110,15 @@ def Movimiento(AR):
         retroceso_line.set_value(0)
 
 try:
-    # Solicita las líneas de TOGGLE_1 y TOGGLE_2 una vez antes del ciclo
-    toggle_1_line = chip.get_line(TOGGLE_1)
-    toggle_2_line = chip.get_line(TOGGLE_2)
-    toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
-    toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
-
     while True:
+        toggle_1_line = chip.get_line(TOGGLE_1)
+        toggle_2_line = chip.get_line(TOGGLE_2)
+
+        if not toggle_1_line.is_requested():
+            toggle_1_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+        if not toggle_2_line.is_requested():
+            toggle_2_line.request(consumer="toggle_check", type=gpiod.LINE_REQ_DIR_IN)
+
         # Lee el valor de las líneas ya solicitadas
         if toggle_1_line.get_value() == 1:  # Si TOGGLE_1 está activado
             LCD("Giro izquierda")
@@ -126,4 +132,6 @@ try:
         sleep(0.5)
 
 except KeyboardInterrupt:
-    pass  # No es necesario el cleanup en gpiod
+    # Libera las líneas GPIO antes de salir
+    release_lines([TOGGLE_1, TOGGLE_2, Avance, Retroceso])
+    print("Interrupción del teclado detectada. Limpieza y salida.")
