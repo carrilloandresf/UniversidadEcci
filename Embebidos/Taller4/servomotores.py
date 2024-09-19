@@ -28,12 +28,14 @@ linea.request(consumer="pwm_control", type=gpiod.LINE_REQ_DIR_OUT)
 try:
     while True:
         # Simular el PWM para ángulo 0°
+        print("0°")
         duty_cycle_0 = porcentaje(0) / 100  # Convertir a fracción
         linea.set_value(1)  # Encender GPIO
         sleep(duty_cycle_0 * periodo)
         linea.set_value(0)  # Apagar GPIO
         sleep((1 - duty_cycle_0) * periodo)
 
+        print("180°")
         # Simular el PWM para ángulo 180°
         duty_cycle_180 = porcentaje(180) / 100  # Convertir a fracción
         linea.set_value(1)
@@ -42,6 +44,7 @@ try:
         sleep((1 - duty_cycle_180) * periodo)
 
         # Simular el PWM para ángulo 90°
+        print("90°")
         duty_cycle_90 = porcentaje(90) / 100
         linea.set_value(1)
         sleep(duty_cycle_90 * periodo)
