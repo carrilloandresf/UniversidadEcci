@@ -21,10 +21,9 @@ def porcentaje(angulo):
 
 # Establecer línea de salida
 linea = chip.get_line(pwmgpio13)
-config = gpiod.line_request()
-config.consumer = "pwm_control"
-config.request_type = gpiod.line_request.DIRECTION_OUTPUT
-linea.request(config)
+
+# Solicitar la línea para salida
+linea.request(consumer="pwm_control", type=gpiod.LINE_REQ_DIR_OUT)
 
 try:
     while True:
