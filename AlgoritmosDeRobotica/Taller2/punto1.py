@@ -6,7 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(489, 326)
+        MainWindow.resize(562, 326)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
@@ -41,10 +41,10 @@ class Ui_MainWindow(object):
         self.label.setFont(font)
         self.label.setObjectName("label")
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
-        self.label_6.setGeometry(QtCore.QRect(220, 70, 131, 101))
+        self.label_6.setGeometry(QtCore.QRect(220, 70, 241, 101))
         self.label_6.setObjectName("label_6")
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setGeometry(QtCore.QRect(220, 20, 91, 231))
+        self.label_4.setGeometry(QtCore.QRect(220, 20, 321, 21))
         font = QtGui.QFont()
         font.setBold(True)
         self.label_4.setFont(font)
@@ -75,7 +75,7 @@ class Ui_MainWindow(object):
         self.textEdit_2.setObjectName("textEdit_2")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 489, 19))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 562, 19))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -116,19 +116,19 @@ class Ui_MainWindow(object):
         self.pushButton_8.setText(_translate("MainWindow", "Tangente"))
         self.pushButton_9.setText(_translate("MainWindow", "Secante"))
         self.pushButton_10.setText(_translate("MainWindow", "Cosecante"))
-        self.label_6.setText(_translate("MainWindow", 
-            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-            "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-            "p, li { white-space: pre-wrap; }\n"
-            "</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
-            "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">"
-            "Andrés Felipe Carrillo Rodríguez<br>Daniela Rodríguez Pelaez<br>Jeisson Gutierrez Sanchez<br>"
-            "William Alejandro Fernandez Pinzón</p>\n"
-            "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">"
-            "Ingeniería Mecatrónica<br>Electiva de Robótica<br>2024 - II</p></body></html>"))
+        self.label_6.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Andrés Felipe Carrillo Rodríguez<br>\n"
+"Daniela Rodríguez Pelaez<br>\n"
+"Jeisson Gutierrez Sanchez<br>\n"
+"William Alejandro Fernandez Pinzón</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ingeniería Mecatrónica<br>\n"
+"Electiva de Robótica<br>\n"
+"2024 - II</p></body></html>"))
 
-
-    # Arithmetic Operations
+   # Arithmetic Operations
     def suma(self):
         try:
             num1 = float(self.textEdit.toPlainText())
@@ -222,8 +222,8 @@ class Ui_MainWindow(object):
         except ValueError:
             self.label_4.setText("Error")
 
-
 if __name__ == "__main__":
+    import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
