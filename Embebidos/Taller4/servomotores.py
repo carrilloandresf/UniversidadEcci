@@ -1,6 +1,5 @@
-import pigpio
-from time import sleep
 import gpiod
+from time import sleep
 
 # Variables para flat
 FLAT1 = 0
@@ -9,7 +8,7 @@ FLAT2 = 0
 # Pines en el gpiochip4 (ajusta según el chip que estés utilizando)
 chip = gpiod.Chip('gpiochip4')
 
-# Pines para los servos (usaremos pigpio para PWM)
+# Pines para los servos
 SERVO_1 = 13
 SERVO_2 = 16
 
@@ -17,7 +16,7 @@ SERVO_2 = 16
 PULSE_1 = 4
 PULSE_2 = 7
 
-# Pines para el LCD (gpiod para controlar el LCD)
+# Pines para el LCD
 LCD_RS = 10
 LCD_E = 9
 LCD_D4 = 22
@@ -25,8 +24,10 @@ LCD_D5 = 23
 LCD_D6 = 24
 LCD_D7 = 25
 
-# Solicitar acceso a los pines de gpiod para el LCD y pulsadores
+# Solicitar acceso a los pines con gpiod
 lines = {
+    'servo_1': chip.get_line(SERVO_1),
+    'servo_2': chip.get_line(SERVO_2),
     'pulse_1': chip.get_line(PULSE_1),
     'pulse_2': chip.get_line(PULSE_2),
     'lcd_rs': chip.get_line(LCD_RS),
@@ -37,23 +38,19 @@ lines = {
     'lcd_d7': chip.get_line(LCD_D7),
 }
 
-# Configurar líneas como entrada o salida
-for name in ['lcd_rs', 'lcd_e', 'lcd_d4', 'lcd_d5', 'lcd_d6', 'lcd_d7']:
+# Configurar líneas como salida o entrada
+for name in ['servo_1', 'servo_2', 'lcd_rs', 'lcd_e', 'lcd_d4', 'lcd_d5', 'lcd_d6', 'lcd_d7']:
     lines[name].request(consumer=name, type=gpiod.LINE_REQ_DIR_OUT)
 
 for name in ['pulse_1', 'pulse_2']:
     lines[name].request(consumer=name, type=gpiod.LINE_REQ_DIR_IN)
 
-# Inicializar pigpio para PWM de los servos
-pi = pigpio.pi()
-
-# Función para mover el servo usando PWM de pigpio
-def mover_servo(pi, pin, angulo):
-    # El rango típico de PWM para servos es entre 500 y 2500 microsegundos (0 a 180 grados)
-    pulse_width = 500 + (angulo + 90) * (2000 / 180)  # Mapeo de -90 a 90 grados
-    pi.set_servo_pulsewidth(pin, pulse_width)
-    print(f"Mover servo en pin {pin} a ángulo {angulo} con pulso {pulse_width} us")
-    sleep(0.5)
+# Función para calcular el duty cycle en función del ángulo
+def porcentaje(angulo):
+    comienzo = 2.5  # Valor de PWM para -90 grados
+    final = 12.5  # Valor de PWM para +90 grados
+    radio = (final - comienzo) / 180
+    return comienzo + (radio * (angulo + 90))
 
 # Función para escribir en el LCD
 def lcd_write(bits, mode):
@@ -97,24 +94,32 @@ def LCD(message1, message2):
     lcd_texto(message2, 0xC0)  # Segunda línea
     sleep(0.01)
 
+# Función para mover el servo
+def mover_servo(line, angulo):
+    duty_cycle = porcentaje(angulo)
+    # Aquí debes implementar el control PWM, ya que gpiod no tiene directamente PWM.
+    # Se puede usar una librería como pigpio para generar PWM, o manejar con delays el control de tiempo.
+    print(f"Mover {line} a ángulo {angulo} con ciclo de trabajo {duty_cycle}")
+    # Implementa el movimiento real del servo
+
 try:
     # Estado inicial
     estado_servo_1 = "Stop"
     estado_servo_2 = "Stop"
 
     print("Iniciando...")
-
+    
     while True:
         print("Pulse 1: {}".format(lines['pulse_1'].get_value()))
         print("Pulse 2: {}".format(lines['pulse_2'].get_value()))
         # Control para el Servo 1
         if lines['pulse_1'].get_value() == 1:
             estado_servo_1 = "Servo_1 giro 90 grados"
-            mover_servo(pi, SERVO_1, 90)
+            mover_servo('servo_1', 90)
             FLAT1 = 1
         elif lines['pulse_1'].get_value() == 0 and FLAT1 == 1:
             estado_servo_1 = "Servo_1 giro -90 grados"
-            mover_servo(pi, SERVO_1, -90)
+            mover_servo('servo_1', -90)
             FLAT1 = 0
         else:
             estado_servo_1 = "Servo_1 Stop"
@@ -122,11 +127,11 @@ try:
         # Control para el Servo 2
         if lines['pulse_2'].get_value() == 1:
             estado_servo_2 = "Servo_2 giro 90 grados"
-            mover_servo(pi, SERVO_2, 90)
+            mover_servo('servo_2', 90)
             FLAT2 = 1
         elif lines['pulse_2'].get_value() == 0 and FLAT2 == 1:
             estado_servo_2 = "Servo_2 giro -90 grados"
-            mover_servo(pi, SERVO_2, -90)
+            mover_servo('servo_2', -90)
             FLAT2 = 0
         else:
             estado_servo_2 = "Servo_2 Stop"
@@ -137,5 +142,4 @@ try:
 
 except KeyboardInterrupt:
     # Limpieza de los GPIO
-    pi.stop()
     chip.close()
