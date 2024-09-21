@@ -106,8 +106,12 @@ try:
     # Estado inicial
     estado_servo_1 = "Stop"
     estado_servo_2 = "Stop"
+
+    print("Iniciando...")
     
     while True:
+        print("Pulse 1: {}".format(lines['pulse_1'].get_value()))
+        print("Pulse 2: {}".format(lines['pulse_2'].get_value()))
         # Control para el Servo 1
         if lines['pulse_1'].get_value() == 1:
             estado_servo_1 = "Servo_1 giro 90 grados"
