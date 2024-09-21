@@ -113,11 +113,11 @@ try:
         print("Pulse 1: {}".format(lines['pulse_1'].get_value()))
         print("Pulse 2: {}".format(lines['pulse_2'].get_value()))
         # Control para el Servo 1
-        if lines['pulse_1'].get_value() == 1:
+        if lines['pulse_1'].get_value() == 0:
             estado_servo_1 = "Servo_1 giro 90 grados"
             mover_servo('servo_1', 90)
             FLAT1 = 1
-        elif lines['pulse_1'].get_value() == 0 and FLAT1 == 1:
+        elif lines['pulse_1'].get_value() == 1 and FLAT1 == 1:
             estado_servo_1 = "Servo_1 giro -90 grados"
             mover_servo('servo_1', -90)
             FLAT1 = 0
@@ -125,11 +125,11 @@ try:
             estado_servo_1 = "Servo_1 Stop"
 
         # Control para el Servo 2
-        if lines['pulse_2'].get_value() == 1:
+        if lines['pulse_2'].get_value() == 0:
             estado_servo_2 = "Servo_2 giro 90 grados"
             mover_servo('servo_2', 90)
             FLAT2 = 1
-        elif lines['pulse_2'].get_value() == 0 and FLAT2 == 1:
+        elif lines['pulse_2'].get_value() == 1 and FLAT2 == 1:
             estado_servo_2 = "Servo_2 giro -90 grados"
             mover_servo('servo_2', -90)
             FLAT2 = 0
