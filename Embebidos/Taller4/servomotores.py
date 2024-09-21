@@ -1,27 +1,20 @@
-import RPi.GPIO as GPIO
+import gpiod
 from time import sleep
 
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-
-#FLAT
+# Variables para flat
 FLAT1 = 0
 FLAT2 = 0
 
-# Definición de pines
+# Pines en el gpiochip4 (ajusta según el chip que estés utilizando)
+chip = gpiod.Chip('gpiochip4')
+
 # Pines para los servos
 SERVO_1 = 13
 SERVO_2 = 16
-'''
-# Pines para los pulsadores de cada servo
-BUTTON_1_POS = 4  # Pulsador para +90 grados del Servo 1
-BUTTON_1_NEG = 7  # Pulsador para -90 grados del Servo 1
-BUTTON_2_POS = 19  # Pulsador para +90 grados del Servo 2
-BUTTON_2_NEG = 27  # Pulsador para -90 grados del Servo 2
-'''
 
-PULSE_1 = 4  # Pulsador para +90 grados del Servo 1
-PULSE_2 = 7  # Pulsador para +90 grados del Servo 2
+# Pines para los pulsadores
+PULSE_1 = 4
+PULSE_2 = 7
 
 # Pines para el LCD
 LCD_RS = 10
@@ -31,25 +24,26 @@ LCD_D5 = 23
 LCD_D6 = 24
 LCD_D7 = 25
 
-# Configuración de los pines GPIO
-GPIO.setup(SERVO_1, GPIO.OUT)
-GPIO.setup(SERVO_2, GPIO.OUT)
-GPIO.setup(PULSE_1, GPIO.IN)
-GPIO.setup(PULSE_2, GPIO.IN)
+# Solicitar acceso a los pines con gpiod
+lines = {
+    'servo_1': chip.get_line(SERVO_1),
+    'servo_2': chip.get_line(SERVO_2),
+    'pulse_1': chip.get_line(PULSE_1),
+    'pulse_2': chip.get_line(PULSE_2),
+    'lcd_rs': chip.get_line(LCD_RS),
+    'lcd_e': chip.get_line(LCD_E),
+    'lcd_d4': chip.get_line(LCD_D4),
+    'lcd_d5': chip.get_line(LCD_D5),
+    'lcd_d6': chip.get_line(LCD_D6),
+    'lcd_d7': chip.get_line(LCD_D7),
+}
 
-# Asegúrate de que los pines del LCD estén configurados como salidas
-GPIO.setup(LCD_RS, GPIO.OUT)
-GPIO.setup(LCD_E, GPIO.OUT)
-GPIO.setup(LCD_D4, GPIO.OUT)
-GPIO.setup(LCD_D5, GPIO.OUT)
-GPIO.setup(LCD_D6, GPIO.OUT)
-GPIO.setup(LCD_D7, GPIO.OUT)
+# Configurar líneas como salida o entrada
+for name in ['servo_1', 'servo_2', 'lcd_rs', 'lcd_e', 'lcd_d4', 'lcd_d5', 'lcd_d6', 'lcd_d7']:
+    lines[name].request(consumer=name, type=gpiod.LINE_REQ_DIR_OUT)
 
-# Configuración del PWM para los servos
-pwm_servo_1 = GPIO.PWM(SERVO_1, 50)
-pwm_servo_2 = GPIO.PWM(SERVO_2, 50)
-pwm_servo_1.start(7.5)  # Posición inicial en el centro (0 grados)
-pwm_servo_2.start(7.5)  # Posición inicial en el centro (0 grados)
+for name in ['pulse_1', 'pulse_2']:
+    lines[name].request(consumer=name, type=gpiod.LINE_REQ_DIR_IN)
 
 # Función para calcular el duty cycle en función del ángulo
 def porcentaje(angulo):
@@ -60,39 +54,39 @@ def porcentaje(angulo):
 
 # Función para escribir en el LCD
 def lcd_write(bits, mode):
-    GPIO.output(LCD_RS, mode)
-    GPIO.output(LCD_D4, bits & 0x10 == 0x10)
-    GPIO.output(LCD_D5, bits & 0x20 == 0x20)
-    GPIO.output(LCD_D6, bits & 0x40 == 0x40)
-    GPIO.output(LCD_D7, bits & 0x80 == 0x80)
+    lines['lcd_rs'].set_value(mode)
+    lines['lcd_d4'].set_value(bits & 0x10 == 0x10)
+    lines['lcd_d5'].set_value(bits & 0x20 == 0x20)
+    lines['lcd_d6'].set_value(bits & 0x40 == 0x40)
+    lines['lcd_d7'].set_value(bits & 0x80 == 0x80)
     lcd_toggle_enable()
-    GPIO.output(LCD_D4, bits & 0x01 == 0x01)
-    GPIO.output(LCD_D5, bits & 0x02 == 0x02)
-    GPIO.output(LCD_D6, bits & 0x04 == 0x04)
-    GPIO.output(LCD_D7, bits & 0x08 == 0x08)
+    lines['lcd_d4'].set_value(bits & 0x01 == 0x01)
+    lines['lcd_d5'].set_value(bits & 0x02 == 0x02)
+    lines['lcd_d6'].set_value(bits & 0x04 == 0x04)
+    lines['lcd_d7'].set_value(bits & 0x08 == 0x08)
     lcd_toggle_enable()
 
 def lcd_toggle_enable():
     sleep(0.0005)
-    GPIO.output(LCD_E, True)
+    lines['lcd_e'].set_value(True)
     sleep(0.0005)
-    GPIO.output(LCD_E, False)
+    lines['lcd_e'].set_value(False)
     sleep(0.0005)
 
 def lcd_init():
-    lcd_write(0x33, GPIO.LOW)
-    lcd_write(0x32, GPIO.LOW)
-    lcd_write(0x06, GPIO.LOW)
-    lcd_write(0x0C, GPIO.LOW)
-    lcd_write(0x28, GPIO.LOW)
-    lcd_write(0x01, GPIO.LOW)
+    lcd_write(0x33, 0)
+    lcd_write(0x32, 0)
+    lcd_write(0x06, 0)
+    lcd_write(0x0C, 0)
+    lcd_write(0x28, 0)
+    lcd_write(0x01, 0)
     sleep(0.0005)
 
 def lcd_texto(message, line):
     message = message.ljust(16, " ")
-    lcd_write(line, GPIO.LOW)
+    lcd_write(line, 0)
     for i in range(16):
-        lcd_write(ord(message[i]), GPIO.HIGH)
+        lcd_write(ord(message[i]), 1)
 
 def LCD(message1, message2):
     lcd_init()
@@ -101,9 +95,12 @@ def LCD(message1, message2):
     sleep(0.01)
 
 # Función para mover el servo
-def mover_servo(pwm_servo, angulo):
-    pwm_servo.ChangeDutyCycle(porcentaje(angulo))
-    sleep(0.5)
+def mover_servo(line, angulo):
+    duty_cycle = porcentaje(angulo)
+    # Aquí debes implementar el control PWM, ya que gpiod no tiene directamente PWM.
+    # Se puede usar una librería como pigpio para generar PWM, o manejar con delays el control de tiempo.
+    print(f"Mover {line} a ángulo {angulo} con ciclo de trabajo {duty_cycle}")
+    # Implementa el movimiento real del servo
 
 try:
     # Estado inicial
@@ -112,35 +109,33 @@ try:
     
     while True:
         # Control para el Servo 1
-        if GPIO.input(PULSE_1) == GPIO.HIGH:
+        if lines['pulse_1'].get_value() == 1:
             estado_servo_1 = "Servo_1 giro 90 grados"
-            mover_servo(pwm_servo_1, 90)
+            mover_servo('servo_1', 90)
             FLAT1 = 1
-        elif GPIO.input(PULSE_1) == GPIO.LOW and FLAT1 == 1:
+        elif lines['pulse_1'].get_value() == 0 and FLAT1 == 1:
             estado_servo_1 = "Servo_1 giro -90 grados"
-            mover_servo(pwm_servo_1, -90)
+            mover_servo('servo_1', -90)
             FLAT1 = 0
         else:
             estado_servo_1 = "Servo_1 Stop"
 
         # Control para el Servo 2
-        if GPIO.input(PULSE_2) == GPIO.HIGH:
+        if lines['pulse_2'].get_value() == 1:
             estado_servo_2 = "Servo_2 giro 90 grados"
-            mover_servo(pwm_servo_2, 90)
+            mover_servo('servo_2', 90)
             FLAT2 = 1
-        elif GPIO.input(PULSE_2) == GPIO.LOW and FLAT2 == 1:
+        elif lines['pulse_2'].get_value() == 0 and FLAT2 == 1:
             estado_servo_2 = "Servo_2 giro -90 grados"
-            mover_servo(pwm_servo_2, -90)
+            mover_servo('servo_2', -90)
             FLAT2 = 0
         else:
             estado_servo_2 = "Servo_2 Stop"
 
         # Mostrar en el LCD
         LCD(estado_servo_1, estado_servo_2)
-        sleep(0.5)  # Pequeña pausa antes de la siguiente actualización
+        sleep(0.5)  # Pausa antes de la siguiente actualización
 
 except KeyboardInterrupt:
-    # Limpieza de los GPIO y parada de los PWM
-    pwm_servo_1.stop()
-    pwm_servo_2.stop()
-    GPIO.cleanup()
+    # Limpieza de los GPIO
+    chip.close()
