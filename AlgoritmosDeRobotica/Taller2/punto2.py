@@ -66,7 +66,7 @@ class Ui_MainWindow(object):
 
         # GraphicsView para mostrar la gráfica
         self.graphicsView = QtWidgets.QGraphicsView(self.centralwidget)
-        self.graphicsView.setGeometry(QtCore.QRect(290, 180, 256, 192))
+        self.graphicsView.setGeometry(QtCore.QRect(290, 180, 491, 381))
         self.graphicsView.setObjectName("graphicsView")
 
         # Figura para Matplotlib
