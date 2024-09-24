@@ -2,6 +2,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QVBoxLayout
+import matplotlib
+matplotlib.use('Qt5Agg')  # Indicar que se use el backend para PyQt5
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import numpy as np
