@@ -110,7 +110,7 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "GRAFICAR"))
         self.label.setText(_translate("MainWindow", "INGRESE VALOR MINIMO "))
         self.label_2.setText(_translate("MainWindow", "INGRESE VALOR MAXIMO "))
-        self.label_6.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.label.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
