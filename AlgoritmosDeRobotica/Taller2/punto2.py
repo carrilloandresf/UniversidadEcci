@@ -20,12 +20,12 @@ class Ui_MainWindow(object):
         self.label_5.setPixmap(QtGui.QPixmap("../../src/img/logo.png"))
         self.label_5.setScaledContents(True)
         self.label_5.setObjectName("label_5")
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(60, 390, 16, 16))
+        self.label_6 = QtWidgets.QLabel(self.centralwidget)
+        self.label_6.setGeometry(QtCore.QRect(60, 390, 16, 16))
         font = QtGui.QFont()
         font.setBold(True)
-        self.label.setFont(font)
-        self.label.setObjectName("label")
+        self.label_6.setFont(font)
+        self.label_6.setObjectName("label_6")
 
         # Botón Graficar
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
@@ -110,7 +110,7 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "GRAFICAR"))
         self.label.setText(_translate("MainWindow", "INGRESE VALOR MINIMO "))
         self.label_2.setText(_translate("MainWindow", "INGRESE VALOR MAXIMO "))
-        self.label.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.label_6.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
