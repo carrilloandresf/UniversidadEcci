@@ -20,7 +20,7 @@ class Ui_MainWindow(object):
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox.setGeometry(QtCore.QRect(470, 20, 161, 61))
         font = QtGui.QFont()
-        font.setPointSize(16)
+        font.setPointSize(18)
         self.comboBox.setFont(font)
         self.comboBox.setStyleSheet("background-color: rgb(170, 85, 255);\n"
                                     "\n"
@@ -106,15 +106,15 @@ class Ui_MainWindow(object):
         # Datos de los robots
         robot_data = {
             "CARTESIANO": {
-                "articulaciones": "3 art lineales",
+                "articulaciones": "3 articulaciones lineales",
                 "imagen": "cartesiano.png"
             },
             "CILINDRICO": {
-                "articulaciones": "1 art rot y 2 lin",
+                "articulaciones": "1 articulaciones rotacionales y 2 lineales",
                 "imagen": "cilindrico.png"
             },
             "ESFÉRICO": {
-                "articulaciones": "2 art rot y 1 lin",
+                "articulaciones": "2 articulaciones rotacionales y 1 lineal",
                 "imagen": "esferico.png"
             }
         }
