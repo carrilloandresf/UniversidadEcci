@@ -136,18 +136,18 @@ class Ui_MainWindow(object):
         self.label_val_res.setText(f"Resistencia (Ohms): {R}")
 
         # Tiempo para la graficación
-        t_carga = np.linspace(0, 5, 500)
-        t_descarga = np.linspace(5, 10, 500)
+        t_carga = np.linspace(0, 5, 500)  # Tiempo para carga
+        t_descarga = np.linspace(5, 10, 500)  # Tiempo para descarga
 
-        # Calcular la carga/descarga del condensador (ecuación RC)
+        # Calcular la carga y descarga del condensador
         tau = R * C
         Vc_carga = V * (1 - np.exp(-t_carga / tau))  # Ecuación de carga
-        Vc_descarga = V * np.exp(-t_descarga / tau)  # Ecuación de descarga
+        Vc_descarga = V * np.exp(-(t_descarga - 5) / tau)  # Ecuación de descarga, empieza desde t=5
 
         # Limpiar el gráfico anterior
         self.ax.clear()
 
-        # Graficar la curva de carga y descarga del condensador
+        # Graficar la carga y descarga del condensador
         self.ax.plot(t_carga, Vc_carga, label="Carga del condensador")
         self.ax.plot(t_descarga, Vc_descarga, label="Descarga del condensador", linestyle='--')
         self.ax.set_title('Carga y Descarga del Condensador')
