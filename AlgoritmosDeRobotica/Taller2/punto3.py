@@ -48,7 +48,7 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName("label_2")
 
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(30, 20, 431, 200))
+        self.label_3.setGeometry(QtCore.QRect(30, 0, 431, 200)) # se puede ajustar el 0 para mover en caso tal si hay error
         font = QtGui.QFont()
         font.setPointSize(14)
         self.label_3.setFont(font)
