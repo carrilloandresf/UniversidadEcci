@@ -3,7 +3,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QVBoxLayout
 import matplotlib
-matplotlib.use('Qt5Agg')  # Indicar que se use el backend para PyQt5
+matplotlib.use('Qt5Agg')  # Utilizar el backend para PyQt5
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import numpy as np
@@ -15,6 +15,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
+        # Layout de sliders
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(-30, 350, 831, 151))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
@@ -22,7 +23,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
 
-        # Slider for voltage
+        # Slider para el voltaje
         self.slider_volt = QtWidgets.QSlider(self.horizontalLayoutWidget)
         self.slider_volt.setMinimum(1)
         self.slider_volt.setMaximum(20)
@@ -30,7 +31,7 @@ class Ui_MainWindow(object):
         self.slider_volt.setObjectName("slider_volt")
         self.horizontalLayout.addWidget(self.slider_volt)
 
-        # Slider for capacitance
+        # Slider para la capacitancia
         self.slider_cap = QtWidgets.QSlider(self.horizontalLayoutWidget)
         self.slider_cap.setMinimum(1)
         self.slider_cap.setMaximum(100)
@@ -38,7 +39,7 @@ class Ui_MainWindow(object):
         self.slider_cap.setObjectName("slider_cap")
         self.horizontalLayout.addWidget(self.slider_cap)
 
-        # Slider for resistance
+        # Slider para la resistencia
         self.slider_res = QtWidgets.QSlider(self.horizontalLayoutWidget)
         self.slider_res.setMinimum(1)
         self.slider_res.setMaximum(1000)
@@ -46,54 +47,49 @@ class Ui_MainWindow(object):
         self.slider_res.setObjectName("slider_res")
         self.horizontalLayout.addWidget(self.slider_res)
 
-        # Label layout
-        self.horizontalLayoutWidget_2 = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(60, 290, 661, 51))
-        self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
-        self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        # Labels para mostrar valores de sliders
+        self.label_val_volt = QtWidgets.QLabel(self.centralwidget)
+        self.label_val_volt.setGeometry(QtCore.QRect(60, 520, 120, 20))
+        self.label_val_volt.setObjectName("label_val_volt")
 
-        self.label_volt = QtWidgets.QLabel(self.horizontalLayoutWidget_2)
+        self.label_val_cap = QtWidgets.QLabel(self.centralwidget)
+        self.label_val_cap.setGeometry(QtCore.QRect(240, 520, 120, 20))
+        self.label_val_cap.setObjectName("label_val_cap")
+
+        self.label_val_res = QtWidgets.QLabel(self.centralwidget)
+        self.label_val_res.setGeometry(QtCore.QRect(420, 520, 120, 20))
+        self.label_val_res.setObjectName("label_val_res")
+
+        # Label para la fórmula utilizada
+        self.label_formula = QtWidgets.QLabel(self.centralwidget)
+        self.label_formula.setGeometry(QtCore.QRect(60, 560, 600, 40))
         font = QtGui.QFont()
-        font.setFamily("Century Schoolbook")
-        font.setPointSize(16)
-        font.setBold(True)
-        self.label_volt.setFont(font)
-        self.label_volt.setMouseTracking(False)
-        self.label_volt.setStyleSheet("background-color: rgb(255, 85, 255);")
-        self.label_volt.setWordWrap(True)
-        self.label_volt.setObjectName("label_volt")
-        self.horizontalLayout_2.addWidget(self.label_volt)
+        font.setPointSize(12)
+        self.label_formula.setFont(font)
+        self.label_formula.setObjectName("label_formula")
 
-        self.label_cap = QtWidgets.QLabel(self.horizontalLayoutWidget_2)
+        # Sección para el logo
+        self.label_logo = QtWidgets.QLabel(self.centralwidget)
+        self.label_logo.setGeometry(QtCore.QRect(60, 490, 131, 41))
+        self.label_logo.setText("")
+        self.label_logo.setPixmap(QtGui.QPixmap("logo.png"))  # Asegúrate de poner la ruta correcta del logo
+        self.label_logo.setScaledContents(True)
+        self.label_logo.setObjectName("label_logo")
+
+        # Sección para los nombres del equipo
+        self.label_equipo = QtWidgets.QLabel(self.centralwidget)
+        self.label_equipo.setGeometry(QtCore.QRect(60, 390, 221, 81))
         font = QtGui.QFont()
-        font.setFamily("Century Schoolbook")
-        font.setPointSize(16)
         font.setBold(True)
-        self.label_cap.setFont(font)
-        self.label_cap.setStyleSheet("background-color: rgb(255, 85, 127);")
-        self.label_cap.setWordWrap(True)
-        self.label_cap.setObjectName("label_cap")
-        self.horizontalLayout_2.addWidget(self.label_cap)
+        self.label_equipo.setFont(font)
+        self.label_equipo.setObjectName("label_equipo")
 
-        self.label_res = QtWidgets.QLabel(self.horizontalLayoutWidget_2)
-        font = QtGui.QFont()
-        font.setFamily("Century Schoolbook")
-        font.setPointSize(16)
-        font.setBold(True)
-        self.label_res.setFont(font)
-        self.label_res.setStyleSheet("background-color: rgb(170, 85, 127);")
-        self.label_res.setWordWrap(True)
-        self.label_res.setObjectName("label_res")
-        self.horizontalLayout_2.addWidget(self.label_res)
-
-        # Widget for matplotlib figure
+        # Widget para el gráfico de matplotlib
         self.widget = QtWidgets.QWidget(self.centralwidget)
         self.widget.setGeometry(QtCore.QRect(220, 30, 341, 221))
         self.widget.setObjectName("widget")
 
-        # Layout for graph
+        # Layout para el gráfico
         self.graph_layout = QVBoxLayout(self.widget)
         self.figure, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.figure)
@@ -111,37 +107,44 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        # Connect sliders to the function that updates the graph
+        # Conectar los sliders a la función que actualiza el gráfico y los valores de los labels
         self.slider_volt.valueChanged.connect(self.update_graph)
         self.slider_cap.valueChanged.connect(self.update_graph)
         self.slider_res.valueChanged.connect(self.update_graph)
 
-        self.update_graph()  # Initial call to draw the graph with default values
+        self.update_graph()  # Llamada inicial para dibujar el gráfico con valores predeterminados
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.label_volt.setText(_translate("MainWindow", "VOLTAJE (V)"))
-        self.label_cap.setText(_translate("MainWindow", "CAPACITANCIA (uF)"))
-        self.label_res.setText(_translate("MainWindow", "RESISTENCIA (ohms)"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Simulador RC Circuito"))
+        self.label_val_volt.setText(_translate("MainWindow", "Voltaje (V): 1"))
+        self.label_val_cap.setText(_translate("MainWindow", "Capacitancia (uF): 1"))
+        self.label_val_res.setText(_translate("MainWindow", "Resistencia (Ohms): 1"))
+        self.label_formula.setText(_translate("MainWindow", "Fórmula: Vc = V * (1 - exp(-t / (R*C)))"))
+        self.label_equipo.setText(_translate("MainWindow", "<html><body><p>Andrés Felipe Carrillo Rodríguez<br>Daniela Rodríguez Pelaez<br>Jeisson Gutierrez Sanchez<br>William Alejandro Fernandez Pinzón</p><p>Ingeniería Mecatrónica<br>Electiva de Robótica<br>2024 - II</p></body></html>"))
 
     def update_graph(self):
-        # Get values from sliders
+        # Obtener valores de los sliders
         V = self.slider_volt.value()  # Voltaje
-        C = self.slider_cap.value() * 1e-6  # Capacitancia in Farads
+        C = self.slider_cap.value() * 1e-6  # Capacitancia en Farads
         R = self.slider_res.value()  # Resistencia
 
-        # Time for plotting
+        # Actualizar los labels con los valores actuales
+        self.label_val_volt.setText(f"Voltaje (V): {V}")
+        self.label_val_cap.setText(f"Capacitancia (uF): {self.slider_cap.value()}")
+        self.label_val_res.setText(f"Resistencia (Ohms): {R}")
+
+        # Tiempo para la graficación
         t = np.linspace(0, 5, 500)
         
-        # Calculate the charge/discharge voltage of the capacitor (RC circuit)
+        # Calcular la carga/descarga del condensador (ecuación RC)
         tau = R * C
-        Vc = V * (1 - np.exp(-t / tau))  # Charging equation
+        Vc = V * (1 - np.exp(-t / tau))  # Ecuación de carga
 
-        # Clear previous plot
+        # Limpiar el gráfico anterior
         self.ax.clear()
         
-        # Plot the capacitor charging curve
+        # Graficar la curva de carga del condensador
         self.ax.plot(t, Vc, label="Carga del condensador")
         self.ax.set_title('Carga del Condensador')
         self.ax.set_xlabel('Tiempo (s)')
@@ -149,9 +152,8 @@ class Ui_MainWindow(object):
         self.ax.legend()
         self.ax.grid(True)
 
-        # Refresh the canvas
+        # Refrescar el canvas del gráfico
         self.canvas.draw()
-
 
 if __name__ == "__main__":
     import sys
