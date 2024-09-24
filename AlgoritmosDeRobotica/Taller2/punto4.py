@@ -11,13 +11,13 @@ import numpy as np
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(900, 750)
+        MainWindow.resize(800, 650)  # Ajuste de tamaño de la ventana principal
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
         # Redimensionar y colocar el gráfico
         self.widget = QtWidgets.QWidget(self.centralwidget)
-        self.widget.setGeometry(QtCore.QRect(100, 30, 700, 300))  # Redimensionado
+        self.widget.setGeometry(QtCore.QRect(100, 30, 600, 250))  # Redimensionado y centrado
         self.widget.setObjectName("widget")
 
         # Layout para el gráfico
@@ -28,24 +28,24 @@ class Ui_MainWindow(object):
 
         # Logo de la universidad
         self.label_logo = QtWidgets.QLabel(self.centralwidget)
-        self.label_logo.setGeometry(QtCore.QRect(50, 340, 150, 150))
+        self.label_logo.setGeometry(QtCore.QRect(50, 300, 100, 100))  # Ajustado tamaño del logo
         self.label_logo.setText("")
-        self.label_logo.setPixmap(QtGui.QPixmap("../../src/img/logo.png"))  # Reemplaza por la ruta de tu logo
+        self.label_logo.setPixmap(QtGui.QPixmap("../../src/img/logo.png"))  # Ruta actualizada para el logo
         self.label_logo.setScaledContents(True)
         self.label_logo.setObjectName("label_logo")
 
         # Nombres del equipo
         self.label_equipo = QtWidgets.QLabel(self.centralwidget)
-        self.label_equipo.setGeometry(QtCore.QRect(220, 340, 300, 100))
+        self.label_equipo.setGeometry(QtCore.QRect(170, 300, 300, 100))  # Ajuste de la posición
         font = QtGui.QFont()
         font.setBold(True)
-        font.setPointSize(10)  # Ajuste del tamaño de fuente
+        font.setPointSize(9)  # Ajuste del tamaño de fuente
         self.label_equipo.setFont(font)
         self.label_equipo.setObjectName("label_equipo")
 
         # Sliders para voltaje, capacitancia y resistencia
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(100, 500, 700, 150))  # Ajustado para mayor espacio
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(100, 450, 600, 120))  # Ajustado para mayor espacio
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -77,28 +77,28 @@ class Ui_MainWindow(object):
 
         # Labels para mostrar los valores de los sliders
         self.label_val_volt = QtWidgets.QLabel(self.centralwidget)
-        self.label_val_volt.setGeometry(QtCore.QRect(130, 670, 120, 20))
+        self.label_val_volt.setGeometry(QtCore.QRect(130, 570, 120, 20))
         self.label_val_volt.setObjectName("label_val_volt")
 
         self.label_val_cap = QtWidgets.QLabel(self.centralwidget)
-        self.label_val_cap.setGeometry(QtCore.QRect(300, 670, 120, 20))
+        self.label_val_cap.setGeometry(QtCore.QRect(300, 570, 120, 20))
         self.label_val_cap.setObjectName("label_val_cap")
 
         self.label_val_res = QtWidgets.QLabel(self.centralwidget)
-        self.label_val_res.setGeometry(QtCore.QRect(500, 670, 120, 20))
+        self.label_val_res.setGeometry(QtCore.QRect(500, 570, 120, 20))
         self.label_val_res.setObjectName("label_val_res")
 
         # Label para la fórmula
         self.label_formula = QtWidgets.QLabel(self.centralwidget)
-        self.label_formula.setGeometry(QtCore.QRect(130, 700, 600, 40))
+        self.label_formula.setGeometry(QtCore.QRect(130, 600, 600, 30))
         font = QtGui.QFont()
-        font.setPointSize(12)
+        font.setPointSize(10)
         self.label_formula.setFont(font)
         self.label_formula.setObjectName("label_formula")
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 900, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
