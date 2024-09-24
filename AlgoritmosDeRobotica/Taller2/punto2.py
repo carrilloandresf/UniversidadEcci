@@ -85,6 +85,12 @@ class Ui_MainWindow(object):
         # Figura para Matplotlib
         self.figure = plt.figure()
         self.canvas = FigureCanvas(self.figure)
+        
+        # Obtener tamaño del graphicsView para ajustar el canvas
+        width = self.graphicsView.geometry().width()
+        height = self.graphicsView.geometry().height()
+        self.canvas.setFixedSize(width, height)
+        
         self.scene = QtWidgets.QGraphicsScene()
         self.scene.addWidget(self.canvas)
         self.graphicsView.setScene(self.scene)
