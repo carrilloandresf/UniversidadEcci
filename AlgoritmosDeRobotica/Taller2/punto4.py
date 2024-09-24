@@ -121,7 +121,7 @@ class Ui_MainWindow(object):
         self.label_val_volt.setText(_translate("MainWindow", "Voltaje (V): 1"))
         self.label_val_cap.setText(_translate("MainWindow", "Capacitancia (uF): 1"))
         self.label_val_res.setText(_translate("MainWindow", "Resistencia (Ohms): 1"))
-        self.label_formula.setText(_translate("MainWindow", "Fórmula: Vc = V * (1 - exp(-t / (R*C)))"))
+        self.label_formula.setText(_translate("MainWindow", "Fórmula (Carga y Descarga): Vc = V * (1 - exp(-t / (R*C))) para carga, Vc = V * exp(-t / (R*C)) para descarga"))
         self.label_equipo.setText(_translate("MainWindow", "<html><body><p>Andrés Felipe Carrillo Rodríguez<br>Daniela Rodríguez Pelaez<br>Jeisson Gutierrez Sanchez<br>William Alejandro Fernandez Pinzón</p><p>Ingeniería Mecatrónica<br>Electiva de Robótica<br>2024 - II</p></body></html>"))
 
     def update_graph(self):
@@ -136,18 +136,21 @@ class Ui_MainWindow(object):
         self.label_val_res.setText(f"Resistencia (Ohms): {R}")
 
         # Tiempo para la graficación
-        t = np.linspace(0, 5, 500)
-        
+        t_carga = np.linspace(0, 5, 500)
+        t_descarga = np.linspace(5, 10, 500)
+
         # Calcular la carga/descarga del condensador (ecuación RC)
         tau = R * C
-        Vc = V * (1 - np.exp(-t / tau))  # Ecuación de carga
+        Vc_carga = V * (1 - np.exp(-t_carga / tau))  # Ecuación de carga
+        Vc_descarga = V * np.exp(-t_descarga / tau)  # Ecuación de descarga
 
         # Limpiar el gráfico anterior
         self.ax.clear()
-        
-        # Graficar la curva de carga del condensador
-        self.ax.plot(t, Vc, label="Carga del condensador")
-        self.ax.set_title('Carga del Condensador')
+
+        # Graficar la curva de carga y descarga del condensador
+        self.ax.plot(t_carga, Vc_carga, label="Carga del condensador")
+        self.ax.plot(t_descarga, Vc_descarga, label="Descarga del condensador", linestyle='--')
+        self.ax.set_title('Carga y Descarga del Condensador')
         self.ax.set_xlabel('Tiempo (s)')
         self.ax.set_ylabel('Voltaje (V)')
         self.ax.legend()
