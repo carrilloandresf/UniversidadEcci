@@ -112,11 +112,11 @@ try:
     
     while True:
         # Control para el Servo 1
-        if GPIO.input(PULSE_1) == GPIO.HIGH:
+        if GPIO.input(PULSE_1) == GPIO.LOW:
             estado_servo_1 = "Servo_1 giro 90 grados"
             mover_servo(pwm_servo_1, 90)
             FLAT1 = 1
-        elif GPIO.input(PULSE_1) == GPIO.LOW and FLAT1 == 1:
+        elif GPIO.input(PULSE_1) == GPIO.TRUE and FLAT1 == 1:
             estado_servo_1 = "Servo_1 giro -90 grados"
             mover_servo(pwm_servo_1, -90)
             FLAT1 = 0
@@ -124,11 +124,11 @@ try:
             estado_servo_1 = "Servo_1 Stop"
 
         # Control para el Servo 2
-        if GPIO.input(PULSE_2) == GPIO.HIGH:
+        if GPIO.input(PULSE_2) == GPIO.LOW:
             estado_servo_2 = "Servo_2 giro 90 grados"
             mover_servo(pwm_servo_2, 90)
             FLAT2 = 1
-        elif GPIO.input(PULSE_2) == GPIO.LOW and FLAT2 == 1:
+        elif GPIO.input(PULSE_2) == GPIO.TRUE and FLAT2 == 1:
             estado_servo_2 = "Servo_2 giro -90 grados"
             mover_servo(pwm_servo_2, -90)
             FLAT2 = 0
