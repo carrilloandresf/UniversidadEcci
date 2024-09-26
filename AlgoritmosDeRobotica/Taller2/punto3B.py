@@ -105,8 +105,15 @@ class Ui_Dialog(object):
             # Leer el valor del sensor
             sensor_value = GPIO.input(SENSOR_PIN)
 
+            print_sensor = "Apagado"
+
+            if sensor_value == 1:
+                print_sensor = "off"
+            elif sensor_value == 0:
+                print_sensor = "on"
+                
             # Mostrar el valor del sensor en `label_6`
-            self.label_6.setText(f"Lectura: {sensor_value}")
+            self.label_6.setText(f"Lectura: {print_sensor}")
 
             # Esperar un segundo antes de la siguiente iteración
             QtCore.QCoreApplication.processEvents()  # Procesar eventos de la interfaz
