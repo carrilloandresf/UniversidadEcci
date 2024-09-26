@@ -167,6 +167,10 @@ class Ui_MainWindow(object):
         self.ax.set_ylabel("Voltaje (V)")
         self.ax.legend()
 
+        # Ajustar la gráfica para que se redimensione automáticamente
+        self.ax.relim()
+        self.ax.autoscale_view()
+
         # Refrescar el canvas del gráfico
         self.canvas.draw()
 
