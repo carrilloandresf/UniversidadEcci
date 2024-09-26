@@ -16,12 +16,14 @@ LCD_D7 = 22
 Avance = 11
 Retroceso = 12
 
+# Pines del motor paso a paso
 BitMot0 = 32
 BitMot1 = 33
 BitMot2 = 36
 BitMot3 = 35
 
 bits_datos = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
+motor_pins = [BitMot0, BitMot1, BitMot2, BitMot3]
 
 # Configuración de pines (solo una vez)
 GPIO.setup(TOGGLE_1, GPIO.IN)
@@ -30,8 +32,40 @@ GPIO.setup(TOGGLE_2, GPIO.IN)
 for salida in bits_datos:
     GPIO.setup(salida, GPIO.OUT)
     
+for pin in motor_pins:
+    GPIO.setup(pin, GPIO.OUT)
+
 GPIO.setup(Avance, GPIO.OUT)
 GPIO.setup(Retroceso, GPIO.OUT)
+
+# Variables de control de movimiento
+grados_a_girar = 135  # Ángulo deseado en grados
+pasos_por_revolucion = 2048  # Pasos por revolución del motor
+pasos = int(pasos_por_revolucion * (grados_a_girar / 360))  # Cálculo de pasos para el ángulo
+
+# Secuencia de pasos del motor
+step_sequence = [
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1]
+]
+
+def set_step(step):
+    for pin in range(4):
+        GPIO.output(motor_pins[pin], step[pin])
+
+def rotate_motor(steps, delay=0.01):
+    for _ in range(steps):
+        for step in step_sequence:
+            set_step(step)
+            sleep(delay)
+
+def return_to_initial_position(steps, delay=0.01):
+    for _ in range(steps):
+        for step in reversed(step_sequence):
+            set_step(step)
+            sleep(delay)
 
 def lcd_write(bits, mode):
     GPIO.output(LCD_RS, mode)
@@ -92,8 +126,11 @@ try:
         elif GPIO.input(TOGGLE_2) == 1 and GPIO.input(TOGGLE_1) == 0:  # Si TOGGLE_2 está activado
             LCD("Giro derecha")
             Movimiento(0)
-        elif GPIO.input(TOGGLE_1) == 1 and GPIO.input(TOGGLE_2) == 1:  # Si ambos están activado
+        elif GPIO.input(TOGGLE_1) == 1 and GPIO.input(TOGGLE_2) == 1:  # Si ambos están activados
             LCD("Motor paso")
+            rotate_motor(pasos)  # Rotar el motor a la posición deseada
+            sleep(1)  # Esperar un segundo
+            #return_to_initial_position(pasos)  # Retornar a la posición inicial
             
         else:
             LCD("Detenido | ECCI")
