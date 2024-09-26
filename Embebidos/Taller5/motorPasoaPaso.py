@@ -120,6 +120,7 @@ def Movimiento(AR):
 
 try:
     while True:
+        print("Toggles:", GPIO.input(TOGGLE_1), GPIO.input(TOGGLE_2))
         if GPIO.input(TOGGLE_1) == 1 and GPIO.input(TOGGLE_2) == 0:  # Si TOGGLE_1 está activado
             LCD("Giro izquierda")
             Movimiento(1)
@@ -130,8 +131,7 @@ try:
             LCD("Motor paso")
             rotate_motor(pasos)  # Rotar el motor a la posición deseada
             sleep(1)  # Esperar un segundo
-            #return_to_initial_position(pasos)  # Retornar a la posición inicial
-            
+            #return_to_initial_position(pasos)  # Retornar a la posición inicial          
         else:
             LCD("Detenido | ECCI")
             Movimiento(-1)  # Asegurarse de detener el movimiento si no hay entradas activadas
