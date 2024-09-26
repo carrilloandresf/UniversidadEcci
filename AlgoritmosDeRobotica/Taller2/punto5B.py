@@ -26,7 +26,7 @@ STEP_SEQUENCE = [
 ]
 
 # Número de pasos por vuelta para el motor
-STEPS_PER_REVOLUTION = 4096  # Ajusta según el motor paso a paso
+STEPS_PER_REVOLUTION = 4096 / 4  # Ajusta según el motor paso a paso
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
