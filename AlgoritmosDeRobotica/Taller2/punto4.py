@@ -9,75 +9,96 @@ from matplotlib.figure import Figure
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 650)  # Ajuste de tamaño de la ventana principal
+        MainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        # Logo de la universidad
+        # Título y logo de la universidad
         self.label_logo = QtWidgets.QLabel(self.centralwidget)
-        self.label_logo.setGeometry(QtCore.QRect(50, 300, 100, 100))
-        self.label_logo.setText("")
-        self.label_logo.setPixmap(QtGui.QPixmap("../../src/img/logo.png"))  # Ruta actualizada para el logo
+        self.label_logo.setGeometry(QtCore.QRect(600, 20, 100, 100))
+        self.label_logo.setPixmap(QtGui.QPixmap("logoUniversidadEcci.jpg"))
         self.label_logo.setScaledContents(True)
         self.label_logo.setObjectName("label_logo")
 
-        # Nombres del equipo
         self.label_equipo = QtWidgets.QLabel(self.centralwidget)
-        self.label_equipo.setGeometry(QtCore.QRect(170, 300, 300, 100))
+        self.label_equipo.setGeometry(QtCore.QRect(50, 20, 500, 80))
         font = QtGui.QFont()
         font.setBold(True)
-        font.setPointSize(9)
+        font.setPointSize(10)
         self.label_equipo.setFont(font)
+        self.label_equipo.setAlignment(QtCore.Qt.AlignLeft)
         self.label_equipo.setObjectName("label_equipo")
 
         # Gráfica usando QGraphicsView
         self.Grafica = QtWidgets.QGraphicsView(self.centralwidget)
-        self.Grafica.setGeometry(QtCore.QRect(100, 30, 600, 250))
+        self.Grafica.setGeometry(QtCore.QRect(100, 120, 600, 250))
         self.Grafica.setObjectName("Grafica")
         self.scene = QGraphicsScene()
         self.Grafica.setScene(self.scene)
 
-        # Sliders para voltaje, capacitancia y resistencia
+        # Sliders para resistencia, voltaje y capacitancia
+        self.label_res = QtWidgets.QLabel(self.centralwidget)
+        self.label_res.setGeometry(QtCore.QRect(100, 400, 200, 20))
+        self.label_res.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_res.setText("Resistencia (Ohms):")
+        self.label_res.setObjectName("label_res")
+
         self.Resistencia = QtWidgets.QSlider(self.centralwidget)
-        self.Resistencia.setGeometry(QtCore.QRect(130, 450, 150, 22))
+        self.Resistencia.setGeometry(QtCore.QRect(100, 420, 200, 20))
         self.Resistencia.setMinimum(1)
         self.Resistencia.setMaximum(1000)
         self.Resistencia.setOrientation(QtCore.Qt.Horizontal)
         self.Resistencia.setObjectName("Resistencia")
 
+        self.label_vol = QtWidgets.QLabel(self.centralwidget)
+        self.label_vol.setGeometry(QtCore.QRect(300, 400, 200, 20))
+        self.label_vol.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_vol.setText("Voltaje (V):")
+        self.label_vol.setObjectName("label_vol")
+
         self.Voltaje = QtWidgets.QSlider(self.centralwidget)
-        self.Voltaje.setGeometry(QtCore.QRect(350, 450, 150, 22))
+        self.Voltaje.setGeometry(QtCore.QRect(300, 420, 200, 20))
         self.Voltaje.setMinimum(1)
         self.Voltaje.setMaximum(20)
         self.Voltaje.setOrientation(QtCore.Qt.Horizontal)
         self.Voltaje.setObjectName("Voltaje")
 
+        self.label_cap = QtWidgets.QLabel(self.centralwidget)
+        self.label_cap.setGeometry(QtCore.QRect(500, 400, 200, 20))
+        self.label_cap.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_cap.setText("Capacitancia (uF):")
+        self.label_cap.setObjectName("label_cap")
+
         self.Capacitancia = QtWidgets.QSlider(self.centralwidget)
-        self.Capacitancia.setGeometry(QtCore.QRect(570, 450, 150, 22))
+        self.Capacitancia.setGeometry(QtCore.QRect(500, 420, 200, 20))
         self.Capacitancia.setMinimum(1)
         self.Capacitancia.setMaximum(100)
         self.Capacitancia.setOrientation(QtCore.Qt.Horizontal)
         self.Capacitancia.setObjectName("Capacitancia")
 
-        # Labels para mostrar los valores de los sliders
+        # Labels para mostrar los valores actuales de los sliders
+        self.label_val_res = QtWidgets.QLabel(self.centralwidget)
+        self.label_val_res.setGeometry(QtCore.QRect(100, 450, 200, 20))
+        self.label_val_res.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_val_res.setObjectName("label_val_res")
+
         self.label_val_volt = QtWidgets.QLabel(self.centralwidget)
-        self.label_val_volt.setGeometry(QtCore.QRect(350, 480, 120, 20))
+        self.label_val_volt.setGeometry(QtCore.QRect(300, 450, 200, 20))
+        self.label_val_volt.setAlignment(QtCore.Qt.AlignCenter)
         self.label_val_volt.setObjectName("label_val_volt")
 
         self.label_val_cap = QtWidgets.QLabel(self.centralwidget)
-        self.label_val_cap.setGeometry(QtCore.QRect(570, 480, 120, 20))
+        self.label_val_cap.setGeometry(QtCore.QRect(500, 450, 200, 20))
+        self.label_val_cap.setAlignment(QtCore.Qt.AlignCenter)
         self.label_val_cap.setObjectName("label_val_cap")
-
-        self.label_val_res = QtWidgets.QLabel(self.centralwidget)
-        self.label_val_res.setGeometry(QtCore.QRect(130, 480, 120, 20))
-        self.label_val_res.setObjectName("label_val_res")
 
         # Label para la fórmula
         self.label_formula = QtWidgets.QLabel(self.centralwidget)
-        self.label_formula.setGeometry(QtCore.QRect(130, 510, 600, 30))
+        self.label_formula.setGeometry(QtCore.QRect(100, 480, 600, 30))
         font = QtGui.QFont()
         font.setPointSize(10)
         self.label_formula.setFont(font)
+        self.label_formula.setAlignment(QtCore.Qt.AlignCenter)
         self.label_formula.setObjectName("label_formula")
 
         MainWindow.setCentralWidget(self.centralwidget)
@@ -110,7 +131,7 @@ class Ui_MainWindow(object):
 
     def configurar(self):
         # Configurar la figura para la gráfica
-        self.figure = Figure(figsize=(2.5, 1.5))
+        self.figure = Figure(figsize=(3, 2))
         self.canvas = FigureCanvas(self.figure)
         self.scene.addWidget(self.canvas)
         self.ax = self.figure.add_subplot(111)
@@ -121,7 +142,7 @@ class Ui_MainWindow(object):
     def datos(self):
         # Obtener valores de sliders
         R = self.Resistencia.value()
-        C = self.Capacitancia.value() / 10000
+        C = self.Capacitancia.value() * 1e-6
         V = self.Voltaje.value()
 
         # Actualizar los labels con los valores actuales
