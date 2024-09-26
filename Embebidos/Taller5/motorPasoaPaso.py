@@ -1,20 +1,20 @@
 import RPi.GPIO as GPIO
 from time import sleep
 
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 # Definición de pines
-TOGGLE_1 = 29
-TOGGLE_2 = 31
-LCD_RS = 19
-LCD_E = 21
-LCD_D4 = 15
-LCD_D5 = 16
-LCD_D6 = 18
-LCD_D7 = 22
-Avance = 11
-Retroceso = 12
+TOGGLE_1 = 4
+TOGGLE_2 = 6
+LCD_RS = 10
+LCD_E = 9
+LCD_D4 = 22
+LCD_D5 = 23
+LCD_D6 = 24
+LCD_D7 = 25
+Avance = 17
+Retroceso = 18
 
 # Pines del motor paso a paso
 BitMot0 = 32
