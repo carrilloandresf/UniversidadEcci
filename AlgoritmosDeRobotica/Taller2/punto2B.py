@@ -77,12 +77,16 @@ class Ui_Dialog(object):
         self.pushButton = QtWidgets.QPushButton(Dialog)
         self.pushButton.setGeometry(QtCore.QRect(160, 80, 121, 41))
         self.pushButton.setObjectName("pushButton")
-        self.pushButton.setStyleSheet("background-color: lightgreen;")  # Color inicial verde
+        self.pushButton.setStyleSheet(
+            "background-color: green; color: white; border-radius: 10px; border: 2px solid darkgreen; font-weight: bold;"
+        )
 
         self.pushButton_2 = QtWidgets.QPushButton(Dialog)
         self.pushButton_2.setGeometry(QtCore.QRect(430, 80, 131, 41))
         self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.setStyleSheet("background-color: lightcoral;")  # Color inicial rojo
+        self.pushButton_2.setStyleSheet(
+            "background-color: red; color: white; border-radius: 10px; border: 2px solid darkred; font-weight: bold;"
+        )
 
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(270, 10, 291, 41))
