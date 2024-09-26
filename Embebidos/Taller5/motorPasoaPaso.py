@@ -126,7 +126,7 @@ try:
         elif GPIO.input(TOGGLE_2) == 1 and GPIO.input(TOGGLE_1) == 0:  # Si TOGGLE_2 está activado
             LCD("Giro derecha")
             Movimiento(0)
-        elif GPIO.input(TOGGLE_1) == 1 and GPIO.input(TOGGLE_2) == 1:  # Si ambos están activados
+        elif GPIO.input(TOGGLE_1) == 0 and GPIO.input(TOGGLE_2) == 0:  # Si ambos están activados
             LCD("Motor paso")
             rotate_motor(pasos)  # Rotar el motor a la posición deseada
             sleep(1)  # Esperar un segundo
