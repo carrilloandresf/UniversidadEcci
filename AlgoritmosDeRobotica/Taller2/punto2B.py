@@ -133,20 +133,17 @@ class Ui_Dialog(object):
         self.led1_state = not self.led1_state
         if self.led1_state:
             pwm_led1.ChangeDutyCycle(self.servomotor1.value())  # Ajustar brillo según el slider
-            self.pushButton.setStyleSheet("background-color: green")  # Encendido: verde
         else:
             pwm_led1.ChangeDutyCycle(0)
-            self.pushButton.setStyleSheet("background-color: lightgreen")  # Apagado: color más claro
+
 
     def toggle_led2(self):
         # Cambiar el estado del LED 2 (encendido/apagado)
         self.led2_state = not self.led2_state
         if self.led2_state:
             pwm_led2.ChangeDutyCycle(self.servomotor2.value())  # Ajustar brillo según el slider
-            self.pushButton_2.setStyleSheet("background-color: red")  # Encendido: rojo
         else:
             pwm_led2.ChangeDutyCycle(0)
-            self.pushButton_2.setStyleSheet("background-color: lightcoral")  # Apagado: color más claro
 
     def adjust_brightness_led1(self, value):
         # Ajustar el brillo del LED 1 y mostrar el porcentaje en `label_4`
