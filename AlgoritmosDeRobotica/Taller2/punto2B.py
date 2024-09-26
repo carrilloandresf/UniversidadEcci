@@ -62,14 +62,14 @@ class Ui_Dialog(object):
         self.label_4 = QtWidgets.QLabel(Dialog)
         self.label_4.setGeometry(QtCore.QRect(160, 260, 171, 51))
         font = QtGui.QFont()
-        font.setPointSize(15)
+        font.setPointSize(10)  # Tamaño de fuente ajustado para que se vea bien
         self.label_4.setFont(font)
         self.label_4.setObjectName("label_4")
 
         self.label_5 = QtWidgets.QLabel(Dialog)
         self.label_5.setGeometry(QtCore.QRect(440, 260, 141, 41))
         font = QtGui.QFont()
-        font.setPointSize(15)
+        font.setPointSize(10)  # Tamaño de fuente ajustado para que se vea bien
         self.label_5.setFont(font)
         self.label_5.setObjectName("label_5")
 
@@ -77,10 +77,12 @@ class Ui_Dialog(object):
         self.pushButton = QtWidgets.QPushButton(Dialog)
         self.pushButton.setGeometry(QtCore.QRect(160, 80, 121, 41))
         self.pushButton.setObjectName("pushButton")
+        self.pushButton.setStyleSheet("background-color: lightgreen;")  # Color inicial verde
 
         self.pushButton_2 = QtWidgets.QPushButton(Dialog)
         self.pushButton_2.setGeometry(QtCore.QRect(430, 80, 131, 41))
         self.pushButton_2.setObjectName("pushButton_2")
+        self.pushButton_2.setStyleSheet("background-color: lightcoral;")  # Color inicial rojo
 
         self.label = QtWidgets.QLabel(Dialog)
         self.label.setGeometry(QtCore.QRect(270, 10, 291, 41))
@@ -105,13 +107,17 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Control de LEDs"))
-        self.label_2.setText(_translate("Dialog", "Andrés Felipe Carrillo Rodríguez\n"
-"Daniela Rodríguez Pelaez\n"
-"Jeisson Gutierrez Sanchez\n"
-"William Alejandro Fernandez Pinzón\n"
-"Ingeniería Mecatrónica\n"
-"Electiva de Robótica\n"
-"2024 - II"))
+        self.label_2.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Andrés Felipe Carrillo Rodríguez<br>\n"
+"Daniela Rodríguez Pelaez<br>\n"
+"Jeisson Gutierrez Sanchez<br>\n"
+"William Alejandro Fernandez Pinzón</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ingeniería Mecatrónica<br>\n"
+"Electiva de Robótica<br>\n"
+"2024 - II</p></body></html>"))
         self.label_4.setText(_translate("Dialog", "Intensidad LED 1: 0%"))
         self.label_5.setText(_translate("Dialog", "Intensidad LED 2: 0%"))
         self.pushButton.setText(_translate("Dialog", "LED VERDE"))
@@ -123,20 +129,20 @@ class Ui_Dialog(object):
         self.led1_state = not self.led1_state
         if self.led1_state:
             pwm_led1.ChangeDutyCycle(self.servomotor1.value())  # Ajustar brillo según el slider
+            self.pushButton.setStyleSheet("background-color: green")  # Encendido: verde
         else:
             pwm_led1.ChangeDutyCycle(0)
-        # Cambiar color del botón
-        self.pushButton.setStyleSheet("background-color: green" if self.led1_state else "background-color: none")
+            self.pushButton.setStyleSheet("background-color: lightgreen")  # Apagado: color más claro
 
     def toggle_led2(self):
         # Cambiar el estado del LED 2 (encendido/apagado)
         self.led2_state = not self.led2_state
         if self.led2_state:
             pwm_led2.ChangeDutyCycle(self.servomotor2.value())  # Ajustar brillo según el slider
+            self.pushButton_2.setStyleSheet("background-color: red")  # Encendido: rojo
         else:
             pwm_led2.ChangeDutyCycle(0)
-        # Cambiar color del botón
-        self.pushButton_2.setStyleSheet("background-color: red" if self.led2_state else "background-color: none")
+            self.pushButton_2.setStyleSheet("background-color: lightcoral")  # Apagado: color más claro
 
     def adjust_brightness_led1(self, value):
         # Ajustar el brillo del LED 1 y mostrar el porcentaje en `label_4`
