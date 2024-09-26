@@ -70,9 +70,15 @@ class Ui_Dialog(object):
     def update_sensor_reading(self):
         # Leer el valor del sensor
         sensor_value = GPIO.input(SENSOR_PIN)
+        print_sensor = "Apagado"
+
+        if sensor_value == 1:
+            print_sensor = "Apagado"
+        elif sensor_value == 0:
+            print_sensor = "Encendido"        
 
         # Actualizar `label_6` con el valor del sensor
-        self.label_6.setText(f"Lectura: {sensor_value}")
+        self.label_6.setText(f"Lectura: {print_sensor}")
 
     def closeEvent(self, event):
         # Detener el temporizador y limpiar los recursos de GPIO al cerrar
