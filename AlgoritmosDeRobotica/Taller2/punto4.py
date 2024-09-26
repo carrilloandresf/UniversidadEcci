@@ -72,7 +72,7 @@ class Ui_MainWindow(object):
         self.Capacitancia = QtWidgets.QSlider(self.centralwidget)
         self.Capacitancia.setGeometry(QtCore.QRect(500, 420, 200, 20))
         self.Capacitancia.setMinimum(1)
-        self.Capacitancia.setMaximum(100)
+        self.Capacitancia.setMaximum(1000)  # Ajustar el máximo a 1000 uF
         self.Capacitancia.setOrientation(QtCore.Qt.Horizontal)
         self.Capacitancia.setObjectName("Capacitancia")
 
@@ -142,12 +142,12 @@ class Ui_MainWindow(object):
     def datos(self):
         # Obtener valores de sliders
         R = self.Resistencia.value()
-        C = self.Capacitancia.value() * 1e-6
+        C = self.Capacitancia.value() * 1e-6  # Convertir de uF a Faradios
         V = self.Voltaje.value()
 
         # Actualizar los labels con los valores actuales
         self.label_val_volt.setText(f"Voltaje (V): {V}")
-        self.label_val_cap.setText(f"Capacitancia (uF): {self.Capacitancia.value()}")
+        self.label_val_cap.setText(f"Capacitancia (uF): {self.Capacitancia.value()}")  # Mostrar uF en lugar de Faradios
         self.label_val_res.setText(f"Resistencia (Ohms): {R}")
 
         # Tiempo para la graficación
