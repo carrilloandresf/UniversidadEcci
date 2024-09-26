@@ -95,13 +95,17 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Control de Servomotores"))
-        self.label_2.setText(_translate("Dialog", "Andrés Felipe Carrillo Rodríguez\n"
-"Daniela Rodríguez Pelaez\n"
-"Jeisson Gutierrez Sanchez\n"
-"William Alejandro Fernandez Pinzón\n"
-"Ingeniería Mecatrónica\n"
-"Electiva de Robótica\n"
-"2024 - II"))
+        self.label_2.setText(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Andrés Felipe Carrillo Rodríguez<br>\n"
+"Daniela Rodríguez Pelaez<br>\n"
+"Jeisson Gutierrez Sanchez<br>\n"
+"William Alejandro Fernandez Pinzón</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ingeniería Mecatrónica<br>\n"
+"Electiva de Robótica<br>\n"
+"2024 - II</p></body></html>"))
         self.label.setText(_translate("Dialog", "Ángulo"))
         self.pushButton.setText(_translate("Dialog", "Actualizar Servo"))
         self.label_4.setText(_translate("Dialog", "Servo Seleccionado: 1"))
