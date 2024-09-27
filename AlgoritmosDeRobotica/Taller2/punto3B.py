@@ -70,7 +70,7 @@ class Ui_Dialog(object):
 
         # Label para mostrar la lectura del sensor
         self.label_6 = QtWidgets.QLabel(Dialog)
-        self.label_6.setGeometry(QtCore.QRect(360, 280, 111, 31))
+        self.label_6.setGeometry(QtCore.QRect(300, 280, 111, 60))
         self.label_6.setObjectName("label_6")
 
         self.retranslateUi(Dialog)
