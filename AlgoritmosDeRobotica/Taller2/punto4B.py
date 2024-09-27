@@ -70,12 +70,15 @@ class Ui_Dialog(object):
     def update_sensor_reading(self):
         # Leer el valor del sensor
         sensor_value = GPIO.input(SENSOR_PIN)
-        print_sensor = "Apagado"
+        print_sensor = "Bajo"
 
         if sensor_value == 1:
-            print_sensor = "Apagado"
+            print_sensor = "Bajo"
+            self.label_6.setStyleSheet("background-color: red;")
+
         elif sensor_value == 0:
-            print_sensor = "Encendido"        
+            print_sensor = "Alto"
+            self.label_6.setStyleSheet("background-color: green;")    
 
         # Actualizar `label_6` con el valor del sensor
         self.label_6.setText(f"Lectura: {print_sensor}")
