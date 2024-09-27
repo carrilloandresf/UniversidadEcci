@@ -4,20 +4,28 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import RPi.GPIO as GPIO
 
 # Pines GPIO para los LEDs
-LED_1 = 27  # LED controlado por `pushButton` y `servomotor1` (PWM)
-LED_2 = 5   # LED controlado por `pushButton_2` y `servomotor2` (PWM)
+LED_1 = 27  # LED controlado por `pushButton`
+LED_2 = 5   # LED controlado por `pushButton_2`
+LED_3 = 14  # LED controlado por `servomotor1`
+LED_4 = 15  # LED controlado por `servomotor2`
 
 # Configuración de GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(LED_1, GPIO.OUT)
 GPIO.setup(LED_2, GPIO.OUT)
+GPIO.setup(LED_3, GPIO.OUT)
+GPIO.setup(LED_4, GPIO.OUT)
 
 # Configuración de PWM para los LEDs
 pwm_led1 = GPIO.PWM(LED_1, 1000)  # 1000 Hz de frecuencia
 pwm_led2 = GPIO.PWM(LED_2, 1000)
+pwm_led3 = GPIO.PWM(LED_3, 1000)  # PWM para LED_3
+pwm_led4 = GPIO.PWM(LED_4, 1000)  # PWM para LED_4
 
 pwm_led1.start(0)
 pwm_led2.start(0)
+pwm_led3.start(0)
+pwm_led4.start(0)
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -42,14 +50,14 @@ class Ui_Dialog(object):
         self.label_3.setWordWrap(False)
         self.label_3.setObjectName("label_3")
 
-        # Slider para ajustar el brillo del LED 1
+        # Slider para ajustar el brillo del LED 3
         self.servomotor1 = QtWidgets.QSlider(Dialog)
         self.servomotor1.setGeometry(QtCore.QRect(150, 210, 160, 22))
         self.servomotor1.setMaximum(100)
         self.servomotor1.setOrientation(QtCore.Qt.Horizontal)
         self.servomotor1.setObjectName("servomotor1")
 
-        # Slider para ajustar el brillo del LED 2
+        # Slider para ajustar el brillo del LED 4
         self.servomotor2 = QtWidgets.QSlider(Dialog)
         self.servomotor2.setGeometry(QtCore.QRect(430, 210, 160, 22))
         self.servomotor2.setMaximum(100)
@@ -101,8 +109,8 @@ class Ui_Dialog(object):
         # Conectar eventos
         self.pushButton.clicked.connect(self.toggle_led1)
         self.pushButton_2.clicked.connect(self.toggle_led2)
-        self.servomotor1.valueChanged.connect(self.adjust_brightness_led1)
-        self.servomotor2.valueChanged.connect(self.adjust_brightness_led2)
+        self.servomotor1.valueChanged.connect(self.adjust_brightness_led3)  # Controla LED_3
+        self.servomotor2.valueChanged.connect(self.adjust_brightness_led4)  # Controla LED_4
 
         # Estado inicial de los LEDs (apagados)
         self.led1_state = False
@@ -122,8 +130,8 @@ class Ui_Dialog(object):
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Ingeniería Mecatrónica<br>\n"
 "Electiva de Robótica<br>\n"
 "2024 - II</p></body></html>"))
-        self.label_4.setText(_translate("Dialog", "Intensidad LED 1: 0%"))
-        self.label_5.setText(_translate("Dialog", "Intensidad LED 2: 0%"))
+        self.label_4.setText(_translate("Dialog", "Intensidad LED 3: 0%"))
+        self.label_5.setText(_translate("Dialog", "Intensidad LED 4: 0%"))
         self.pushButton.setText(_translate("Dialog", "LED VERDE"))
         self.pushButton_2.setText(_translate("Dialog", "LED ROJO"))
         self.label.setText(_translate("Dialog", "Escritura de puertos"))
@@ -136,7 +144,6 @@ class Ui_Dialog(object):
         else:
             pwm_led1.ChangeDutyCycle(0)
 
-
     def toggle_led2(self):
         # Cambiar el estado del LED 2 (encendido/apagado)
         self.led2_state = not self.led2_state
@@ -145,22 +152,22 @@ class Ui_Dialog(object):
         else:
             pwm_led2.ChangeDutyCycle(0)
 
-    def adjust_brightness_led1(self, value):
-        # Ajustar el brillo del LED 1 y mostrar el porcentaje en `label_4`
-        if self.led1_state:  # Solo ajustar brillo si el LED está encendido
-            pwm_led1.ChangeDutyCycle(value)
-        self.label_4.setText(f"Intensidad LED 1: {value}%")
+    def adjust_brightness_led3(self, value):
+        # Ajustar el brillo del LED 3 y mostrar el porcentaje en `label_4`
+        pwm_led3.ChangeDutyCycle(value)
+        self.label_4.setText(f"Intensidad LED 3: {value}%")
 
-    def adjust_brightness_led2(self, value):
-        # Ajustar el brillo del LED 2 y mostrar el porcentaje en `label_5`
-        if self.led2_state:  # Solo ajustar brillo si el LED está encendido
-            pwm_led2.ChangeDutyCycle(value)
-        self.label_5.setText(f"Intensidad LED 2: {value}%")
+    def adjust_brightness_led4(self, value):
+        # Ajustar el brillo del LED 4 y mostrar el porcentaje en `label_5`
+        pwm_led4.ChangeDutyCycle(value)
+        self.label_5.setText(f"Intensidad LED 4: {value}%")
 
     def closeEvent(self, event):
         # Detener y limpiar los recursos de GPIO
         pwm_led1.stop()
         pwm_led2.stop()
+        pwm_led3.stop()
+        pwm_led4.stop()
         GPIO.cleanup()
         event.accept()
 
