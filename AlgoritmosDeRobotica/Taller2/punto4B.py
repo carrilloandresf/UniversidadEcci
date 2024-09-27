@@ -74,7 +74,7 @@ class Ui_Dialog(object):
 
         if sensor_value == 1:
             print_sensor = "Bajo"
-            self.label_6.setStyleSheet("background-color: green;")
+            self.label_6.setStyleSheet("background-color: blue;")
 
         elif sensor_value == 0:
             print_sensor = "Alto"
