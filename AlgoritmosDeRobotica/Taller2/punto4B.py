@@ -74,11 +74,11 @@ class Ui_Dialog(object):
 
         if sensor_value == 1:
             print_sensor = "Bajo"
-            self.label_6.setStyleSheet("background-color: red;")
+            self.label_6.setStyleSheet("background-color: green;")
 
         elif sensor_value == 0:
             print_sensor = "Alto"
-            self.label_6.setStyleSheet("background-color: green;")    
+            self.label_6.setStyleSheet("background-color: red;")    
 
         # Actualizar `label_6` con el valor del sensor
         self.label_6.setText(f"Lectura: {print_sensor}")
