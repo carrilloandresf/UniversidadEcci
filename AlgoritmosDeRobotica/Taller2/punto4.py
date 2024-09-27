@@ -150,8 +150,10 @@ class Ui_MainWindow(object):
         self.label_val_cap.setText(f"Capacitancia (uF): {self.Capacitancia.value()}")  # Mostrar uF en lugar de Faradios
         self.label_val_res.setText(f"Resistencia (Ohms): {R}")
 
-        # Tiempo para la graficación
-        t = np.linspace(0, 1, 4000)
+        # Calcular la constante de tiempo (tau) y ajustar el rango del tiempo t
+        tau = R * C
+        t_max = 5 * tau  # Tiempo máximo para cubrir la carga y descarga completa (5 * tau es un buen punto de referencia)
+        t = np.linspace(0, t_max, 4000)
 
         # Calcular la carga y descarga del condensador
         Carga = self.carga(V, R, C, t)
