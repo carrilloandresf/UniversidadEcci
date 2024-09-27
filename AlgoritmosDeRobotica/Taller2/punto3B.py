@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import RPi.GPIO as GPIO
+import smbus  # Para comunicación I2C con el MPU-6050
 import time
 
-# Configuración del pin GPIO para la lectura del sensor
-SENSOR_PIN = 4
+# Dirección del MPU-6050 y configuración del bus I2C
+MPU6050_ADDR = 0x68
+bus = smbus.SMBus(1)  # Usar I2C bus 1
 
-# Configuración de GPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(SENSOR_PIN, GPIO.IN)
+# Inicializar el sensor MPU-6050
+bus.write_byte_data(MPU6050_ADDR, 0x6B, 0)  # Despertar el MPU-6050
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
@@ -81,7 +81,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Control de Sensor"))
+        Dialog.setWindowTitle(_translate("Dialog", "Control de Sensor MPU-6050"))
         self.label_2.setText(_translate("Dialog", "<html><head/><body><p align=\"center\">Daniela Rodriguez 83549</p><p align=\"center\">Jeison Sanchez 61849</p><p align=\"center\">Andres C. Rodriguez 83836</p><p align=\"center\">William A. Fernandez 77516</p><p><br/></p><p><br/></p></body></html>"))
         self.label_4.setText(_translate("Dialog", "INGRESE TIEMPO ESTIMADO EN SEGUNDOS"))
         self.label.setText(_translate("Dialog", "Comunicación I2C"))
@@ -102,27 +102,32 @@ class Ui_Dialog(object):
             # Mostrar el tiempo restante en `label_5`
             self.label_5.setText(f"Tiempo restante: {remaining_time}s")
 
-            # Leer el valor del sensor
-            sensor_value = GPIO.input(SENSOR_PIN)
+            # Leer valores del sensor MPU-6050 (aceleración en X, Y, Z)
+            acc_x = self.read_raw_data(0x3B)
+            acc_y = self.read_raw_data(0x3D)
+            acc_z = self.read_raw_data(0x3F)
 
-            print_sensor = "Apagado"
-
-            if sensor_value == 1:
-                print_sensor = "off"
-            elif sensor_value == 0:
-                print_sensor = "on"
-                
-            # Mostrar el valor del sensor en `label_6`
-            self.label_6.setText(f"Lectura: {print_sensor}")
+            # Calcular valores reales de aceleración
+            ax = acc_x / 16384.0
+            ay = acc_y / 16384.0
+            az = acc_z / 16384.0
+            
+            # Mostrar los valores de aceleración en `label_6`
+            self.label_6.setText(f"AX: {ax:.2f}g AY: {ay:.2f}g AZ: {az:.2f}g")
 
             # Esperar un segundo antes de la siguiente iteración
             QtCore.QCoreApplication.processEvents()  # Procesar eventos de la interfaz
             time.sleep(1)
 
-    def closeEvent(self, event):
-        # Limpiar los recursos de GPIO al cerrar
-        GPIO.cleanup()
-        event.accept()
+    def read_raw_data(self, addr):
+        # Leer datos crudos de 16 bits del sensor
+        high = bus.read_byte_data(MPU6050_ADDR, addr)
+        low = bus.read_byte_data(MPU6050_ADDR, addr + 1)
+        value = ((high << 8) | low)
+        # Convertir a complemento a dos
+        if value > 32768:
+            value = value - 65536
+        return value
 
 if __name__ == "__main__":
     import sys
