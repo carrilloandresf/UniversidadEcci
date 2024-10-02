@@ -1,18 +1,13 @@
 import RPi.GPIO as GPIO
 from time import sleep
 
+# Configuración de GPIO
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 # Definición de pines
-TOGGLE_1 = 4
-TOGGLE_2 = 6
-LCD_RS = 10
-LCD_E = 9
-LCD_D4 = 22
-LCD_D5 = 23
-LCD_D6 = 24
-LCD_D7 = 25
+TOGGLE_1 = 4  # Avance
+TOGGLE_2 = 6  # Retroceso
 Avance = 17
 Retroceso = 18
 
@@ -21,84 +16,56 @@ BitMot0 = 12
 BitMot1 = 13
 BitMot2 = 16
 BitMot3 = 19
-
 motor_pins = [BitMot0, BitMot1, BitMot2, BitMot3]
 
-# Pin para el buzzer
-BUZZER = 21
+# Pines de la LCD
+LCD_RS = 10
+LCD_E = 9
+LCD_D4 = 22
+LCD_D5 = 23
+LCD_D6 = 24
+LCD_D7 = 25
 
-# Pines del servomotor (puente H)
-Servo_PWM = 18  # Pin de señal PWM del servomotor
+# Pin del servomotor
+SERVO_PIN = 20  
 
-# Configuración de pines (solo una vez)
-GPIO.setup(TOGGLE_1, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(TOGGLE_2, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(BUZZER, GPIO.OUT)
-
+# Configuración de pines de entrada y salida
+GPIO.setup(TOGGLE_1, GPIO.IN)
+GPIO.setup(TOGGLE_2, GPIO.IN)
 GPIO.setup(Avance, GPIO.OUT)
 GPIO.setup(Retroceso, GPIO.OUT)
 
+# Configurar los pines del motor paso a paso
 for pin in motor_pins:
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, GPIO.LOW)
+
+# Configuración de pines de la pantalla LCD
+lcd_pins = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
+for pin in lcd_pins:
     GPIO.setup(pin, GPIO.OUT)
 
 # Configuración del servomotor
-GPIO.setup(Servo_PWM, GPIO.OUT)
-servo = GPIO.PWM(Servo_PWM, 50)  # PWM a 50Hz
+GPIO.setup(SERVO_PIN, GPIO.OUT)
+servo = GPIO.PWM(SERVO_PIN, 50)  # 50Hz para el servomotor
 servo.start(0)
 
-# Configuración del buzzer
-def buzzer_sound(duration=0.1):
-    GPIO.output(BUZZER, True)
-    sleep(duration)
-    GPIO.output(BUZZER, False)
-
-# Secuencia de pasos del motor paso a paso
-step_sequence = [
+# Secuencia de pasos del motor paso a paso (ULN2003AN)
+STEP_SEQUENCE = [
     [1, 0, 0, 0],
+    [1, 1, 0, 0],
     [0, 1, 0, 0],
+    [0, 1, 1, 0],
     [0, 0, 1, 0],
-    [0, 0, 0, 1]
+    [0, 0, 1, 1],
+    [0, 0, 0, 1],
+    [1, 0, 0, 1]
 ]
 
-def set_step(step):
-    for pin in range(4):
-        GPIO.output(motor_pins[pin], step[pin])
+# Número de pasos por revolución para el motor paso a paso
+STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
 
-def rotate_motor(steps, delay=0.01):
-    for _ in range(steps):
-        for step in step_sequence:
-            set_step(step)
-            sleep(delay)
-
-def return_to_initial_position(steps, delay=0.01):
-    for _ in range(steps):
-        for step in reversed(step_sequence):
-            set_step(step)
-            sleep(delay)
-
-def lcd_write(bits, mode):
-    try:
-        GPIO.output(LCD_RS, mode)
-        GPIO.output(LCD_D4, bits & 0x10 == 0x10)
-        GPIO.output(LCD_D5, bits & 0x20 == 0x20)
-        GPIO.output(LCD_D6, bits & 0x40 == 0x40)
-        GPIO.output(LCD_D7, bits & 0x80 == 0x80)
-        lcd_toggle_enable()
-        GPIO.output(LCD_D4, bits & 0x01 == 0x01)
-        GPIO.output(LCD_D5, bits & 0x02 == 0x02)
-        GPIO.output(LCD_D6, bits & 0x04 == 0x04)
-        GPIO.output(LCD_D7, bits & 0x08 == 0x08)
-        lcd_toggle_enable()
-    except Exception as e:
-        print(f"Error al escribir en la LCD: {e}")
-
-def lcd_toggle_enable():
-    sleep(0.0005)
-    GPIO.output(LCD_E, True)
-    sleep(0.0005)
-    GPIO.output(LCD_E, False)
-    sleep(0.0005)
-
+# Función para inicializar la pantalla LCD
 def lcd_init():
     lcd_write(0x33, GPIO.LOW)
     lcd_write(0x32, GPIO.LOW)
@@ -108,70 +75,98 @@ def lcd_init():
     lcd_write(0x01, GPIO.LOW)
     sleep(0.0005)
 
-def lcd_texto(message, line):
+def lcd_write(bits, mode):
+    GPIO.output(LCD_RS, mode)
+    GPIO.output(LCD_D4, bits & 0x10 == 0x10)
+    GPIO.output(LCD_D5, bits & 0x20 == 0x20)
+    GPIO.output(LCD_D6, bits & 0x40 == 0x40)
+    GPIO.output(LCD_D7, bits & 0x80 == 0x80)
+    lcd_toggle_enable()
+    GPIO.output(LCD_D4, bits & 0x01 == 0x01)
+    GPIO.output(LCD_D5, bits & 0x02 == 0x02)
+    GPIO.output(LCD_D6, bits & 0x04 == 0x04)
+    GPIO.output(LCD_D7, bits & 0x08 == 0x08)
+    lcd_toggle_enable()
+
+def lcd_toggle_enable():
+    sleep(0.0005)
+    GPIO.output(LCD_E, True)
+    sleep(0.0005)
+    GPIO.output(LCD_E, False)
+    sleep(0.0005)
+
+def lcd_text(message, line):
     message = message.ljust(16, " ")
     lcd_write(line, GPIO.LOW)
-    for i in range(16):
-        lcd_write(ord(message[i]), GPIO.HIGH)
+    for char in message:
+        lcd_write(ord(char), GPIO.HIGH)
 
-def LCD(message):
-    lcd_init()
-    lcd_texto(message, 0x80)
-    sleep(0.01)
+# Función para activar avance del motor DC
+def activar_avance():
+    lcd_text("Giro: Avance", 0x80)
+    GPIO.output(Avance, True)
+    GPIO.output(Retroceso, False)
 
-def Movimiento(AR):
-    if AR == 1:
-        GPIO.output(Avance, True)
-        GPIO.output(Retroceso, False)
-    elif AR == 0:
-        GPIO.output(Avance, False)
-        GPIO.output(Retroceso, True)
-    else:
-        GPIO.output(Avance, False)
-        GPIO.output(Retroceso, False)
+# Función para activar retroceso del motor DC
+def activar_retroceso():
+    lcd_text("Giro: Retroceso", 0x80)
+    GPIO.output(Avance, False)
+    GPIO.output(Retroceso, True)
 
+# Función para detener el motor DC
+def detener_motor_dc():
+    lcd_text("Motor DC Detenido", 0x80)
+    GPIO.output(Avance, False)
+    GPIO.output(Retroceso, False)
+
+# Función para girar el motor paso a paso
+def girar_motor_paso_paso(steps=STEPS_PER_REVOLUTION, delay=0.01):
+    lcd_text("Motor Paso a Paso", 0x80)
+    for _ in range(steps):
+        for sequence in STEP_SEQUENCE:
+            for pin in range(4):
+                GPIO.output(motor_pins[pin], sequence[pin])
+            sleep(delay)
+
+# Función para mover el servomotor a una posición
 def mover_servo(angulo):
-    duty_cycle = angulo / 18 + 2
+    duty_cycle = 2 + (angulo / 18)  # Calcular el ciclo de trabajo
     servo.ChangeDutyCycle(duty_cycle)
 
+# Inicializa la pantalla LCD al inicio
+lcd_init()
+
 try:
-    estado_anterior = None
-
     while True:
-        toggle1 = GPIO.input(TOGGLE_1)
-        toggle2 = GPIO.input(TOGGLE_2)
+        toggle1 = GPIO.input(TOGGLE_1)  # Lee entrada de avance
+        toggle2 = GPIO.input(TOGGLE_2)  # Lee entrada de retroceso
 
-        # Estado actual para comparar cambios
-        estado_actual = (toggle1, toggle2)
+        print(f"TOGGLE_1: {toggle1}, TOGGLE_2: {toggle2}")
 
-        # Si se detecta un cambio de estado, activar el buzzer
-        if estado_actual != estado_anterior:
-            buzzer_sound()
-            estado_anterior = estado_actual
-
-        # Si ambas entradas están inactivas
+        # Si ambas entradas están inactivas (falsas), mover el servomotor
         if toggle1 == 0 and toggle2 == 0:
-            LCD("Servomotor 180\u00b0")  # Usar código Unicode para el símbolo de grado
-            mover_servo(180)
-            sleep(1)  # Esperar un segundo
-            mover_servo(0)  # Regresar a la posición cero
-        # Si solo TOGGLE_1 está activo
+            lcd_text("Servo: 90 grados", 0x80)
+            mover_servo(90)
+            sleep(1)
+            mover_servo(0)  # Regresar a la posición inicial
+
+        # Si solo TOGGLE_1 está activo (verdadero), activar avance
         elif toggle1 == 1 and toggle2 == 0:
-            LCD("Giro derecha")
-            Movimiento(1)
-        # Si solo TOGGLE_2 está activo
+            activar_avance()
+
+        # Si solo TOGGLE_2 está activo (verdadero), activar retroceso
         elif toggle2 == 1 and toggle1 == 0:
-            LCD("Giro izquierda")
-            Movimiento(0)
-        # Si ambos están activos
+            activar_retroceso()
+
+        # Si ambas entradas están activas (verdaderas), girar motor paso a paso
         elif toggle1 == 1 and toggle2 == 1:
-            LCD("Motor paso")
-            rotate_motor(2048)  # Rotar el motor paso a paso
-        else:
-            Movimiento(-1)  # Detener el motor DC si no hay condiciones activas
-        
-        sleep(0.5)
+            girar_motor_paso_paso()  # Gira el motor paso a paso
+
+        # Pausa breve para evitar lectura continua excesiva
+        sleep(0.1)
 
 except KeyboardInterrupt:
+    print("Deteniendo programa")
+    detener_motor_dc()
     servo.stop()
     GPIO.cleanup()
