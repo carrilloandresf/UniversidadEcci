@@ -122,14 +122,14 @@ def activar_retroceso():
 
 # Función para detener el motor DC
 def detener_motor_dc():
-    lcd_text("Motor DC Detenido", 0x80)
     GPIO.output(Avance, False)
     GPIO.output(Retroceso, False)
 
-# Función para mover el servomotor a una posición
+# Función para mover el servomotor a un ángulo dado
 def mover_servo(angulo):
     duty_cycle = 2 + (angulo / 18)  # Calcular el ciclo de trabajo
     servo.ChangeDutyCycle(duty_cycle)
+    sleep(0.05)  # Pausar brevemente para permitir el movimiento
 
 # Función para activar buzzer por medio segundo
 def activar_buzzer(Caracter):
@@ -160,11 +160,17 @@ try:
 
         # Si ambas entradas están inactivas (falsas), mover el servomotor
         if toggle1 == 0 and toggle2 == 0:
+            detener_motor_dc()
             activar_buzzer(0)
-            lcd_text("Servo: 90 grados", 0x80)
-            mover_servo(90)
-            sleep(1)
-            mover_servo(0)  # Regresar a la posición inicial
+            lcd_text("Servo: 0 a 180", 0x80)
+            
+            # Recorrer de 0 a 180 grados
+            for angulo in range(0, 181, 10):
+                mover_servo(angulo)
+            
+            # Regresar de 180 a 0 grados
+            for angulo in range(180, -1, -10):
+                mover_servo(angulo)
 
         # Si solo TOGGLE_1 está activo (verdadero), activar avance
         elif toggle1 == 1 and toggle2 == 0:
@@ -178,6 +184,7 @@ try:
 
         # Si ambas entradas están activas (verdaderas), ejecutar un solo paso
         elif toggle1 == 1 and toggle2 == 1:
+            detener_motor_dc()
             activar_buzzer(3)
             # Ejecutar un paso del motor paso a paso
             sequence = STEP_SEQUENCE[step_index]
