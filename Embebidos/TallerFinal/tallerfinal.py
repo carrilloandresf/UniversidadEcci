@@ -27,13 +27,20 @@ LCD_D6 = 24
 LCD_D7 = 25
 
 # Pin del servomotor
-SERVO_PIN = 20  
+SERVO_PIN = 20
+
+# Buzzer de cambios
+Buzzer_PIN = 21
+
+# Variable de seguimiento de secuencia
+flat = 0
 
 # Configuración de pines de entrada y salida
 GPIO.setup(TOGGLE_1, GPIO.IN)
 GPIO.setup(TOGGLE_2, GPIO.IN)
 GPIO.setup(Avance, GPIO.OUT)
 GPIO.setup(Retroceso, GPIO.OUT)
+GPIO.setup(Buzzer_PIN, GPIO.OUT)  # Configurar Buzzer_PIN como salida
 
 # Configurar los pines del motor paso a paso
 for pin in motor_pins:
@@ -119,22 +126,30 @@ def detener_motor_dc():
     GPIO.output(Avance, False)
     GPIO.output(Retroceso, False)
 
-# Función para girar el motor paso a paso
-def girar_motor_paso_paso(steps=STEPS_PER_REVOLUTION, delay=0.01):
-    lcd_text("Motor Paso a Paso", 0x80)
-    for _ in range(steps):
-        for sequence in STEP_SEQUENCE:
-            for pin in range(4):
-                GPIO.output(motor_pins[pin], sequence[pin])
-            sleep(delay)
-
 # Función para mover el servomotor a una posición
 def mover_servo(angulo):
     duty_cycle = 2 + (angulo / 18)  # Calcular el ciclo de trabajo
     servo.ChangeDutyCycle(duty_cycle)
 
+# Función para activar buzzer por medio segundo
+def activar_buzzer(Caracter):
+    global flat
+    if flat == Caracter:
+        return
+    GPIO.output(Buzzer_PIN, True)
+    sleep(0.5)
+    GPIO.output(Buzzer_PIN, False)
+    flat = Caracter
+
 # Inicializa la pantalla LCD al inicio
 lcd_init()
+
+# Índice de secuencia del motor paso a paso
+step_index = 0
+step_count = 0
+
+lcd_text("Universidad ECCI", 0x80)
+sleep(1)
 
 try:
     while True:
@@ -145,6 +160,7 @@ try:
 
         # Si ambas entradas están inactivas (falsas), mover el servomotor
         if toggle1 == 0 and toggle2 == 0:
+            activar_buzzer(0)
             lcd_text("Servo: 90 grados", 0x80)
             mover_servo(90)
             sleep(1)
@@ -152,15 +168,31 @@ try:
 
         # Si solo TOGGLE_1 está activo (verdadero), activar avance
         elif toggle1 == 1 and toggle2 == 0:
+            activar_buzzer(1)
             activar_avance()
 
         # Si solo TOGGLE_2 está activo (verdadero), activar retroceso
         elif toggle2 == 1 and toggle1 == 0:
+            activar_buzzer(2)
             activar_retroceso()
 
-        # Si ambas entradas están activas (verdaderas), girar motor paso a paso
+        # Si ambas entradas están activas (verdaderas), ejecutar un solo paso
         elif toggle1 == 1 and toggle2 == 1:
-            girar_motor_paso_paso()  # Gira el motor paso a paso
+            activar_buzzer(3)
+            # Ejecutar un paso del motor paso a paso
+            sequence = STEP_SEQUENCE[step_index]
+            for pin in range(4):
+                GPIO.output(motor_pins[pin], sequence[pin])
+            
+            # Actualizar el paso en la LCD
+            step_count += 1
+            lcd_text(f"Paso: {step_count}", 0x80)
+
+            # Avanzar al siguiente paso en la secuencia
+            step_index = (step_index + 1) % len(STEP_SEQUENCE)
+
+            # Pausar brevemente para permitir el movimiento del motor
+            sleep(0.01)
 
         # Pausa breve para evitar lectura continua excesiva
         sleep(0.1)
