@@ -147,6 +147,7 @@ lcd_init()
 # Índice de secuencia del motor paso a paso
 step_index = 0
 step_count = 0
+
 print("Iniciando...")
 lcd_text("Universidad ECCI", 0x80)
 sleep(1)
