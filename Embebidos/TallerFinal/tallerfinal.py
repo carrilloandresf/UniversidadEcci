@@ -17,6 +17,7 @@ BitMot1 = 13
 BitMot2 = 16
 BitMot3 = 19
 motor_pins = [BitMot0, BitMot1, BitMot2, BitMot3]
+MOTOR_PINS = [12, 13, 16, 19]
 
 # Pines de la LCD
 LCD_RS = 10
@@ -155,7 +156,7 @@ def mover_motor_paso_a_paso(num_turns):
     for step in range(total_steps):
         for sequence in STEP_SEQUENCE:
             for pin in range(4):
-                GPIO.output(motor_pins[pin], sequence[pin])
+                GPIO.output(MOTOR_PINS[pin], sequence[pin])
             sleep(STEP_DELAY)
 
         lcd_text(f"Vuelta: {vuelta_actual}", 0x80)
@@ -219,4 +220,3 @@ try:
 
 except KeyboardInterrupt:
     print("Deteniendo programa")
-    detener_motor
