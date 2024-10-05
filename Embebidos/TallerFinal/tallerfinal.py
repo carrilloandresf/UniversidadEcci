@@ -11,13 +11,9 @@ TOGGLE_2 = 6  # Retroceso
 Avance = 17
 Retroceso = 18
 
-# Pines del motor paso a paso (nuevo)
-BitMot0 = 12
-BitMot1 = 13
-BitMot2 = 16
-BitMot3 = 19
-motor_pins = [BitMot0, BitMot1, BitMot2, BitMot3]
-MOTOR_PINS = [12, 13, 16, 19]
+# Pines del motor paso a paso
+MOTOR_PINS = [12, 13, 16, 19]  # Pines conectados al motor
+GPIO.setup(MOTOR_PINS, GPIO.OUT)
 
 # Pines de la LCD
 LCD_RS = 10
@@ -44,7 +40,7 @@ GPIO.setup(Retroceso, GPIO.OUT)
 GPIO.setup(Buzzer_PIN, GPIO.OUT)  # Configurar Buzzer_PIN como salida
 
 # Configurar los pines del motor paso a paso
-for pin in motor_pins:
+for pin in MOTOR_PINS:
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, GPIO.LOW)
 
@@ -71,10 +67,10 @@ STEP_SEQUENCE = [
 ]
 
 # Número de pasos por revolución para el motor paso a paso
-STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
+STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
 
 # Tiempo de delay entre pasos para ajustar velocidad
-STEP_DELAY = 0.001  # Ajusta el tiempo para el motor
+STEP_DELAY = 0.01  # Ajusta el tiempo para el motor
 
 # Función para inicializar la pantalla LCD
 def lcd_init():
@@ -147,10 +143,7 @@ def activar_buzzer(Caracter):
 
 # Función para activar el movimiento del motor paso a paso
 def mover_motor_paso_a_paso(num_turns):
-    global step_index, step_count
     total_steps = int(num_turns * STEPS_PER_REVOLUTION)
-
-    vuelta_actual = 1  # Contador de vueltas
 
     # Girar el motor por el número de pasos calculado
     for step in range(total_steps):
@@ -159,15 +152,8 @@ def mover_motor_paso_a_paso(num_turns):
                 GPIO.output(MOTOR_PINS[pin], sequence[pin])
             sleep(STEP_DELAY)
 
-        lcd_text(f"Vuelta: {vuelta_actual}", 0x80)
-        lcd_text(f"Paso: {step_count}", 0xC0)  # 0xC0 para la segunda línea de la LCD
-
 # Inicializa la pantalla LCD al inicio
 lcd_init()
-
-# Índice de secuencia del motor paso a paso
-step_index = 0
-step_count = 0
 
 print("Iniciando...")
 lcd_text("Universidad ECCI", 0x80)
@@ -220,3 +206,6 @@ try:
 
 except KeyboardInterrupt:
     print("Deteniendo programa")
+finally:
+    # Limpia la configuración de los GPIO al terminar
+    GPIO.cleanup()
