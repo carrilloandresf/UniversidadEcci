@@ -70,10 +70,10 @@ STEP_SEQUENCE = [
 ]
 
 # Número de pasos por revolución para el motor paso a paso
-STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
+STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
 # Tiempo de delay entre pasos para ajustar velocidad
-STEP_DELAY = 0.01  # Ajusta el tiempo para el motor
+STEP_DELAY = 0.001  # Ajusta el tiempo para el motor
 
 # Función para inicializar la pantalla LCD
 def lcd_init():
@@ -153,23 +153,11 @@ def mover_motor_paso_a_paso(num_turns):
 
     # Girar el motor por el número de pasos calculado
     for step in range(total_steps):
-        # Seleccionar la secuencia de paso actual
-        sequence = STEP_SEQUENCE[step_index]
+        for sequence in STEP_SEQUENCE:
+            for pin in range(4):
+                GPIO.output(motor_pins[pin], sequence[pin])
+            sleep(STEP_DELAY)
 
-        # Enviar la secuencia a los pines del motor
-        for pin in range(4):
-            GPIO.output(motor_pins[pin], sequence[pin])
-
-        # Avanzar al siguiente paso en la secuencia
-        step_index = (step_index + 1) % len(STEP_SEQUENCE)
-
-        # Pausar brevemente para permitir el movimiento del motor
-        sleep(STEP_DELAY)
-
-        # Actualizar el paso y la vuelta en la LCD
-        step_count += 1
-        if step_count % STEPS_PER_REVOLUTION == 0:
-            vuelta_actual += 1
         lcd_text(f"Vuelta: {vuelta_actual}", 0x80)
         lcd_text(f"Paso: {step_count}", 0xC0)  # 0xC0 para la segunda línea de la LCD
 
@@ -221,7 +209,7 @@ try:
             activar_buzzer(3)
 
             # Número de vueltas que el motor debe dar (ajústalo según necesites)
-            num_turns = 5  # Cambia esto al número de vueltas deseadas
+            num_turns = 1  # Cambia esto al número de vueltas deseadas
 
             # Llamar a la función de movimiento del motor paso a paso
             mover_motor_paso_a_paso(num_turns)
