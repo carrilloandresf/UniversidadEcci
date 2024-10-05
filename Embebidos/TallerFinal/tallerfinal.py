@@ -221,7 +221,7 @@ try:
             activar_buzzer(3)
 
             # Número de vueltas que el motor debe dar (ajústalo según necesites)
-            num_turns = 1  # Cambia esto al número de vueltas deseadas
+            num_turns = 5  # Cambia esto al número de vueltas deseadas
 
             # Llamar a la función de movimiento del motor paso a paso
             mover_motor_paso_a_paso(num_turns)
