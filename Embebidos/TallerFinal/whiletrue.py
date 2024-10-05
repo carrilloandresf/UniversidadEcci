@@ -7,7 +7,7 @@ inicio_programa = datetime.now()
 
 def calcular_progreso(inicio):
     # Hora de fin a las 22:00 (10:00 p.m.)
-    fin = datetime(inicio.year, inicio.month, inicio.day, 22, 0, 0)
+    fin = datetime(inicio.year, inicio.month, inicio.day, 13, 00, 0)
     
     # Calcular el progreso en porcentaje
     total_seconds = (fin - inicio).total_seconds()
@@ -32,5 +32,5 @@ while True:
         break
     
     # Esperar un intervalo aleatorio entre 0.5 y 3 segundos
-    intervalo_sleep = random.uniform(0.5, 3.0)
+    intervalo_sleep = random.uniform(1.0, 2.0)
     time.sleep(intervalo_sleep)

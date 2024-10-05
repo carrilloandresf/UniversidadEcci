@@ -5,7 +5,8 @@ import RPi.GPIO as GPIO
 import time
 
 # Pines GPIO para el motor paso a paso
-MOTOR_PINS = [12, 20, 21, 19]
+#MOTOR_PINS = [12, 20, 21, 19] Anteriores
+MOTOR_PINS = [12, 13, 16, 19]
 
 # Configuración de GPIO
 GPIO.setmode(GPIO.BCM)
