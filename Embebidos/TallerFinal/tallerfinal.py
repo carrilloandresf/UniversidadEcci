@@ -149,8 +149,8 @@ def mover_motor_paso_a_paso(num_turns):
     global vuelta_actual
     total_steps = int(num_turns * STEPS_PER_REVOLUTION)
 
-    step_count = 0
     vuelta_actual += 1
+    lcd_text(f"Vuelta: {vuelta_actual}", 0x80)
 
     # Girar el motor por el número de pasos calculado
     for step in range(total_steps):
@@ -158,8 +158,7 @@ def mover_motor_paso_a_paso(num_turns):
             for pin in range(4):
                 GPIO.output(MOTOR_PINS[pin], sequence[pin])
             sleep(STEP_DELAY)
-
-    lcd_text(f"Vuelta: {vuelta_actual}", 0x80)
+        lcd_text(f"Paso: {step}", 0xC0)
     
 
 # Inicializa la pantalla LCD al inicio
