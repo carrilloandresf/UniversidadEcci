@@ -157,8 +157,6 @@ def mover_motor_paso_a_paso(num_turns):
         for sequence in STEP_SEQUENCE:
             for pin in range(4):
                 GPIO.output(MOTOR_PINS[pin], sequence[pin])
-            step_count += 1
-            lcd_text(f"Paso: {step_count}", 0xC0)
             sleep(STEP_DELAY)
 
     lcd_text(f"Vuelta: {vuelta_actual}", 0x80)
