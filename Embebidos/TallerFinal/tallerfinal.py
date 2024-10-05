@@ -144,13 +144,41 @@ def activar_buzzer(Caracter):
     GPIO.output(Buzzer_PIN, False)
     flat = Caracter
 
+# Función para activar el movimiento del motor paso a paso
+def mover_motor_paso_a_paso(num_turns):
+    global step_index, step_count
+    total_steps = int(num_turns * STEPS_PER_REVOLUTION)
+
+    vuelta_actual = 1  # Contador de vueltas
+
+    # Girar el motor por el número de pasos calculado
+    for step in range(total_steps):
+        # Seleccionar la secuencia de paso actual
+        sequence = STEP_SEQUENCE[step_index]
+
+        # Enviar la secuencia a los pines del motor
+        for pin in range(4):
+            GPIO.output(motor_pins[pin], sequence[pin])
+
+        # Avanzar al siguiente paso en la secuencia
+        step_index = (step_index + 1) % len(STEP_SEQUENCE)
+
+        # Pausar brevemente para permitir el movimiento del motor
+        sleep(STEP_DELAY)
+
+        # Actualizar el paso y la vuelta en la LCD
+        step_count += 1
+        if step_count % STEPS_PER_REVOLUTION == 0:
+            vuelta_actual += 1
+        lcd_text(f"Vuelta: {vuelta_actual}", 0x80)
+        lcd_text(f"Paso: {step_count}", 0xC0)  # 0xC0 para la segunda línea de la LCD
+
 # Inicializa la pantalla LCD al inicio
 lcd_init()
 
 # Índice de secuencia del motor paso a paso
 step_index = 0
 step_count = 0
-turn_count = 0
 
 print("Iniciando...")
 lcd_text("Universidad ECCI", 0x80)
@@ -163,43 +191,44 @@ try:
 
         print(f"\rTOGGLE_1: {toggle1}, TOGGLE_2: {toggle2}")
 
+        # Si ambas entradas están inactivas (falsas), mover el servomotor
+        if toggle1 == 0 and toggle2 == 0:
+            detener_motor_dc()
+            activar_buzzer(0)
+            lcd_text("Servo: 0 a 180", 0x80)
+
+            # Recorrer de 0 a 180 grados
+            for angulo in range(0, 181, 10):
+                mover_servo(angulo)
+
+            # Regresar de 180 a 0 grados
+            for angulo in range(180, -1, -10):
+                mover_servo(angulo)
+
+        # Si solo TOGGLE_1 está activo (verdadero), activar avance
+        elif toggle1 == 1 and toggle2 == 0:
+            activar_buzzer(1)
+            activar_avance()
+
+        # Si solo TOGGLE_2 está activo (verdadero), activar retroceso
+        elif toggle2 == 1 and toggle1 == 0:
+            activar_buzzer(2)
+            activar_retroceso()
+
         # Si ambas entradas están activas (verdaderas), ejecutar vueltas del motor paso a paso
-        if toggle1 == 1 and toggle2 == 1:
+        elif toggle1 == 1 and toggle2 == 1:
             detener_motor_dc()
             activar_buzzer(3)
 
-            print("Motor paso a paso: Iniciando vueltas...")
-            lcd_text("Motor Stepper", 0x80)
+            # Número de vueltas que el motor debe dar (ajústalo según necesites)
+            num_turns = 1  # Cambia esto al número de vueltas deseadas
 
-            # Girar continuamente para dar vueltas completas
-            while True:
-                # Ejecutar una secuencia completa de pasos para una vuelta
-                for step in range(STEPS_PER_REVOLUTION):
-                    # Seleccionar la secuencia de paso actual
-                    sequence = STEP_SEQUENCE[step_index]
-                    
-                    # Enviar la secuencia a los pines del motor
-                    for pin in range(4):
-                        GPIO.output(motor_pins[pin], sequence[pin])
-                    
-                    # Avanzar al siguiente paso en la secuencia
-                    step_index = (step_index + 1) % len(STEP_SEQUENCE)
-                    
-                    # Pausar brevemente para permitir el movimiento del motor
-                    sleep(STEP_DELAY)
+            # Llamar a la función de movimiento del motor paso a paso
+            mover_motor_paso_a_paso(num_turns)
 
-                    # Actualizar el paso en la pantalla LCD y la consola
-                    step_count += 1
-                    if step_count % STEPS_PER_REVOLUTION == 0:
-                        turn_count += 1
-                        print(f"Vuelta completada: {turn_count}")
-                        lcd_text(f"Vuelta: {turn_count}", 0x80)
-
-                # Imprimir información del paso actual
-                print(f"Paso {step_count} / Vuelta {turn_count}")
+        # Pausa breve para evitar lectura continua excesiva
+        sleep(0.1)
 
 except KeyboardInterrupt:
     print("Deteniendo programa")
-    detener_motor_dc()
-    servo.stop()
-    GPIO.cleanup()
+    detener_motor
