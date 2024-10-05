@@ -72,6 +72,9 @@ STEP_SEQUENCE = [
 # Número de pasos por revolución para el motor paso a paso
 STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
 
+# Tiempo de delay entre pasos para ajustar velocidad
+STEP_DELAY = 0.01  # Ajusta el tiempo para el motor
+
 # Función para inicializar la pantalla LCD
 def lcd_init():
     lcd_write(0x33, GPIO.LOW)
@@ -159,48 +162,30 @@ try:
 
         print(f"TOGGLE_1: {toggle1}, TOGGLE_2: {toggle2}")
 
-        # Si ambas entradas están inactivas (falsas), mover el servomotor
-        if toggle1 == 0 and toggle2 == 0:
-            detener_motor_dc()
-            activar_buzzer(0)
-            lcd_text("Servo: 0 a 180", 0x80)
-            
-            # Recorrer de 0 a 180 grados
-            for angulo in range(0, 181, 10):
-                mover_servo(angulo)
-            
-            # Regresar de 180 a 0 grados
-            for angulo in range(180, -1, -10):
-                mover_servo(angulo)
-
-        # Si solo TOGGLE_1 está activo (verdadero), activar avance
-        elif toggle1 == 1 and toggle2 == 0:
-            activar_buzzer(1)
-            activar_avance()
-
-        # Si solo TOGGLE_2 está activo (verdadero), activar retroceso
-        elif toggle2 == 1 and toggle1 == 0:
-            activar_buzzer(2)
-            activar_retroceso()
-
-        # Si ambas entradas están activas (verdaderas), ejecutar un solo paso
-        elif toggle1 == 1 and toggle2 == 1:
+        # Si ambas entradas están activas (verdaderas), ejecutar vueltas del motor paso a paso
+        if toggle1 == 1 and toggle2 == 1:
             detener_motor_dc()
             activar_buzzer(3)
-            # Ejecutar un paso del motor paso a paso
-            sequence = STEP_SEQUENCE[step_index]
-            for pin in range(4):
-                GPIO.output(motor_pins[pin], sequence[pin])
-            
-            # Actualizar el paso en la LCD
-            step_count += 1
-            lcd_text(f"Paso: {step_count}", 0x80)
 
-            # Avanzar al siguiente paso en la secuencia
-            step_index = (step_index + 1) % len(STEP_SEQUENCE)
+            # Ingresar número de vueltas manualmente
+            num_turns = 1  # Cambia esto al número de vueltas deseadas
+            total_steps = int(num_turns * STEPS_PER_REVOLUTION)
 
-            # Pausar brevemente para permitir el movimiento del motor
-            sleep(0.01)
+            # Girar el motor por el número de pasos calculado
+            for step in range(total_steps):
+                sequence = STEP_SEQUENCE[step_index]
+                for pin in range(4):
+                    GPIO.output(motor_pins[pin], sequence[pin])
+                
+                # Actualizar el paso en la LCD
+                step_count += 1
+                lcd_text(f"Paso: {step_count}", 0x80)
+
+                # Avanzar al siguiente paso en la secuencia
+                step_index = (step_index + 1) % len(STEP_SEQUENCE)
+
+                # Pausar brevemente para permitir el movimiento del motor
+                sleep(STEP_DELAY)
 
         # Pausa breve para evitar lectura continua excesiva
         sleep(0.1)
