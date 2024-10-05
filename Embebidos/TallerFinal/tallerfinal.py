@@ -158,13 +158,13 @@ def mover_motor_paso_a_paso(num_turns):
             for pin in range(4):
                 GPIO.output(MOTOR_PINS[pin], sequence[pin])
             sleep(STEP_DELAY)
-    lcd_text(f"Paso: {step}", 0xC0)
     
 
 # Inicializa la pantalla LCD al inicio
 lcd_init()
 
-lcd_text("Universidad ECCI", 0x80)
+lcd_text("BIENVENIDO :D", 0x80)
+lcd_text("Universidad ECCI", 0xC0)
 sleep(1)
 
 try:
@@ -172,7 +172,7 @@ try:
         toggle1 = GPIO.input(TOGGLE_1)  # Lee entrada de avance
         toggle2 = GPIO.input(TOGGLE_2)  # Lee entrada de retroceso
 
-        print(f"TOGGLE_1: {toggle1}, TOGGLE_2: {toggle2}", end='\r')
+        print(f"SENSOR_1: {toggle1}, SENSOR_2: {toggle2}", end='\r')
 
         # Si ambas entradas están inactivas (falsas), mover el servomotor
         if toggle1 == 0 and toggle2 == 0:
