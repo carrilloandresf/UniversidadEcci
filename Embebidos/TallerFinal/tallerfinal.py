@@ -175,7 +175,7 @@ try:
         toggle1 = GPIO.input(TOGGLE_1)  # Lee entrada de avance
         toggle2 = GPIO.input(TOGGLE_2)  # Lee entrada de retroceso
 
-        print(f"\rTOGGLE_1: {toggle1}, TOGGLE_2: {toggle2}")
+        print(f"TOGGLE_1: {toggle1}, TOGGLE_2: {toggle2}", end='\r')
 
         # Si ambas entradas están inactivas (falsas), mover el servomotor
         if toggle1 == 0 and toggle2 == 0:
