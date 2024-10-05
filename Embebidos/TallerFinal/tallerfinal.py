@@ -67,10 +67,10 @@ STEP_SEQUENCE = [
 ]
 
 # Número de pasos por revolución para el motor paso a paso
-STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
+STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
 # Tiempo de delay entre pasos para ajustar velocidad
-STEP_DELAY = 0.01  # Ajusta el tiempo para el motor
+STEP_DELAY = 0.001  # Ajustado para el motor
 
 # Función para inicializar la pantalla LCD
 def lcd_init():
