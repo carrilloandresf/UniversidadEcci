@@ -5,7 +5,7 @@ import RPi.GPIO as GPIO  # Importa la librería RPi.GPIO para controlar los pine
 led_pin = 27  # Define el pin donde está conectado el LED (número de pin en modo BOARD)
 
 # Configura el uso de la numeración de los pines en modo BOARD (basado en la posición física de los pines)
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
 # Configura el pin del LED como salida
 GPIO.setup(led_pin, GPIO.OUT)
