@@ -2,13 +2,12 @@ import tkinter as tk  # Importa la librería Tkinter para crear interfaces gráf
 import RPi.GPIO as GPIO  # Importa la librería RPi.GPIO para controlar los pines GPIO de la Raspberry Pi
 
 # Configuración de los pines
-led_pin_1 = 11  # Define el pin donde está conectado el primer LED (modo BOARD)
+led_pin_1 = 27  # Define el pin donde está conectado el primer LED (modo BOARD)
 led_pin_2 = 26  # Define el pin donde está conectado el segundo LED (modo BCM)
 
 # Configura el uso de la numeración de los pines en modo BOARD (para led_pin_1) y modo BCM (para led_pin_2)
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(led_pin_1, GPIO.OUT)  # Configura el pin del primer LED como salida
 GPIO.setmode(GPIO.BCM)
+GPIO.setup(led_pin_1, GPIO.OUT)  # Configura el pin del primer LED como salida
 GPIO.setup(led_pin_2, GPIO.OUT)  # Configura el pin del segundo LED como salida
 
 # Función para encender y apagar el primer LED
