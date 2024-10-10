@@ -4,7 +4,7 @@ import RPi.GPIO as GPIO
 
 # Configuración de GPIO
 GPIO.setmode(GPIO.BCM)
-LED_PIN = 24
+LED_PIN = 27
 GPIO.setup(LED_PIN, GPIO.OUT)
 GPIO.output(LED_PIN, GPIO.LOW)
 
