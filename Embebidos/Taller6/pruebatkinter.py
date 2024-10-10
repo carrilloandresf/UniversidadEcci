@@ -1,45 +1,36 @@
-import tkinter as tk
-from tkinter import messagebox
-import RPi.GPIO as GPIO
+import tkinter as tk  # Importa la librería Tkinter para crear interfaces gráficas
+import RPi.GPIO as GPIO  # Importa la librería RPi.GPIO para controlar los pines GPIO de la Raspberry Pi
 
-# Configuración de GPIO
-GPIO.setmode(GPIO.BCM)
-LED_PIN = 27
-GPIO.setup(LED_PIN, GPIO.OUT)
-GPIO.output(LED_PIN, GPIO.LOW)
+# Configuración de los pines
+led_pin = 11  # Define el pin donde está conectado el LED (número de pin en modo BOARD)
 
-# Inicializamos el estado del LED como apagado
-led_state = False
+# Configura el uso de la numeración de los pines en modo BOARD (basado en la posición física de los pines)
+GPIO.setmode(GPIO.BOARD)
 
-# Función para cambiar el estado del LED
+# Configura el pin del LED como salida
+GPIO.setup(led_pin, GPIO.OUT)
+
+# Función para encender y apagar el LED
 def toggle_led():
-    global led_state
-    if led_state:
-        GPIO.output(LED_PIN, GPIO.LOW)
-        btn_led.config(text="Encender LED")
-        led_state = False
-    else:
-        GPIO.output(LED_PIN, GPIO.HIGH)
-        btn_led.config(text="Apagar LED")
-        led_state = True
+    current_state = GPIO.input(led_pin)  # Lee el estado actual del pin (encendido o apagado)
+    GPIO.output(led_pin, not current_state)  # Cambia el estado del pin (si está encendido, lo apaga y viceversa)
 
-# Función para cerrar la ventana y limpiar los GPIO
-def close_window():
-    GPIO.cleanup()
-    window.quit()
-
-# Crear la ventana principal
-window = tk.Tk()
-window.title("Control de LED con Tkinter")
+# Configuración de la ventana de Tkinter
+root = tk.Tk()  # Crea la ventana principal de Tkinter
+root.title("Control de LED")  # Título de la ventana
 
 # Botón para encender/apagar el LED
-btn_led = tk.Button(window, text="Encender LED", command=toggle_led, width=20, height=2)
-btn_led.pack(pady=20)
+led_button = tk.Button(root, text="LED_1", command=toggle_led)  # Crea un botón con el texto 'LED_1' y la función 'toggle_led'
+led_button.pack(pady=300)  # Coloca el botón en la ventana con un espacio de 300 píxeles en el eje y (vertical)
+led_button.place(x=50, y=50)  # Ubica el botón en la posición (50, 50) de la ventana
 
-# Botón para salir de la aplicación
-btn_exit = tk.Button(window, text="Salir", command=close_window, width=20, height=2)
-btn_exit.pack(pady=20)
+# Cierre adecuado de GPIO al salir
+def on_closing():
+    GPIO.cleanup()  # Limpia los pines GPIO para asegurarse de que estén en estado seguro
+    root.quit()  # Cierra la ventana de la aplicación
 
-# Ejecutar la ventana principal
-window.protocol("WM_DELETE_WINDOW", close_window)
-window.mainloop()
+# Detecta si el usuario cierra la ventana y ejecuta la función 'on_closing' para limpiar los GPIO
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
+# Iniciar la aplicación
+root.mainloop()  # Mantiene la ventana abierta y esperando interacción del usuario
