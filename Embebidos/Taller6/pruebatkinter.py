@@ -2,7 +2,7 @@ import tkinter as tk  # Importa la librería Tkinter para crear interfaces gráf
 import RPi.GPIO as GPIO  # Importa la librería RPi.GPIO para controlar los pines GPIO de la Raspberry Pi
 
 # Configuración de los pines
-led_pin = 11  # Define el pin donde está conectado el LED (número de pin en modo BOARD)
+led_pin = 27  # Define el pin donde está conectado el LED (número de pin en modo BOARD)
 
 # Configura el uso de la numeración de los pines en modo BOARD (basado en la posición física de los pines)
 GPIO.setmode(GPIO.BOARD)
