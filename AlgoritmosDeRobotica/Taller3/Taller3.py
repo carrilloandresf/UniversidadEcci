@@ -243,9 +243,13 @@ class Ui_Dialog(object):
     def write_name(self, name):
         # Lógica de escritura de nombre con el efector final
         # Podrías usar un método básico para cada letra en el nombre
-        self.set_servo_angle(servo1, 45)
-        self.set_servo_angle(servo2, 45)
-        # (Completar la lógica de escritura)
+        for letter in name:
+            # Lógica de movimiento específica para cada letra
+            self.set_servo_angle(servo1, 45)
+            self.set_servo_angle(servo2, 45)
+            time.sleep(1)
+        self.set_servo_angle(servo1, 0)
+        self.set_servo_angle(servo2, 0)
 
     def write_custom_word(self):
         word = self.lineEdit_3.text()
@@ -256,8 +260,20 @@ class Ui_Dialog(object):
         self.set_servo_angle(servo1, 0)
         self.set_servo_angle(servo2, 0)
         time.sleep(2)  # Espera para que el usuario coloque el papel
-        # (Implementar lógica para trazar el logo paso a paso)
-# comentario random
+        # Implementar lógica para trazar el logo paso a paso
+        if logo_name == "Puma":
+            # Lógica de trazado para Puma
+            pass
+        elif logo_name == "Toyota":
+            # Lógica de trazado para Toyota
+            pass
+        elif logo_name == "Apple":
+            # Lógica de trazado para Apple
+            pass
+        elif logo_name == "Pepsi":
+            # Lógica de trazado para Pepsi
+            pass
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
