@@ -39,6 +39,11 @@ Para garantizar que todas las dependencias necesarias están instaladas y evitar
     deactivate
     ```
 
+6. **Activar entonrno creado**
+    ```bash
+    source ~/mi_entorno/bin/activate
+    ```
+
 De esta manera, los colaboradores del proyecto podrán instalar todas las dependencias necesarias de forma rápida y sencilla.
 
 
