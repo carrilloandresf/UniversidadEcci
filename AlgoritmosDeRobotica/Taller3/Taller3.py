@@ -257,7 +257,7 @@ class Ui_Dialog(object):
         self.set_servo_angle(servo2, 0)
         time.sleep(2)  # Espera para que el usuario coloque el papel
         # (Implementar lógica para trazar el logo paso a paso)
-
+# comentario random
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
