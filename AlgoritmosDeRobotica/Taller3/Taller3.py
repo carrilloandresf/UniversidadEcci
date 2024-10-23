@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import RPi.GPIO as GPIO
@@ -25,9 +26,34 @@ class MplCanvas(FigureCanvas):
         self.axes = self.fig.add_subplot(111)
         super(MplCanvas, self).__init__(self.fig)
 
+class SimulationWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Simulación del Robot SCARA")
+        self.canvas = MplCanvas(self, width=5, height=4, dpi=100)
+        self.setCentralWidget(self.canvas)
+        self.show()
+
+    def update_graph(self, theta1, theta2):
+        # Dibujar el robot en el canvas de matplotlib
+        self.canvas.axes.clear()
+        # Calcular las posiciones del robot
+        x1 = np.cos(np.radians(theta1))
+        y1 = np.sin(np.radians(theta1))
+        x2 = x1 + np.cos(np.radians(theta1 + theta2))
+        y2 = y1 + np.sin(np.radians(theta1 + theta2))
+
+        # Dibujar el robot SCARA
+        self.canvas.axes.plot([0, x1, x2], [0, y1, y2], marker='o')
+        self.canvas.axes.set_xlim(-2, 2)
+        self.canvas.axes.set_ylim(-2, 2)
+        self.canvas.axes.set_title("Simulación SCARA")
+        self.canvas.draw()
+
 class Ui_Dialog(object):
     def __init__(self):
         self.robot = self.create_robot()
+        self.simulation_window = SimulationWindow()  # Crear ventana de simulación
 
     def create_robot(self):
         # Configuración del robot SCARA con los parámetros DH
@@ -43,18 +69,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(860, 640)
-        # Configuración de la interfaz gráfica
-        self.graphicsView = QtWidgets.QWidget(Dialog)
-        self.graphicsView.setGeometry(QtCore.QRect(450, 80, 256, 192))
-        
-        # Crear una figura de matplotlib dentro de graphicsView
-        self.canvas = MplCanvas(self.graphicsView, width=5, height=4, dpi=100)
-        layout = QtWidgets.QVBoxLayout(self.graphicsView)
-        layout.addWidget(self.canvas)
-
-        self.update_robot_graph(0, 0)
-
-        # Aquí continúa la configuración de los elementos UI...
+        # Configuración de los elementos UI
         self.label_2 = QtWidgets.QLabel(Dialog)
         self.label_2.setGeometry(QtCore.QRect(40, 440, 261, 181))
         font = QtGui.QFont()
@@ -111,9 +126,6 @@ class Ui_Dialog(object):
         font.setPointSize(15)
         self.label_8.setFont(font)
         self.label_8.setObjectName("label_8")
-        self.graphicsView = QtWidgets.QGraphicsView(Dialog)
-        self.graphicsView.setGeometry(QtCore.QRect(450, 80, 256, 192))
-        self.graphicsView.setObjectName("graphicsView")
         self.pushButton = QtWidgets.QPushButton(Dialog)
         self.pushButton.setGeometry(QtCore.QRect(20, 180, 80, 22))
         self.pushButton.setObjectName("pushButton")
@@ -173,6 +185,11 @@ class Ui_Dialog(object):
         self.pushButton_9.clicked.connect(lambda: self.draw_logo("Apple"))
         self.pushButton_10.clicked.connect(lambda: self.draw_logo("Pepsi"))
 
+        # Iniciar los servos y la simulación en 0 grados
+        self.set_servo_angle(servo1, 0)
+        self.set_servo_angle(servo2, 0)
+        self.simulation_window.update_graph(0, 0)
+
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
@@ -204,7 +221,7 @@ class Ui_Dialog(object):
         self.set_servo_angle(servo2, theta2)
         self.label_7.setText(f"{theta1:.2f}")
         self.label_8.setText(f"{theta2:.2f}")
-        self.update_robot_graph(theta1, theta2)
+        self.simulation_window.update_graph(theta1, theta2)
 
     def inverse_kinematics(self, x, y):
         # Simulación del cálculo de ángulos inversos para el robot SCARA
@@ -221,7 +238,7 @@ class Ui_Dialog(object):
             self.set_servo_angle(servo2, s2)
             self.label_7.setText(f"{s1:.2f}")
             self.label_8.setText(f"{s2:.2f}")
-            self.update_robot_graph(s1, s2)
+            self.simulation_window.update_graph(s1, s2)
 
     def write_name(self, name):
         # Lógica de escritura de nombre con el efector final
@@ -240,22 +257,6 @@ class Ui_Dialog(object):
         self.set_servo_angle(servo2, 0)
         time.sleep(2)  # Espera para que el usuario coloque el papel
         # (Implementar lógica para trazar el logo paso a paso)
-
-    def update_robot_graph(self, theta1, theta2):
-        # Dibujar el robot en el canvas de matplotlib
-        self.canvas.axes.clear()
-        # Calcular las posiciones del robot
-        x1 = np.cos(np.radians(theta1))
-        y1 = np.sin(np.radians(theta1))
-        x2 = x1 + np.cos(np.radians(theta1 + theta2))
-        y2 = y1 + np.sin(np.radians(theta1 + theta2))
-
-        # Dibujar el robot SCARA
-        self.canvas.axes.plot([0, x1, x2], [0, y1, y2], marker='o')
-        self.canvas.axes.set_xlim(-2, 2)
-        self.canvas.axes.set_ylim(-2, 2)
-        self.canvas.axes.set_title("Simulación SCARA")
-        self.canvas.draw()
 
 if __name__ == "__main__":
     import sys
