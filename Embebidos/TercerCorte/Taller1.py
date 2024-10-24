@@ -15,14 +15,30 @@ GPIO.setup(MOTOR_LEFT, GPIO.OUT)
 GPIO.setup(MOTOR_RIGHT, GPIO.OUT)
 GPIO.setup(BUZZER, GPIO.OUT)
 
-# Funciones para controlar el motor y el zumbador
-def rotate_left():
-    GPIO.output(MOTOR_LEFT, GPIO.HIGH)
-    GPIO.output(MOTOR_RIGHT, GPIO.LOW)
+# Variables de estado para los botones de giro
+motor_left_state = False
+motor_right_state = False
 
-def rotate_right():
-    GPIO.output(MOTOR_LEFT, GPIO.LOW)
-    GPIO.output(MOTOR_RIGHT, GPIO.HIGH)
+# Funciones para controlar el motor y el zumbador
+def toggle_left():
+    global motor_left_state
+    if motor_left_state:
+        stop_motor()
+        motor_left_state = False
+    else:
+        GPIO.output(MOTOR_LEFT, GPIO.HIGH)
+        GPIO.output(MOTOR_RIGHT, GPIO.LOW)
+        motor_left_state = True
+
+def toggle_right():
+    global motor_right_state
+    if motor_right_state:
+        stop_motor()
+        motor_right_state = False
+    else:
+        GPIO.output(MOTOR_LEFT, GPIO.LOW)
+        GPIO.output(MOTOR_RIGHT, GPIO.HIGH)
+        motor_right_state = True
 
 def stop_motor():
     GPIO.output(MOTOR_LEFT, GPIO.LOW)
@@ -44,8 +60,8 @@ root = tk.Tk()
 root.title("Control de Puente-H y Zumbador")
 
 # Crear los botones
-btn_left = tk.Button(root, text="Girar Izquierda", command=rotate_left)
-btn_right = tk.Button(root, text="Girar Derecha", command=rotate_right)
+btn_left = tk.Button(root, text="Girar Izquierda", command=toggle_left)
+btn_right = tk.Button(root, text="Girar Derecha", command=toggle_right)
 btn_buzzer = tk.Button(root, text="Encender/Apagar Zumbador", command=toggle_buzzer)
 btn_exit = tk.Button(root, text="Salir", command=exit_program)
 
