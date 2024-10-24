@@ -223,6 +223,7 @@ class Ui_Dialog(object):
         self.pushButton_11.setText(_translate("Dialog", "Mover"))
 
     def move_to_position(self):
+        print("move_to_position")
         x = float(self.lineEdit.text())
         y = float(self.lineEdit_2.text())
         # Calcular ángulos inversos (IK) para alcanzar la posición (x, y)
@@ -257,8 +258,10 @@ class Ui_Dialog(object):
             return 0, 0
 
     def draw_yin_yang(self):
+        print("draw_yin_yang")
         movements = [(0, 0), (90, 0), (180, 0), (180, 90), (0, 180), (0, 90), (0, 0)]
         for s1, s2 in movements:
+            print(s1,"|",s2)
             self.set_servo_angle(servo1, s1)
             self.set_servo_angle(servo2, s2)
             self.label_7.setText(f"{s1:.2f}")
@@ -266,6 +269,7 @@ class Ui_Dialog(object):
             self.simulation_window.update_graph(s1, s2)
 
     def write_name(self, name):
+        print("write_name")
         # Lógica de escritura de nombre con el efector final
         # Podrías usar un método básico para cada letra en el nombre
         for letter in name:
