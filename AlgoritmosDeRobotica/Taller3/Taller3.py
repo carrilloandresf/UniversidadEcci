@@ -2,23 +2,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import RPi.GPIO as GPIO
 import time
 from roboticstoolbox import DHRobot, RevoluteDH
 import numpy as np
+import board
+import busio
+from adafruit_pca9685 import PCA9685
 
-# Configuración GPIO para Raspberry Pi
-GPIO.setmode(GPIO.BCM)
-SERVO1_PIN = 17  # Asigna un pin GPIO para el servo 1
-SERVO2_PIN = 18  # Asigna un pin GPIO para el servo 2
-
-GPIO.setup(SERVO1_PIN, GPIO.OUT)
-GPIO.setup(SERVO2_PIN, GPIO.OUT)
-
-servo1 = GPIO.PWM(SERVO1_PIN, 50)  # Inicializa el servo 1 con una frecuencia de 50Hz
-servo2 = GPIO.PWM(SERVO2_PIN, 50)  # Inicializa el servo 2 con una frecuencia de 50Hz
-servo1.start(0)
-servo2.start(0)
+# Configuración del bus I2C y el controlador PCA9685
+i2c = busio.I2C(board.SCL, board.SDA)
+pca = PCA9685(i2c)
+pca.frequency = 50  # Frecuencia de 50 Hz para servos
 
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -61,20 +55,29 @@ class Ui_Dialog(object):
         link2 = RevoluteDH(d=0, a=1, alpha=0)
         return DHRobot([link1, link2], name='SCARA')
 
-    def set_servo_angle(self, servo, angle):
-        # Limitar el ángulo entre 0 y 180 grados (ajusta según el rango permitido por tu servomotor)
+    def set_servo_angle(self, channel, angle):
+        """
+        Ajusta el ángulo del servomotor en el canal especificado del PCA9685.
+        Args:
+            channel (int): Canal en el que está conectado el servomotor (0 a 15).
+            angle (float): Ángulo en grados (0 a 180).
+        """
+        # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
         
-        # Calcular el ciclo de trabajo basado en el ángulo
-        duty = angle / 18 + 2
+        # Convertir el ángulo a un valor de pulso PWM (usando la escala típica de 500-2500 µs)
+        pulse_min = 500   # Ancho de pulso mínimo (en microsegundos)
+        pulse_max = 2500  # Ancho de pulso máximo (en microsegundos)
         
-        # Limitar el ciclo de trabajo entre 0.0 y 100.0 para evitar errores
-        duty = max(0.0, min(100.0, duty))
+        # Calcular el valor de pulso basado en el ángulo (mapeo lineal)
+        pulse_length = pulse_min + (angle / 180.0) * (pulse_max - pulse_min)
         
-        # Asignar el ciclo de trabajo al servomotor
-        servo.ChangeDutyCycle(duty)
-        time.sleep(1)  # Espera para que el movimiento se vea reflejado físicamente
-
+        # Convertir el ancho de pulso a un valor entre 0 y 4095 (12 bits del PCA9685)
+        pwm_value = int((pulse_length / 1000000.0) * pca.frequency * 4096)
+        
+        # Establecer el valor PWM en el canal correspondiente
+        pca.channels[channel].duty_cycle = pwm_value
+        time.sleep(1)
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
@@ -196,8 +199,8 @@ class Ui_Dialog(object):
         self.pushButton_10.clicked.connect(lambda: self.draw_logo("Pepsi"))
 
         # Iniciar los servos y la simulación en 0 grados
-        self.set_servo_angle(servo1, 0)
-        self.set_servo_angle(servo2, 0)
+        self.set_servo_angle(0, 0)
+        self.set_servo_angle(1, 0)
         self.simulation_window.update_graph(0, 0)
 
     def retranslateUi(self, Dialog):
@@ -207,7 +210,7 @@ class Ui_Dialog(object):
         self.label.setText(_translate("Dialog", "Manejo de posiciones"))
         self.label_4.setText(_translate("Dialog", "Posicion x"))
         self.label_5.setText(_translate("Dialog", "Posicion Y"))
-        self.label_6.setText(_translate("Dialog", "Angulo: X                     y"))
+        self.label_6.setText(_translate("Dialog", "Angulo: S1                     S2"))
         self.label_7.setText(_translate("Dialog", "###"))
         self.label_8.setText(_translate("Dialog", "###"))
         self.pushButton.setText(_translate("Dialog", "Trayectoria"))
@@ -228,8 +231,8 @@ class Ui_Dialog(object):
         y = float(self.lineEdit_2.text())
         # Calcular ángulos inversos (IK) para alcanzar la posición (x, y)
         theta1, theta2 = self.inverse_kinematics(x, y)
-        self.set_servo_angle(servo1, theta1)
-        self.set_servo_angle(servo2, theta2)
+        self.set_servo_angle(0, theta1)
+        self.set_servo_angle(1, theta2)
         self.label_7.setText(f"{theta1:.2f}")
         self.label_8.setText(f"{theta2:.2f}")
         self.simulation_window.update_graph(theta1, theta2)
@@ -266,8 +269,8 @@ class Ui_Dialog(object):
             theta1, theta2 = self.inverse_kinematics(float(s1), float(s2))
             print(" -- ", theta1, " | ", theta2)
             # Actualizar los labels con los valores actuales
-            self.set_servo_angle(servo1, theta1)
-            self.set_servo_angle(servo2, theta2)
+            self.set_servo_angle(0, theta1)
+            self.set_servo_angle(1, theta2)
             self.label_7.setText(f"{theta1:.2f}")
             self.label_8.setText(f"{theta2:.2f}")
             self.simulation_window.update_graph(theta1, theta2)
@@ -275,18 +278,17 @@ class Ui_Dialog(object):
             # Esperar un segundo antes de pasar al siguiente movimiento
             time.sleep(1)
 
-
     def write_name(self, name):
         print("write_name")
         # Lógica de escritura de nombre con el efector final
         # Podrías usar un método básico para cada letra en el nombre
         for letter in name:
             # Lógica de movimiento específica para cada letra
-            self.set_servo_angle(servo1, 45)
-            self.set_servo_angle(servo2, 45)
+            self.set_servo_angle(0, 45)
+            self.set_servo_angle(1, 45)
             time.sleep(1)
-        self.set_servo_angle(servo1, 0)
-        self.set_servo_angle(servo2, 0)
+        self.set_servo_angle(0, 0)
+        self.set_servo_angle(1, 0)
 
     def write_custom_word(self):
         word = self.lineEdit_3.text()
@@ -294,8 +296,8 @@ class Ui_Dialog(object):
 
     def draw_logo(self, logo_name):
         # Lógica para trazar los logos específicos
-        self.set_servo_angle(servo1, 0)
-        self.set_servo_angle(servo2, 0)
+        self.set_servo_angle(0, 0)
+        self.set_servo_angle(1, 0)
         time.sleep(2)  # Espera para que el usuario coloque el papel
         # Implementar lógica para trazar el logo paso a paso
         if logo_name == "Puma":
