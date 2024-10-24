@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 import RPi.GPIO as GPIO
 
 # Configuración de los GPIO
@@ -59,14 +60,17 @@ def exit_program():
 root = tk.Tk()
 root.title("Control de Puente-H y Zumbador")
 
-# Crear los botones
-btn_left = tk.Button(root, text="Girar Izquierda", command=toggle_left)
-btn_right = tk.Button(root, text="Girar Derecha", command=toggle_right)
-btn_buzzer = tk.Button(root, text="Encender/Apagar Zumbador", command=toggle_buzzer)
-btn_exit = tk.Button(root, text="Salir", command=exit_program)
+# Mostrar mensaje emergente
+messagebox.showinfo("Bienvenida", "Profe te amo")
+
+# Crear los botones con colores personalizados
+btn_left = tk.Button(root, text="Girar Izquierda", command=toggle_left, bg="#FF9999", fg="white", font=("Arial", 12, "bold"))
+btn_right = tk.Button(root, text="Girar Derecha", command=toggle_right, bg="#99CCFF", fg="white", font=("Arial", 12, "bold"))
+btn_buzzer = tk.Button(root, text="Encender/Apagar Zumbador", command=toggle_buzzer, bg="#FFD700", fg="black", font=("Arial", 12, "bold"))
+btn_exit = tk.Button(root, text="Salir", command=exit_program, bg="#FF6666", fg="white", font=("Arial", 12, "bold"))
 
 # Crear la caja de texto
-text_box = tk.Entry(root, width=30)
+text_box = tk.Entry(root, width=30, font=("Arial", 12))
 
 # Colocar los widgets en la ventana
 btn_left.grid(row=0, column=0, padx=10, pady=10)
