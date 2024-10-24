@@ -62,9 +62,19 @@ class Ui_Dialog(object):
         return DHRobot([link1, link2], name='SCARA')
 
     def set_servo_angle(self, servo, angle):
+        # Limitar el ángulo entre 0 y 180 grados (ajusta según el rango permitido por tu servomotor)
+        angle = max(0, min(180, angle))
+        
+        # Calcular el ciclo de trabajo basado en el ángulo
         duty = angle / 18 + 2
+        
+        # Limitar el ciclo de trabajo entre 0.0 y 100.0 para evitar errores
+        duty = max(0.0, min(100.0, duty))
+        
+        # Asignar el ciclo de trabajo al servomotor
         servo.ChangeDutyCycle(duty)
         time.sleep(1)  # Espera para que el movimiento se vea reflejado físicamente
+
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
