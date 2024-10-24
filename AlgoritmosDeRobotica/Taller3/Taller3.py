@@ -260,13 +260,25 @@ class Ui_Dialog(object):
     def draw_yin_yang(self):
         print("draw_yin_yang")
         movements = [(0, 0), (90, 0), (180, 0), (180, 90), (0, 180), (0, 90), (0, 0)]
+        
         for s1, s2 in movements:
-            print(s1,"|",s2)
+            print(s1, "|", s2)
             self.set_servo_angle(servo1, s1)
             self.set_servo_angle(servo2, s2)
+            
+            # Actualizar los labels con los valores actuales
             self.label_7.setText(f"{s1:.2f}")
             self.label_8.setText(f"{s2:.2f}")
+            
+            # Forzar la actualización de la interfaz gráfica
+            QtWidgets.QApplication.processEvents()
+            
+            # Actualizar la gráfica de simulación
             self.simulation_window.update_graph(s1, s2)
+            
+            # Esperar un segundo antes de pasar al siguiente movimiento
+            time.sleep(1)
+
 
     def write_name(self, name):
         print("write_name")
