@@ -5,15 +5,18 @@ from matplotlib.figure import Figure
 import time
 from roboticstoolbox import DHRobot, RevoluteDH
 import numpy as np
-import Adafruit_PCA9685
+import board
+from adafruit_motor import servo
+from adafruit_pca9685 import PCA9685
 
-# Inicializar el PCA9685 usando la dirección predeterminada (0x40)
-pwm = Adafruit_PCA9685.PCA9685()
-pwm.set_pwm_freq(60)  # Configurar la frecuencia a 60Hz para servomotores
+# Configuración de PCA9685 y servos
+i2c = board.I2C()  # usa board.SCL y board.SDA en la Raspberry Pi
+pca = PCA9685(i2c)
+pca.frequency = 50  # Configuración de frecuencia para servos
 
-# Configurar el ancho de pulso mínimo y máximo para los servos
-servo_min = 150  # Ancho de pulso mínimo (en unidades de 12 bits, de 0 a 4096)
-servo_max = 600  # Ancho de pulso máximo (en unidades de 12 bits, de 0 a 4096)
+# Configuración de los servos en los canales 0 y 1
+servo1 = servo.Servo(pca.channels[0], min_pulse=500, max_pulse=2400)
+servo2 = servo.Servo(pca.channels[1], min_pulse=500, max_pulse=2400)
 
 class MplCanvas(FigureCanvas):
     def __init__(self, parent=None, width=5, height=4, dpi=100):
@@ -56,21 +59,16 @@ class Ui_Dialog(object):
         link2 = RevoluteDH(d=0, a=1, alpha=0)
         return DHRobot([link1, link2], name='SCARA')
 
-    def set_servo_angle(self, channel, angle):
+    def set_servo_angle(self, servo_motor, angle):
         """
-        Ajusta el ángulo del servomotor en el canal especificado del PCA9685.
+        Ajusta el ángulo del servomotor usando la instancia del servo.
         Args:
-            channel (int): Canal en el que está conectado el servomotor (0 a 15).
+            servo_motor (adafruit_motor.servo.Servo): Instancia del servomotor.
             angle (float): Ángulo en grados (0 a 180).
         """
         # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
-        
-        # Mapear el ángulo al rango de ancho de pulso (servo_min a servo_max)
-        pulse = int(servo_min + (angle / 180.0) * (servo_max - servo_min))
-        
-        # Configurar el ancho de pulso del canal correspondiente
-        pwm.set_pwm(channel, 0, pulse)
+        servo_motor.angle = angle
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
@@ -192,8 +190,8 @@ class Ui_Dialog(object):
         self.pushButton_10.clicked.connect(lambda: self.draw_logo("Pepsi"))
 
         # Iniciar los servos y la simulación en 0 grados
-        self.set_servo_angle(0, 0)  # Canal 0 (primer servo)
-        self.set_servo_angle(1, 0)  # Canal 1 (segundo servo)
+        self.set_servo_angle(servo1, 0)  # Canal 0 (primer servo)
+        self.set_servo_angle(servo2, 0)  # Canal 1 (segundo servo)
         self.simulation_window.update_graph(0, 0)
 
     def retranslateUi(self, Dialog):
@@ -224,8 +222,8 @@ class Ui_Dialog(object):
         y = float(self.lineEdit_2.text())
         # Calcular ángulos inversos (IK) para alcanzar la posición (x, y)
         theta1, theta2 = self.inverse_kinematics(x, y)
-        self.set_servo_angle(0, theta1)  # Canal 0 para el primer servo
-        self.set_servo_angle(1, theta2)  # Canal 1 para el segundo servo
+        self.set_servo_angle(servo1, theta1)  # Canal 0 para el primer servo
+        self.set_servo_angle(servo2, theta2)  # Canal 1 para el segundo servo
         self.label_7.setText(f"{theta1:.2f}")
         self.label_8.setText(f"{theta2:.2f}")
         self.simulation_window.update_graph(theta1, theta2)
@@ -262,8 +260,8 @@ class Ui_Dialog(object):
             theta1, theta2 = self.inverse_kinematics(float(s1), float(s2))
             print(" -- ", theta1, " | ", theta2)
             # Actualizar los labels con los valores actuales
-            self.set_servo_angle(0, theta1)  # Canal 0 para el primer servo
-            self.set_servo_angle(1, theta2)  # Canal 1 para el segundo servo
+            self.set_servo_angle(servo1, theta1)  # Canal 0 para el primer servo
+            self.set_servo_angle(servo2, theta2)  # Canal 1 para el segundo servo
             self.label_7.setText(f"{theta1:.2f}")
             self.label_8.setText(f"{theta2:.2f}")
             self.simulation_window.update_graph(theta1, theta2)
@@ -277,11 +275,11 @@ class Ui_Dialog(object):
         # Podrías usar un método básico para cada letra en el nombre
         for letter in name:
             # Lógica de movimiento específica para cada letra
-            self.set_servo_angle(0, 45)  # Canal 0
-            self.set_servo_angle(1, 45)  # Canal 1
+            self.set_servo_angle(servo1, 45)  # Canal 0
+            self.set_servo_angle(servo2, 45)  # Canal 1
             time.sleep(1)
-        self.set_servo_angle(0, 0)  # Canal 0
-        self.set_servo_angle(1, 0)  # Canal 1
+        self.set_servo_angle(servo1, 0)  # Canal 0
+        self.set_servo_angle(servo2, 0)  # Canal 1
 
     def write_custom_word(self):
         word = self.lineEdit_3.text()
@@ -289,8 +287,8 @@ class Ui_Dialog(object):
 
     def draw_logo(self, logo_name):
         # Lógica para trazar los logos específicos
-        self.set_servo_angle(0, 0)  # Canal 0
-        self.set_servo_angle(1, 0)  # Canal 1
+        self.set_servo_angle(servo1, 0)  # Canal 0
+        self.set_servo_angle(servo2, 0)  # Canal 1
         time.sleep(2)  # Espera para que el usuario coloque el papel
         # Implementar lógica para trazar el logo paso a paso
         if logo_name == "Puma":
