@@ -263,7 +263,8 @@ class Ui_Dialog(object):
         
         for s1, s2 in movements:
             print(s1, "|", s2)
-            theta1, theta2 = self.inverse_kinematics(s1, s2)
+            theta1, theta2 = self.inverse_kinematics(float(s1), float(s2))
+            print(" -- ", theta1, " | ", theta2)
             # Actualizar los labels con los valores actuales
             self.set_servo_angle(servo1, theta1)
             self.set_servo_angle(servo2, theta2)
