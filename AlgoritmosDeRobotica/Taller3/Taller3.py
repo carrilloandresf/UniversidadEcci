@@ -227,9 +227,24 @@ class Ui_Dialog(object):
         # Simulación del cálculo de ángulos inversos para el robot SCARA
         d1 = 1  # Longitud del primer brazo
         d2 = 1  # Longitud del segundo brazo
-        theta2 = np.arccos((x**2 + y**2 - d1**2 - d2**2) / (2 * d1 * d2))
-        theta1 = np.arctan2(y, x) - np.arctan2(d2 * np.sin(theta2), d1 + d2 * np.cos(theta2))
-        return np.degrees(theta1), np.degrees(theta2)
+        
+        # Calcular el valor del coseno de theta2, asegurando que esté en el rango [-1, 1]
+        cos_theta2 = (x**2 + y**2 - d1**2 - d2**2) / (2 * d1 * d2)
+        
+        # Limitar el valor de cos_theta2 para evitar errores de dominio
+        cos_theta2 = np.clip(cos_theta2, -1, 1)
+        
+        try:
+            # Calcular theta2 en radianes y luego convertir a grados
+            theta2 = np.arccos(cos_theta2)
+            # Calcular theta1 en radianes y luego convertir a grados
+            theta1 = np.arctan2(y, x) - np.arctan2(d2 * np.sin(theta2), d1 + d2 * np.cos(theta2))
+            
+            return np.degrees(theta1), np.degrees(theta2)
+        except ValueError:
+            # Si hay un error, retornar ángulos predeterminados o levantar una excepción
+            print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
+            return 0, 0
 
     def draw_yin_yang(self):
         movements = [(0, 0), (90, 0), (180, 0), (180, 90), (0, 180), (0, 90), (0, 0)]
