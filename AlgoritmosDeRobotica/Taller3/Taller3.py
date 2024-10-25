@@ -70,6 +70,43 @@ class Ui_Dialog(object):
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
+    def move_servos_smoothly(self, target_angle1, target_angle2, steps=50, delay=0.02):
+        """
+        Mueve ambos servos suavemente hacia los ángulos objetivo de manera sincronizada.
+        Args:
+            target_angle1 (float): Ángulo objetivo para el primer servo.
+            target_angle2 (float): Ángulo objetivo para el segundo servo.
+            steps (int): Número de pasos intermedios para un movimiento suave.
+            delay (float): Tiempo de espera entre cada paso en segundos.
+        """
+        # Obtener los ángulos actuales de los servos
+        current_angle1 = servo1.angle if servo1.angle is not None else 0
+        current_angle2 = servo2.angle if servo2.angle is not None else 0
+
+        # Calcular las diferencias de ángulo
+        diff1 = target_angle1 - current_angle1
+        diff2 = target_angle2 - current_angle2
+
+        # Mover en pequeños pasos para hacer el movimiento más suave
+        for step in range(steps + 1):
+            # Calcular los ángulos intermedios para ambos servos
+            intermediate_angle1 = current_angle1 + (diff1 / steps) * step
+            intermediate_angle2 = current_angle2 + (diff2 / steps) * step
+
+            # Establecer los ángulos intermedios para ambos servos
+            self.set_servo_angle(servo1, intermediate_angle1)
+            self.set_servo_angle(servo2, intermediate_angle2)
+
+            # Actualizar los labels con los valores actuales
+            self.label_7.setText(f"{intermediate_angle1:.2f}")
+            self.label_8.setText(f"{intermediate_angle2:.2f}")
+            
+            # Actualizar la simulación para reflejar los ángulos actuales
+            self.simulation_window.update_graph(intermediate_angle1, intermediate_angle2)
+
+            # Esperar un pequeño intervalo de tiempo para hacer el movimiento suave
+            time.sleep(delay)
+
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(860, 640)
@@ -201,7 +238,7 @@ class Ui_Dialog(object):
         self.label.setText(_translate("Dialog", "Manejo de posiciones"))
         self.label_4.setText(_translate("Dialog", "Posicion x"))
         self.label_5.setText(_translate("Dialog", "Posicion Y"))
-        self.label_6.setText(_translate("Dialog", "Angulo: S1                     S2"))
+        self.label_6.setText(_translate("Dialog", "Angulo:S1                        S2"))
         self.label_7.setText(_translate("Dialog", "###"))
         self.label_8.setText(_translate("Dialog", "###"))
         self.pushButton.setText(_translate("Dialog", "Trayectoria"))
@@ -222,8 +259,7 @@ class Ui_Dialog(object):
         y = float(self.lineEdit_2.text())
         # Calcular ángulos inversos (IK) para alcanzar la posición (x, y)
         theta1, theta2 = self.inverse_kinematics(x, y)
-        self.set_servo_angle(servo1, theta1)  # Canal 0 para el primer servo
-        self.set_servo_angle(servo2, theta2)  # Canal 1 para el segundo servo
+        self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
         self.label_7.setText(f"{theta1:.2f}")
         self.label_8.setText(f"{theta2:.2f}")
         self.simulation_window.update_graph(theta1, theta2)
@@ -259,9 +295,9 @@ class Ui_Dialog(object):
             print(s1, "|", s2)
             theta1, theta2 = self.inverse_kinematics(float(s1), float(s2))
             print(" -- ", theta1, " | ", theta2)
+            # Mover suavemente ambos servos hacia los ángulos calculados
+            self.move_servos_smoothly(theta1, theta2)
             # Actualizar los labels con los valores actuales
-            self.set_servo_angle(servo1, theta1)  # Canal 0 para el primer servo
-            self.set_servo_angle(servo2, theta2)  # Canal 1 para el segundo servo
             self.label_7.setText(f"{theta1:.2f}")
             self.label_8.setText(f"{theta2:.2f}")
             self.simulation_window.update_graph(theta1, theta2)
@@ -275,11 +311,9 @@ class Ui_Dialog(object):
         # Podrías usar un método básico para cada letra en el nombre
         for letter in name:
             # Lógica de movimiento específica para cada letra
-            self.set_servo_angle(servo1, 45)  # Canal 0
-            self.set_servo_angle(servo2, 45)  # Canal 1
+            self.move_servos_smoothly(45, 45)
             time.sleep(1)
-        self.set_servo_angle(servo1, 0)  # Canal 0
-        self.set_servo_angle(servo2, 0)  # Canal 1
+        self.move_servos_smoothly(0, 0)
 
     def write_custom_word(self):
         word = self.lineEdit_3.text()
@@ -287,8 +321,7 @@ class Ui_Dialog(object):
 
     def draw_logo(self, logo_name):
         # Lógica para trazar los logos específicos
-        self.set_servo_angle(servo1, 0)  # Canal 0
-        self.set_servo_angle(servo2, 0)  # Canal 1
+        self.move_servos_smoothly(0, 0)
         time.sleep(2)  # Espera para que el usuario coloque el papel
         # Implementar lógica para trazar el logo paso a paso
         if logo_name == "Puma":
