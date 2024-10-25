@@ -281,15 +281,28 @@ class Ui_Dialog(object):
         
         try:
             # Calcular theta2 en radianes y luego convertir a grados
-            theta2 = np.arccos(cos_theta2)
-            # Calcular theta1 en radianes y luego convertir a grados
-            theta1 = np.arctan2(y, x) - np.arctan2(d2 * np.sin(theta2), d1 + d2 * np.cos(theta2))
+            theta2 = np.degrees(np.arccos(cos_theta2))
             
-            return np.degrees(theta1), np.degrees(theta2)
+            # Calcular theta1 en radianes y luego convertir a grados
+            theta1 = np.degrees(np.arctan2(y, x) - np.arctan2(d2 * np.sin(np.radians(theta2)), d1 + d2 * np.cos(np.radians(theta2))))
+            
+            # Ajustar los ángulos al rango de 0 a 180 grados
+            if theta1 < 0:
+                theta1 += 360  # Si theta1 es negativo, se suma 360 para mantenerlo positivo
+            if theta2 < 0:
+                theta2 += 360  # Si theta2 es negativo, se suma 360 para mantenerlo positivo
+            
+            # Limitar los ángulos al rango de 0 a 180 grados (rango de los servomotores)
+            theta1 = max(0, min(180, theta1))
+            theta2 = max(0, min(180, theta2))
+
+            return theta1, theta2
+
         except ValueError:
             # Si hay un error, retornar ángulos predeterminados o levantar una excepción
             print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
             return 0, 0
+
 
     def draw_yin_yang(self):
         print("draw_yin_yang")
