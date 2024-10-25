@@ -273,6 +273,14 @@ class Ui_Dialog(object):
         d1 = 1  # Longitud del primer brazo
         d2 = 1  # Longitud del segundo brazo
         
+        # Calcular la distancia del origen al punto (x, y)
+        distance = np.sqrt(x**2 + y**2)
+
+        # Verificar si la distancia está dentro del espacio de trabajo del robot
+        if distance > (d1 + d2) or distance < abs(d1 - d2):
+            print("Error: Punto fuera del espacio de trabajo.")
+            return 0, 0
+
         # Calcular el valor del coseno de theta2, asegurando que esté en el rango [-1, 1]
         cos_theta2 = (x**2 + y**2 - d1**2 - d2**2) / (2 * d1 * d2)
         
@@ -302,6 +310,7 @@ class Ui_Dialog(object):
             # Si hay un error, retornar ángulos predeterminados o levantar una excepción
             print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
             return 0, 0
+
 
 
     def draw_yin_yang(self):
