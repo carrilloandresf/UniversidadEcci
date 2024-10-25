@@ -70,7 +70,7 @@ class Ui_Dialog(object):
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
-    def move_servos_smoothly(self, target_angle1, target_angle2, steps=50, delay=0.02):
+    def move_servos_smoothly(self, target_angle1, target_angle2, steps=100, delay=0.01):
         """
         Mueve ambos servos suavemente hacia los ángulos objetivo de manera sincronizada.
         Args:
@@ -293,7 +293,7 @@ class Ui_Dialog(object):
         
         for s1, s2 in movements:
             print(s1, "|", s2)
-            theta1, theta2 = self.inverse_kinematics(float(s1), float(s2))
+            theta1, theta2 = s1, s2
             self.simulation_window.update_graph(theta1, theta2)
             self.label_8.setText(f"{theta2:.2f}")
             self.label_7.setText(f"{theta1:.2f}")
