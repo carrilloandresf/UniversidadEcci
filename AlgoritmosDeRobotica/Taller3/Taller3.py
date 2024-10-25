@@ -70,7 +70,7 @@ class Ui_Dialog(object):
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
-    def move_servos_smoothly(self, target_angle1, target_angle2, steps=100, delay=0.01):
+    def move_servos_smoothly(self, target_angle1, target_angle2, steps=50, delay=0.01):
         """
         Mueve ambos servos suavemente hacia los ángulos objetivo de manera sincronizada.
         Args:
@@ -104,8 +104,12 @@ class Ui_Dialog(object):
             # Actualizar la simulación para reflejar los ángulos actuales
             self.simulation_window.update_graph(intermediate_angle1, intermediate_angle2)
 
+            # Permitir que Qt procese eventos pendientes para actualizar la UI
+            QtWidgets.QApplication.processEvents()
+
             # Esperar un pequeño intervalo de tiempo para hacer el movimiento suave
             time.sleep(delay)
+
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
