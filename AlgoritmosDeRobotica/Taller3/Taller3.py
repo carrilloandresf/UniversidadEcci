@@ -293,7 +293,7 @@ class Ui_Dialog(object):
 
     def draw_yin_yang(self):
         print("draw_yin_yang")
-        movements = [(0, 0), (90, 0), (180, 0), (180, 90), (180, 180), (0, 90), (0, 0)]
+        movements = [(0, 0), (90, 0), (180, 0), (180, 90), (180, 180), (0, 180), (0, 90), (0, 0)]
         
         for s1, s2 in movements:
             print(s1, "|", s2)
