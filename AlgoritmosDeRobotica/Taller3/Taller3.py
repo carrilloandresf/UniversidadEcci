@@ -70,7 +70,7 @@ class Ui_Dialog(object):
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
-    def move_servos_smoothly(self, target_angle1, target_angle2, steps=50, delay=0.01):
+    def move_servos_smoothly(self, target_angle1, target_angle2, steps=100, delay=0.01):
         """
         Mueve ambos servos suavemente hacia los ángulos objetivo de manera sincronizada.
         Args:
@@ -293,7 +293,7 @@ class Ui_Dialog(object):
 
     def draw_yin_yang(self):
         print("draw_yin_yang")
-        movements = [(0, 0), (90, 0), (180, 0), (180, 90), (0, 180), (0, 90), (0, 0)]
+        movements = [(0, 0), (90, 0), (180, 0), (180, 90), (180, 180), (0, 90), (0, 0)]
         
         for s1, s2 in movements:
             print(s1, "|", s2)
