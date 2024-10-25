@@ -269,42 +269,44 @@ class Ui_Dialog(object):
         self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
 
     def inverse_kinematics(self, x, y):
-        # Simulación del cálculo de ángulos inversos para el robot SCARA
+        # Longitudes de los eslabones
         d1 = 1  # Longitud del primer brazo
         d2 = 1  # Longitud del segundo brazo
-        
-        # Calcular la distancia del origen al punto (x, y)
-        distance = np.sqrt(x**2 + y**2)
-
-        # Verificar si la distancia está dentro del espacio de trabajo del robot
-        if distance > (d1 + d2) or distance < abs(d1 - d2):
-            print("Error: Punto fuera del espacio de trabajo.")
-            return 0, 0
 
         # Calcular el valor del coseno de theta2, asegurando que esté en el rango [-1, 1]
         cos_theta2 = (x**2 + y**2 - d1**2 - d2**2) / (2 * d1 * d2)
-        
+
         # Limitar el valor de cos_theta2 para evitar errores de dominio
         cos_theta2 = np.clip(cos_theta2, -1, 1)
-        
+
         try:
-            # Calcular theta2 en radianes y luego convertir a grados
-            theta2 = np.degrees(np.arccos(cos_theta2))
-            
-            # Calcular theta1 en radianes y luego convertir a grados
-            theta1 = np.degrees(np.arctan2(y, x) - np.arctan2(d2 * np.sin(np.radians(theta2)), d1 + d2 * np.cos(np.radians(theta2))))
-            
-            # Ajustar los ángulos al rango de 0 a 180 grados
-            if theta1 < 0:
-                theta1 += 360  # Si theta1 es negativo, se suma 360 para mantenerlo positivo
-            if theta2 < 0:
-                theta2 += 360  # Si theta2 es negativo, se suma 360 para mantenerlo positivo
-            
-            # Limitar los ángulos al rango de 0 a 180 grados (rango de los servomotores)
+            # Calcular theta2 en radianes (hay dos posibles soluciones, se puede usar la que mejor se adapte)
+            theta2_rad = np.arccos(cos_theta2)
+
+            # Calcular theta1 considerando las dos soluciones posibles
+            k1 = d1 + d2 * np.cos(theta2_rad)
+            k2 = d2 * np.sin(theta2_rad)
+            theta1_rad = np.arctan2(y, x) - np.arctan2(k2, k1)
+
+            # Convertir ángulos a grados
+            theta1 = np.degrees(theta1_rad)
+            theta2 = np.degrees(theta2_rad)
+
+            # Ajustar los ángulos al rango de 0 a 180 grados para que los servos puedan manejarlos
+            theta1 = (theta1 + 360) % 360  # Asegurar que esté en rango positivo
+            if theta1 > 180:
+                theta1 -= 360
+
+            # Limitar theta1 y theta2 al rango de trabajo del servo (0 a 180 grados)
             theta1 = max(0, min(180, theta1))
             theta2 = max(0, min(180, theta2))
 
             return theta1, theta2
+        except ValueError:
+            # Si hay un error, retornar ángulos predeterminados o levantar una excepción
+            print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
+            return 0, 0
+
 
         except ValueError:
             # Si hay un error, retornar ángulos predeterminados o levantar una excepción
