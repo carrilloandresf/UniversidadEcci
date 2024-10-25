@@ -238,7 +238,7 @@ class Ui_Dialog(object):
         self.label.setText(_translate("Dialog", "Manejo de posiciones"))
         self.label_4.setText(_translate("Dialog", "Posicion x"))
         self.label_5.setText(_translate("Dialog", "Posicion Y"))
-        self.label_6.setText(_translate("Dialog", "Angulo:S1                        S2"))
+        self.label_6.setText(_translate("Dialog", "Angulo:S1                S2"))
         self.label_7.setText(_translate("Dialog", "###"))
         self.label_8.setText(_translate("Dialog", "###"))
         self.pushButton.setText(_translate("Dialog", "Trayectoria"))
@@ -259,10 +259,10 @@ class Ui_Dialog(object):
         y = float(self.lineEdit_2.text())
         # Calcular ángulos inversos (IK) para alcanzar la posición (x, y)
         theta1, theta2 = self.inverse_kinematics(x, y)
-        self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
         self.label_7.setText(f"{theta1:.2f}")
         self.label_8.setText(f"{theta2:.2f}")
         self.simulation_window.update_graph(theta1, theta2)
+        self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
 
     def inverse_kinematics(self, x, y):
         # Simulación del cálculo de ángulos inversos para el robot SCARA
@@ -294,13 +294,12 @@ class Ui_Dialog(object):
         for s1, s2 in movements:
             print(s1, "|", s2)
             theta1, theta2 = self.inverse_kinematics(float(s1), float(s2))
-            print(" -- ", theta1, " | ", theta2)
-            # Mover suavemente ambos servos hacia los ángulos calculados
-            self.move_servos_smoothly(theta1, theta2)
-            # Actualizar los labels con los valores actuales
-            self.label_7.setText(f"{theta1:.2f}")
-            self.label_8.setText(f"{theta2:.2f}")
             self.simulation_window.update_graph(theta1, theta2)
+            self.label_8.setText(f"{theta2:.2f}")
+            self.label_7.setText(f"{theta1:.2f}")
+            print(" -- ", theta1, " | ", theta2)
+            self.move_servos_smoothly(theta1, theta2)
+
             
             # Esperar un segundo antes de pasar al siguiente movimiento
             time.sleep(1)
