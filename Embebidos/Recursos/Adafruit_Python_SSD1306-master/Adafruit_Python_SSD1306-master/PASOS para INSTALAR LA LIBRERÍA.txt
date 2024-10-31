@@ -1,0 +1,3 @@
+Estimados UM, de acá van a instalar:
+
+sudo python setup.py install
