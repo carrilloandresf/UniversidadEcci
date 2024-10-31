@@ -1,54 +1,78 @@
-import Adafruit_GPIO.I2C as I2C
-import Adafruit_SSD1306
-from PIL import Image, ImageDraw, ImageFont
+# Importación de librerías necesarias
+import board
+import busio as io
+from time import sleep
 import time
+import Adafruit_SSD1306
+import Adafruit_GPIO.I2C as I2C
+from PIL import Image, ImageDraw, ImageFont
 
-# Configuración de la pantalla OLED
-RST = None  # No se usa el pin de reset, se utiliza None
-# Dirección I2C por defecto para la pantalla OLED SSD1306
-ADDRESS = 0x3C
+# Configuración de la pantalla OLED y dirección I2C
+RST = None  # Raspberry Pi configura el pin de reset de la OLED
+disp = Adafruit_SSD1306.SSD1306_128_32(rst=RST, i2c_address=0x3C)
 
-# Inicializar la pantalla OLED
-oled = Adafruit_SSD1306.SSD1306_128_64(rst=RST)
-oled.begin()
-oled.clear()
-oled.display()
+# Inicialización de la pantalla
+disp.begin()   # Inicializa la pantalla OLED
+disp.clear()   # Limpia el buffer de la pantalla
+disp.display() # Muestra el buffer vacío en la pantalla
 
-# Crear una imagen en modo 1 (blanco y negro)
-width = oled.width
-height = oled.height
-image = Image.new('1', (width, height))
+# Crear imagen en blanco con el modo '1' (1 bit de color)
+image = Image.new('1', (disp.width, disp.height))
 draw = ImageDraw.Draw(image)
 
-# Cargar una fuente (opcional, puedes usar la fuente por defecto)
-# font = ImageFont.load_default()  # Fuente por defecto
-font = ImageFont.truetype('LiberationSerif-Regular.ttf', 20)  # Asegúrate de que la fuente esté disponible
+# Definición de los bitmaps para cada letra
+bitmap_E = [
+    0b1111111111,
+    0b1100000000,
+    0b1100000000,
+    0b1100000000,
+    0b1111111111,
+    0b1111111111,
+    0b1100000000,
+    0b1100000000,
+    0b1100000000,
+    0b1111111111,
+]
 
-# Calcular la posición para centrar la letra "e"
-text = "E"
-(text_width, text_height) = draw.textsize(text, font=font)
-x = (width - text_width) // 2
-y = (height - text_height) // 2
+bitmap_C = [
+    0b0111111110,
+    0b1100000011,
+    0b1000000001,
+    0b1000000000,
+    0b1000000000,
+    0b1000000000,
+    0b1000000001,
+    0b1100000011,
+    0b0111111110,
+    0b0000000000,
+]
 
-# Dibujar la letra "e" en el centro
-draw.text((x, y), text, font=font, fill=1)
-oled.image(image)
-oled.display()
+bitmap_I = [
+    0b1111111111,
+    0b0001100000,
+    0b0001100000,
+    0b0001100000,
+    0b0001100000,
+    0b0001100000,
+    0b0001100000,
+    0b0001100000,
+    0b1111111111,
+    0b0000000000,
+]
 
-# Esperar un momento para que se muestre la letra
-time.sleep(3)
+# Función para dibujar letras en la pantalla OLED
+def draw_ecci(x, y, bitmap):
+    for i in range(10):
+        for j in range(10):
+            if (bitmap[i] >> (9 - j)) & 1:
+                draw.point((x + j, y + i), fill=1)
 
-# =======================
-# Código comentado para imprimir "ECCI"
-# =======================
-# draw.rectangle((0, 0, width, height), outline=0, fill=0)  # Limpiar la pantalla
-# text = "ECCI"
-# (text_width, text_height) = draw.textsize(text, font=font)
-# x = (width - text_width) // 2
-# y = (height - text_height) // 2
-# draw.text((x, y), text, font=font, fill=1)
-# oled.image(image)
-# oled.display()
+# Dibujar las letras 'E', 'C', 'C', 'I' en las posiciones correspondientes
+draw_ecci(20, 10, bitmap_E)
+draw_ecci(40, 10, bitmap_C)
+draw_ecci(60, 10, bitmap_C)
+draw_ecci(80, 10, bitmap_I)
 
-# Esperar un momento antes de terminar
-time.sleep(5)
+# Enviar la imagen generada al buffer de la pantalla OLED
+disp.image(image)
+disp.display()
