@@ -20,8 +20,9 @@ class SimulationWindow(QMainWindow):
     def __init__(self, robot):
         super().__init__()
         self.robot = robot
-        self.setWindowTitle("Simulación del Robot SCARA")
+        self.setWindowTitle("Simulación del Robot")
         self.robot.teach(q=[0, 0])  # Abre la interfaz de visualización con la configuración inicial
+        self.simulation_window.show() 
         self.show()
 
     def update_graph(self, theta1, theta2):
@@ -36,10 +37,9 @@ class Ui_Dialog(object):
         self.simulation_window = SimulationWindow(self.robot)  # Crear ventana de simulación
 
     def create_robot(self):
-        # Configuración del robot SCARA con los parámetros DH
         link1 = RevoluteDH(d=0, a=1, alpha=0)
         link2 = RevoluteDH(d=0, a=1, alpha=0)
-        return DHRobot([link1, link2], name='SCARA')
+        return DHRobot([link1, link2], name='ROBOT')
 
     def set_servo_angle(self, servo_motor, angle):
         # Limitar el ángulo entre 0 y 180 grados
