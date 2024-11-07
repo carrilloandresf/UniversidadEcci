@@ -25,19 +25,20 @@ class SimulationWindow(QMainWindow):
         super().__init__()
         self.robot = robot
         self.setWindowTitle("Simulación del Robot")
-        self.robot.teach(q=[0, 0])  # Abre la interfaz de visualización con la configuración inicial
+        self.setGeometry(100, 100, 800, 600)  # Ajusta la geometría de la ventana
+        self.robot.teach(q=[0, 0], block=False)  # Abre la interfaz de visualización sin bloquear la ejecución
         self.show()
 
     def update_graph(self, theta1, theta2):
         # Mueve el robot a los nuevos ángulos
         self.robot.q = [np.radians(theta1), np.radians(theta2)]
         # Refrescar la visualización
-        self.robot.teach(q=self.robot.q)
+        self.robot.teach(q=self.robot.q, block=False)
 
 class Ui_Dialog(object):
     def __init__(self):
         self.robot = self.create_robot()
-        self.simulation_window = SimulationWindow(self.robot)  # Crear ventana de simulación
+        self.simulation_window = None  # Inicialmente no crear la ventana de simulación
 
     def create_robot(self):
         link1 = RevoluteDH(d=0, a=1, alpha=0)
@@ -73,7 +74,8 @@ class Ui_Dialog(object):
             self.label_8.setText(f"{intermediate_angle2:.2f}")
             
             # Actualizar la simulación para reflejar los ángulos actuales
-            self.simulation_window.update_graph(intermediate_angle1, intermediate_angle2)
+            if self.simulation_window:
+                self.simulation_window.update_graph(intermediate_angle1, intermediate_angle2)
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
             QtWidgets.QApplication.processEvents()
@@ -200,10 +202,14 @@ class Ui_Dialog(object):
         self.pushButton_9.clicked.connect(lambda: self.draw_logo("Apple"))
         self.pushButton_10.clicked.connect(lambda: self.draw_logo("Pepsi"))
 
+        # Crear la ventana de simulación después de inicializar la UI principal
+        self.simulation_window = SimulationWindow(self.robot)
+
         # Iniciar los servos y la simulación en 0 grados
         self.set_servo_angle(servo1, 0)  # Canal 0 (primer servo)
         self.set_servo_angle(servo2, 0)  # Canal 1 (segundo servo)
-        self.simulation_window.update_graph(0, 0)
+        if self.simulation_window:
+            self.simulation_window.update_graph(0, 0)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -235,7 +241,8 @@ class Ui_Dialog(object):
         theta1, theta2 = self.inverse_kinematics(x, y)
         self.label_7.setText(f"{theta1:.2f}")
         self.label_8.setText(f"{theta2:.2f}")
-        self.simulation_window.update_graph(theta1, theta2)
+        if self.simulation_window:
+            self.simulation_window.update_graph(theta1, theta2)
         self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
 
     def inverse_kinematics(self, x, y):
@@ -284,7 +291,8 @@ class Ui_Dialog(object):
         for s1, s2 in movements:
             print(s1, "|", s2)
             theta1, theta2 = s1, s2
-            self.simulation_window.update_graph(theta1, theta2)
+            if self.simulation_window:
+                self.simulation_window.update_graph(theta1, theta2)
             self.label_8.setText(f"{theta2:.2f}")
             self.label_7.setText(f"{theta1:.2f}")
             print(" -- ", theta1, " | ", theta2)
