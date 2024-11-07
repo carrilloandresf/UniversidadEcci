@@ -271,7 +271,7 @@ class Ui_Dialog(object):
     def inverse_kinematics(self, x, y):
         # Longitudes de los eslabones
         d1 = 1  # Longitud del primer brazo
-        d2 = 1  # Longitud del segundo brazo
+        d2 = 0.5  # Longitud del segundo brazo
 
         # Calcular el valor del coseno de theta2, asegurando que esté en el rango [-1, 1]
         cos_theta2 = (x**2 + y**2 - d1**2 - d2**2) / (2 * d1 * d2)
