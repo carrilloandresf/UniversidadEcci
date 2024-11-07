@@ -30,7 +30,7 @@ class SimulationWindow(QMainWindow):
         # Refrescar la visualización
         self.robot.teach(q=self.robot.q)
 
-class Ui_Dialog(QMainWindow):
+class Ui_Dialog:
     def __init__(self):
         self.robot = self.create_robot()
         self.simulation_window = SimulationWindow(self.robot)  # Crear ventana de simulación
@@ -41,106 +41,82 @@ class Ui_Dialog(QMainWindow):
         return DHRobot([link1, link2], name='ROBOT')
 
     def set_servo_angle(self, servo_motor, angle):
-        # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
     def move_servos_smoothly(self, target_angle1, target_angle2, steps=100, delay=0.01):
-        # Obtener los ángulos actuales de los servos
         current_angle1 = servo1.angle if servo1.angle is not None else 0
         current_angle2 = servo2.angle if servo2.angle is not None else 0
-
-        # Calcular las diferencias de ángulo
         diff1 = target_angle1 - current_angle1
         diff2 = target_angle2 - current_angle2
-
-        # Mover en pequeños pasos para hacer el movimiento más suave
         for step in range(steps + 1):
-            # Calcular los ángulos intermedios para ambos servos
             intermediate_angle1 = current_angle1 + (diff1 / steps) * step
             intermediate_angle2 = current_angle2 + (diff2 / steps) * step
-
-            # Establecer los ángulos intermedios para ambos servos
             self.set_servo_angle(servo1, intermediate_angle1)
             self.set_servo_angle(servo2, intermediate_angle2)
-
-            # Actualizar los labels con los valores actuales
             self.label_7.setText(f"{intermediate_angle1:.2f}")
             self.label_8.setText(f"{intermediate_angle2:.2f}")
-            
-            # Actualizar la simulación para reflejar los ángulos actuales
             self.simulation_window.update_graph(intermediate_angle1, intermediate_angle2)
-
-            # Permitir que Qt procese eventos pendientes para actualizar la UI
             QtWidgets.QApplication.processEvents()
-
-            # Esperar un pequeño intervalo de tiempo para hacer el movimiento suave
             time.sleep(delay)
 
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(860, 640)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
 
-    def setupUi(self):
-        self.setObjectName("MainWindow")
-        self.resize(860, 640)
-        central_widget = QtWidgets.QWidget(self)
-        self.setCentralWidget(central_widget)
         # Configuración de los elementos UI
-        self.label_2 = QtWidgets.QLabel(Dialog)
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(40, 440, 261, 181))
         font = QtGui.QFont()
         font.setPointSize(12)
         self.label_2.setFont(font)
         self.label_2.setScaledContents(True)
         self.label_2.setObjectName("label_2")
-        self.label_3 = QtWidgets.QLabel(Dialog)
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(450, 400, 271, 161))
-        self.label_3.setText("")
         self.label_3.setPixmap(QtGui.QPixmap("../Taller2/logoUniversidadEcci.jpg"))
         self.label_3.setScaledContents(True)
         self.label_3.setWordWrap(False)
         self.label_3.setObjectName("label_3")
-        self.label = QtWidgets.QLabel(Dialog)
+        self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(270, 10, 291, 41))
-        font = QtGui.QFont()
         font.setPointSize(15)
         self.label.setFont(font)
         self.label.setObjectName("label")
-        self.label_4 = QtWidgets.QLabel(Dialog)
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
         self.label_4.setGeometry(QtCore.QRect(20, 60, 291, 41))
-        font = QtGui.QFont()
         font.setPointSize(15)
         self.label_4.setFont(font)
         self.label_4.setObjectName("label_4")
-        self.label_5 = QtWidgets.QLabel(Dialog)
+        self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(150, 60, 291, 41))
-        font = QtGui.QFont()
         font.setPointSize(15)
         self.label_5.setFont(font)
         self.label_5.setObjectName("label_5")
-        self.label_6 = QtWidgets.QLabel(Dialog)
+        self.label_6 = QtWidgets.QLabel(self.centralwidget)
         self.label_6.setGeometry(QtCore.QRect(30, 130, 291, 41))
-        font = QtGui.QFont()
         font.setPointSize(15)
         self.label_6.setFont(font)
         self.label_6.setObjectName("label_6")
-        self.lineEdit = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(20, 90, 113, 22))
         self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit_2 = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_2.setGeometry(QtCore.QRect(150, 90, 113, 22))
         self.lineEdit_2.setObjectName("lineEdit_2")
-        self.label_7 = QtWidgets.QLabel(Dialog)
+        self.label_7 = QtWidgets.QLabel(self.centralwidget)
         self.label_7.setGeometry(QtCore.QRect(150, 130, 81, 41))
-        font = QtGui.QFont()
         font.setPointSize(15)
         self.label_7.setFont(font)
         self.label_7.setObjectName("label_7")
-        self.label_8 = QtWidgets.QLabel(Dialog)
+        self.label_8 = QtWidgets.QLabel(self.centralwidget)
         self.label_8.setGeometry(QtCore.QRect(280, 130, 81, 41))
-        font = QtGui.QFont()
         font.setPointSize(15)
         self.label_8.setFont(font)
         self.label_8.setObjectName("label_8")
-        self.pushButton = QtWidgets.QPushButton(Dialog)
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(20, 180, 80, 22))
         self.pushButton.setObjectName("pushButton")
         self.pushButton_2 = QtWidgets.QPushButton(Dialog)
@@ -181,9 +157,9 @@ class Ui_Dialog(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
         # Conexiones de botones
-        self.pushButton_11.clicked.connect(self.move_to_position)
+        self.pushButton_11.clicked.connect(self.move_to_position) 
         self.pushButton.clicked.connect(self.draw_yin_yang)
-
+		
         # Asigna la función a los botones de nombres
         self.pushButton_2.clicked.connect(lambda: self.write_name("Felipe"))
         self.pushButton_3.clicked.connect(lambda: self.write_name("Jeisson"))
@@ -199,12 +175,7 @@ class Ui_Dialog(QMainWindow):
         self.pushButton_9.clicked.connect(lambda: self.draw_logo("Apple"))
         self.pushButton_10.clicked.connect(lambda: self.draw_logo("Pepsi"))
 
-        # Iniciar los servos y la simulación en 0 grados
-        self.set_servo_angle(servo1, 0)  # Canal 0 (primer servo)
-        self.set_servo_angle(servo2, 0)  # Canal 1 (segundo servo)
-        self.simulation_window.update_graph(0, 0)
-
-    def retranslateUi(self, Dialog):
+  def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label_2.setText(_translate("Dialog", "<html><head/><body><p align=\"center\">Daniela Rodriguez 83549</p><p align=\"center\">Jeison Sanchez   61849</p><p align=\"center\">Andres C. Rodriguez  83836</p><p align=\"center\">William A. Fernandez 77516</p><p><br/></p><p><br/></p></body></html>"))
@@ -281,12 +252,14 @@ class Ui_Dialog(QMainWindow):
             print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
             return 0, 0
 
+        MainWindow.setCentralWidget(self.centralwidget)
 
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def draw_yin_yang(self):
         print("draw_yin_yang")
         movements = [(0, 0), (90, 0), (180, 0), (180, 90), (180, 180), (0, 180), (0, 90), (0, 0)]
-        
         for s1, s2 in movements:
             print(s1, "|", s2)
             theta1, theta2 = s1, s2
@@ -331,12 +304,11 @@ class Ui_Dialog(QMainWindow):
         elif logo_name == "Pepsi":
             # Lógica de trazado para Pepsi
             pass
-
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-								
-    mainWindow = Ui_Dialog()
-					  
-    mainWindow.show()
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_Dialog()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
     sys.exit(app.exec_())
