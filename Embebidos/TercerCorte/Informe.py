@@ -51,8 +51,8 @@ def update_display():
         disp.image(image)
         disp.display()
 
-        # Escribir en el log cada minuto
-        if time.time() - last_log_time >= 60:
+        # Escribir en el log cada 30 segundos
+        if time.time() - last_log_time >= 30:
             log_data(temperature, humidity)
             last_log_time = time.time()
         
