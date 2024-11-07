@@ -209,8 +209,14 @@ class Ui_Dialog(object):
 
     def move_to_position(self):
         print("move_to_position")                                 
-        x = float(self.lineEdit.text())
-        y = float(self.lineEdit_2.text())
+        # Verificar si los campos están vacíos y asignar valores predeterminados
+        try:
+            x = float(self.lineEdit.text()) if self.lineEdit.text() else 0.0
+            y = float(self.lineEdit_2.text()) if self.lineEdit_2.text() else 0.0
+        except ValueError:
+            print("Error: Entrada no válida en los campos de posición.")
+            return
+
         # Calcular ángulos inversos (IK) para alcanzar la posición (x, y)
         theta1, theta2 = self.inverse_kinematics(x, y)
         self.label_7.setText(f"{theta1:.2f}")
