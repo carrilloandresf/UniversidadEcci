@@ -17,7 +17,7 @@ pca = PCA9685(i2c)
 pca.frequency = 50  # Configuración de frecuencia para servos
 
 # Configuración de los servos en los canales 0 y 1
-servo1 = servo.Servo(pca.channels[0], min_pulse=500, max_pulse=2400)
+servo1 = servo.Servo(pca.channels[0], min_pulse=500, max_pulse=2400)  # Consider moving min_pulse and max_pulse values to configurable variables or constants
 servo2 = servo.Servo(pca.channels[1], min_pulse=500, max_pulse=2400)
 
 # Dimensiones del robot (ajustables)
@@ -42,6 +42,10 @@ class Ui_Dialog(object):
         servo_motor.angle = angle
 
     def move_servos_smoothly(self, target_angle1, target_angle2, steps=100, delay=0.01):
+        # Validar que 'steps' sea un entero positivo
+        if steps <= 0:
+            raise ValueError("Steps must be a positive integer")
+
         # Obtener los ángulos actuales de los servos
         current_angle1 = servo1.angle if servo1.angle is not None else 0
         current_angle2 = servo2.angle if servo2.angle is not None else 0
@@ -61,17 +65,19 @@ class Ui_Dialog(object):
             self.set_servo_angle(servo2, intermediate_angle2)
 
             # Actualizar la simulación del robot
-            self.robot.q = [np.radians(intermediate_angle1), np.radians(intermediate_angle2)]
-            self.simulation.step()
+            if step % 10 == 0:  # Reduce la frecuencia de actualización para mejorar el rendimiento
+                self.robot.q = [np.radians(intermediate_angle1), np.radians(intermediate_angle2)]
+                self.simulation.step()
 
             # Actualizar los labels con los valores actuales
-            self.label_7.setText(f"{intermediate_angle1:.2f}")
-            self.label_8.setText(f"{intermediate_angle2:.2f}")
+            if step % 10 == 0:  # Actualizar menos frecuentemente para mejorar el rendimiento
+                self.label_7.setText(f"{intermediate_angle1:.2f}")
+                self.label_8.setText(f"{intermediate_angle2:.2f}")
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
             QtWidgets.QApplication.processEvents()
 
-            # Esperar un pequeño intervalo de tiempo para hacer el movimiento suave
+            # Consider using QTimer for delays to avoid blocking the UI thread
             time.sleep(delay)
 
     def setupUi(self, Dialog):
@@ -192,10 +198,6 @@ class Ui_Dialog(object):
         self.pushButton_8.clicked.connect(lambda: self.draw_logo("Toyota"))
         self.pushButton_9.clicked.connect(lambda: self.draw_logo("Apple"))
         self.pushButton_10.clicked.connect(lambda: self.draw_logo("Pepsi"))
-
-        # Iniciar los servos en 0 grados
-        self.set_servo_angle(servo1, 0)  # Canal 0 (primer servo)
-        self.set_servo_angle(servo2, 0)  # Canal 1 (segundo servo)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
