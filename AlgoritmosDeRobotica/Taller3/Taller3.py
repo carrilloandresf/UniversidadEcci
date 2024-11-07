@@ -30,10 +30,11 @@ class SimulationWindow(QMainWindow):
         # Refrescar la visualización
         self.robot.teach(q=self.robot.q)
 
-class Ui_Dialog:
+class Ui_MainWindow:
     def __init__(self):
+        # Creación del robot y ventana de simulación
         self.robot = self.create_robot()
-        self.simulation_window = SimulationWindow(self.robot)  # Crear ventana de simulación
+        self.simulation_window = SimulationWindow(self.robot)  # Ventana de simulación
 
     def create_robot(self):
         link1 = RevoluteDH(d=0, a=1, alpha=0)
@@ -119,83 +120,24 @@ class Ui_Dialog:
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(20, 180, 80, 22))
         self.pushButton.setObjectName("pushButton")
-        self.pushButton_2 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_2.setGeometry(QtCore.QRect(110, 210, 80, 22))
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_3 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_3.setGeometry(QtCore.QRect(200, 210, 80, 22))
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_4 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_4.setGeometry(QtCore.QRect(20, 210, 80, 22))
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.pushButton_5 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_5.setGeometry(QtCore.QRect(290, 210, 80, 22))
-        self.pushButton_5.setObjectName("pushButton_5")
-        self.pushButton_6 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_6.setGeometry(QtCore.QRect(290, 240, 80, 22))
-        self.pushButton_6.setObjectName("pushButton_6")
-        self.lineEdit_3 = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_3.setGeometry(QtCore.QRect(20, 240, 261, 22))
-        self.lineEdit_3.setObjectName("lineEdit_3")
-        self.pushButton_7 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_7.setGeometry(QtCore.QRect(20, 280, 80, 22))
-        self.pushButton_7.setObjectName("pushButton_7")
-        self.pushButton_8 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_8.setGeometry(QtCore.QRect(110, 280, 80, 22))
-        self.pushButton_8.setObjectName("pushButton_8")
-        self.pushButton_9 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_9.setGeometry(QtCore.QRect(200, 280, 80, 22))
-        self.pushButton_9.setObjectName("pushButton_9")
-        self.pushButton_10 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_10.setGeometry(QtCore.QRect(290, 280, 80, 22))
-        self.pushButton_10.setObjectName("pushButton_10")
-        self.pushButton_11 = QtWidgets.QPushButton(Dialog)
-        self.pushButton_11.setGeometry(QtCore.QRect(280, 90, 80, 22))
-        self.pushButton_11.setObjectName("pushButton_11")
+        
+        MainWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(Dialog)
-        QtCore.QMetaObject.connectSlotsByName(Dialog)
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        # Conexiones de botones
-        self.pushButton_11.clicked.connect(self.move_to_position) 
-        self.pushButton.clicked.connect(self.draw_yin_yang)
-		
-        # Asigna la función a los botones de nombres
-        self.pushButton_2.clicked.connect(lambda: self.write_name("Felipe"))
-        self.pushButton_3.clicked.connect(lambda: self.write_name("Jeisson"))
-        self.pushButton_4.clicked.connect(lambda: self.write_name("Daniela"))
-        self.pushButton_5.clicked.connect(lambda: self.write_name("William"))
-
-        # Botón para escribir palabra ingresada en lineEdit_3
-        self.pushButton_6.clicked.connect(self.write_custom_word)
-
-        # Botones para logos (Ejemplo)
-        self.pushButton_7.clicked.connect(lambda: self.draw_logo("Puma"))
-        self.pushButton_8.clicked.connect(lambda: self.draw_logo("Toyota"))
-        self.pushButton_9.clicked.connect(lambda: self.draw_logo("Apple"))
-        self.pushButton_10.clicked.connect(lambda: self.draw_logo("Pepsi"))
-
-  def retranslateUi(self, Dialog):
+    def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.label_2.setText(_translate("Dialog", "<html><head/><body><p align=\"center\">Daniela Rodriguez 83549</p><p align=\"center\">Jeison Sanchez   61849</p><p align=\"center\">Andres C. Rodriguez  83836</p><p align=\"center\">William A. Fernandez 77516</p><p><br/></p><p><br/></p></body></html>"))
-        self.label.setText(_translate("Dialog", "Manejo de posiciones"))
-        self.label_4.setText(_translate("Dialog", "Posicion x"))
-        self.label_5.setText(_translate("Dialog", "Posicion Y"))
-        self.label_6.setText(_translate("Dialog", "Angulo:S1                S2"))
-        self.label_7.setText(_translate("Dialog", "###"))
-        self.label_8.setText(_translate("Dialog", "###"))
-        self.pushButton.setText(_translate("Dialog", "Trayectoria"))
-        self.pushButton_2.setText(_translate("Dialog", "Felipe"))
-        self.pushButton_3.setText(_translate("Dialog", "Jeisson"))
-        self.pushButton_4.setText(_translate("Dialog", "Daniela"))
-        self.pushButton_5.setText(_translate("Dialog", "William"))
-        self.pushButton_6.setText(_translate("Dialog", "Escribir"))
-        self.pushButton_7.setText(_translate("Dialog", "Puma"))
-        self.pushButton_8.setText(_translate("Dialog", "Toyota"))
-        self.pushButton_9.setText(_translate("Dialog", "Apple"))
-        self.pushButton_10.setText(_translate("Dialog", "Pepsi"))
-        self.pushButton_11.setText(_translate("Dialog", "Mover"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Simulación Robot"))
+        self.label_2.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\">Daniela Rodriguez 83549</p><p align=\"center\">Jeison Sanchez 61849</p><p align=\"center\">Andres C. Rodriguez 83836</p><p align=\"center\">William A. Fernandez 77516</p><p><br/></p><p><br/></p></body></html>"))
+        self.label.setText(_translate("MainWindow", "Manejo de posiciones"))
+        self.label_4.setText(_translate("MainWindow", "Posición X"))
+        self.label_5.setText(_translate("MainWindow", "Posición Y"))
+        self.label_6.setText(_translate("MainWindow", "Ángulo S1 y S2"))
+        self.label_7.setText(_translate("MainWindow", "###"))
+        self.label_8.setText(_translate("MainWindow", "###"))
+        self.pushButton.setText(_translate("MainWindow", "Trayectoria"))
+
     def move_to_position(self):
         print("move_to_position")                                 
         x = float(self.lineEdit.text())
@@ -214,101 +156,43 @@ class Ui_Dialog:
 
         # Calcular el valor del coseno de theta2, asegurando que esté en el rango [-1, 1]
         cos_theta2 = (x**2 + y**2 - d1**2 - d2**2) / (2 * d1 * d2)
-
-        # Limitar el valor de cos_theta2 para evitar errores de dominio
         cos_theta2 = np.clip(cos_theta2, -1, 1)
 
         try:
-            # Calcular theta2 en radianes (hay dos posibles soluciones, se puede usar la que mejor se adapte)
+            # Calcular theta2 en radianes (dos posibles soluciones)
             theta2_rad = np.arccos(cos_theta2)
-
-            # Calcular theta1 considerando las dos soluciones posibles
             k1 = d1 + d2 * np.cos(theta2_rad)
             k2 = d2 * np.sin(theta2_rad)
             theta1_rad = np.arctan2(y, x) - np.arctan2(k2, k1)
-
-            # Convertir ángulos a grados
             theta1 = np.degrees(theta1_rad)
             theta2 = np.degrees(theta2_rad)
 
-            # Ajustar los ángulos al rango de 0 a 180 grados para que los servos puedan manejarlos
-            theta1 = (theta1 + 360) % 360  # Asegurar que esté en rango positivo
+            theta1 = (theta1 + 360) % 360
             if theta1 > 180:
                 theta1 -= 360
-
-            # Limitar theta1 y theta2 al rango de trabajo del servo (0 a 180 grados)
             theta1 = max(0, min(180, theta1))
             theta2 = max(0, min(180, theta2))
 
             return theta1, theta2
         except ValueError:
-            # Si hay un error, retornar ángulos predeterminados o levantar una excepción
             print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
             return 0, 0
-
-
-        except ValueError:
-            # Si hay un error, retornar ángulos predeterminados o levantar una excepción
-            print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
-            return 0, 0
-
-        MainWindow.setCentralWidget(self.centralwidget)
-
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def draw_yin_yang(self):
-        print("draw_yin_yang")
         movements = [(0, 0), (90, 0), (180, 0), (180, 90), (180, 180), (0, 180), (0, 90), (0, 0)]
         for s1, s2 in movements:
-            print(s1, "|", s2)
             theta1, theta2 = s1, s2
             self.simulation_window.update_graph(theta1, theta2)
             self.label_8.setText(f"{theta2:.2f}")
             self.label_7.setText(f"{theta1:.2f}")
-            print(" -- ", theta1, " | ", theta2)
             self.move_servos_smoothly(theta1, theta2)
-
-            
-            # Esperar un segundo antes de pasar al siguiente movimiento
             time.sleep(1)
 
-    def write_name(self, name):
-        print("write_name")
-        # Lógica de escritura de nombre con el efector final
-        # Podrías usar un método básico para cada letra en el nombre
-        for letter in name:
-            # Lógica de movimiento específica para cada letra
-            self.move_servos_smoothly(45, 45)
-            time.sleep(1)
-        self.move_servos_smoothly(0, 0)
-
-    def write_custom_word(self):
-        word = self.lineEdit_3.text()
-        self.write_name(word)
-
-    def draw_logo(self, logo_name):
-        # Lógica para trazar los logos específicos
-        self.move_servos_smoothly(0, 0)
-        time.sleep(2)  # Espera para que el usuario coloque el papel
-        # Implementar lógica para trazar el logo paso a paso
-        if logo_name == "Puma":
-            # Lógica de trazado para Puma
-            pass
-        elif logo_name == "Toyota":
-            # Lógica de trazado para Toyota
-            pass
-        elif logo_name == "Apple":
-            # Lógica de trazado para Apple
-            pass
-        elif logo_name == "Pepsi":
-            # Lógica de trazado para Pepsi
-            pass
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_Dialog()
+    ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
