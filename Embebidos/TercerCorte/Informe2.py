@@ -30,7 +30,7 @@ log_file = "log_humedad.txt"
 def log_data(temperature, humidity):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(log_file, "a") as file:
-        file.write(f"{timestamp} - Temperatura: {temperature:.2f}°C, Humedad: {humidity:.2f}%\n")
+        file.write(f"{timestamp} - TEMP: {temperature:.2f}°C, HUM: {humidity:.2f}%\n")
 
 # Función para actualizar la pantalla
 def update_display():
