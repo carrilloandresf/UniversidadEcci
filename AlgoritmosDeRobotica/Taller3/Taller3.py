@@ -1,7 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
+from PyQt5.QtWidgets import QMainWindow
 import time
 from roboticstoolbox import DHRobot, RevoluteDH
 import numpy as np
@@ -18,40 +16,24 @@ pca.frequency = 50  # Configuración de frecuencia para servos
 servo1 = servo.Servo(pca.channels[0], min_pulse=500, max_pulse=2400)
 servo2 = servo.Servo(pca.channels[1], min_pulse=500, max_pulse=2400)
 
-class MplCanvas(FigureCanvas):
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = self.fig.add_subplot(111)
-        super(MplCanvas, self).__init__(self.fig)
-
 class SimulationWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, robot):
         super().__init__()
+        self.robot = robot
         self.setWindowTitle("Simulación del Robot SCARA")
-        self.canvas = MplCanvas(self, width=5, height=4, dpi=100)
-        self.setCentralWidget(self.canvas)
+        self.robot.teach(jointlimits=True)  # Abre la interfaz de visualización de Peter Corke
         self.show()
 
     def update_graph(self, theta1, theta2):
-        # Dibujar el robot en el canvas de matplotlib
-        self.canvas.axes.clear()
-        # Calcular las posiciones del robot
-        x1 = np.cos(np.radians(theta1))
-        y1 = np.sin(np.radians(theta1))
-        x2 = x1 + np.cos(np.radians(theta1 + theta2))
-        y2 = y1 + np.sin(np.radians(theta1 + theta2))
-
-        # Dibujar el robot SCARA
-        self.canvas.axes.plot([0, x1, x2], [0, y1, y2], marker='o')
-        self.canvas.axes.set_xlim(-2, 2)
-        self.canvas.axes.set_ylim(-2, 2)
-        self.canvas.axes.set_title("Simulación SCARA")
-        self.canvas.draw()
+        # Mueve el robot a los nuevos ángulos
+        self.robot.q = [np.radians(theta1), np.radians(theta2)]
+        # Refrescar la visualización
+        self.robot.teach(jointlimits=True)
 
 class Ui_Dialog(object):
     def __init__(self):
         self.robot = self.create_robot()
-        self.simulation_window = SimulationWindow()  # Crear ventana de simulación
+        self.simulation_window = SimulationWindow(self.robot)  # Crear ventana de simulación
 
     def create_robot(self):
         # Configuración del robot SCARA con los parámetros DH
@@ -60,25 +42,11 @@ class Ui_Dialog(object):
         return DHRobot([link1, link2], name='SCARA')
 
     def set_servo_angle(self, servo_motor, angle):
-        """
-        Ajusta el ángulo del servomotor usando la instancia del servo.
-        Args:
-            servo_motor (adafruit_motor.servo.Servo): Instancia del servomotor.
-            angle (float): Ángulo en grados (0 a 180).
-        """
         # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
     def move_servos_smoothly(self, target_angle1, target_angle2, steps=100, delay=0.01):
-        """
-        Mueve ambos servos suavemente hacia los ángulos objetivo de manera sincronizada.
-        Args:
-            target_angle1 (float): Ángulo objetivo para el primer servo.
-            target_angle2 (float): Ángulo objetivo para el segundo servo.
-            steps (int): Número de pasos intermedios para un movimiento suave.
-            delay (float): Tiempo de espera entre cada paso en segundos.
-        """
         # Obtener los ángulos actuales de los servos
         current_angle1 = servo1.angle if servo1.angle is not None else 0
         current_angle2 = servo2.angle if servo2.angle is not None else 0
@@ -256,9 +224,8 @@ class Ui_Dialog(object):
         self.pushButton_9.setText(_translate("Dialog", "Apple"))
         self.pushButton_10.setText(_translate("Dialog", "Pepsi"))
         self.pushButton_11.setText(_translate("Dialog", "Mover"))
-
     def move_to_position(self):
-        print("move_to_position")
+        print("move_to_position")                                 
         x = float(self.lineEdit.text())
         y = float(self.lineEdit_2.text())
         # Calcular ángulos inversos (IK) para alcanzar la posición (x, y)
