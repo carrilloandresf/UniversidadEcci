@@ -21,14 +21,14 @@ class SimulationWindow(QMainWindow):
         super().__init__()
         self.robot = robot
         self.setWindowTitle("Simulación del Robot SCARA")
-        self.robot.teach()   # Abre la interfaz de visualización de Peter Corke
+        self.robot.teach(q=[0, 0])  # Abre la interfaz de visualización con la configuración inicial
         self.show()
 
     def update_graph(self, theta1, theta2):
         # Mueve el robot a los nuevos ángulos
         self.robot.q = [np.radians(theta1), np.radians(theta2)]
         # Refrescar la visualización
-        self.robot.teach()
+        self.robot.teach(q=self.robot.q)
 
 class Ui_Dialog(object):
     def __init__(self):
