@@ -22,7 +22,6 @@ class SimulationWindow(QMainWindow):
         self.robot = robot
         self.setWindowTitle("Simulación del Robot")
         self.robot.teach(q=[0, 0])  # Abre la interfaz de visualización con la configuración inicial
-        self.simulation_window.show() 
         self.show()
 
     def update_graph(self, theta1, theta2):
@@ -31,7 +30,7 @@ class SimulationWindow(QMainWindow):
         # Refrescar la visualización
         self.robot.teach(q=self.robot.q)
 
-class Ui_Dialog(object):
+class Ui_Dialog(QMainWindow):
     def __init__(self):
         self.robot = self.create_robot()
         self.simulation_window = SimulationWindow(self.robot)  # Crear ventana de simulación
@@ -79,9 +78,11 @@ class Ui_Dialog(object):
             time.sleep(delay)
 
 
-    def setupUi(self, Dialog):
-        Dialog.setObjectName("Dialog")
-        Dialog.resize(860, 640)
+    def setupUi(self):
+        self.setObjectName("MainWindow")
+        self.resize(860, 640)
+        central_widget = QtWidgets.QWidget(self)
+        self.setCentralWidget(central_widget)
         # Configuración de los elementos UI
         self.label_2 = QtWidgets.QLabel(Dialog)
         self.label_2.setGeometry(QtCore.QRect(40, 440, 261, 181))
@@ -334,8 +335,8 @@ class Ui_Dialog(object):
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
-    ui.setupUi(Dialog)
-    Dialog.show()
+								
+    mainWindow = Ui_Dialog()
+					  
+    mainWindow.show()
     sys.exit(app.exec_())
