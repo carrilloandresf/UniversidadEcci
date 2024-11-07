@@ -22,7 +22,6 @@ def log_data(temperature, humidity):
 # Función para actualizar los datos en la interfaz y log cada minuto
 def update_data():
     while True:
-        # Obtener temperatura y humedad del sensor
         temperature = sensor.temperature
         humidity = sensor.relative_humidity
         
