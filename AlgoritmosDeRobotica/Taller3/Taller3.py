@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import time
 from roboticstoolbox import DHRobot, RevoluteDH
+from roboticstoolbox.backends.PyPlot import PyPlot
 import numpy as np
 import board
 from adafruit_motor import servo
@@ -19,13 +20,20 @@ pca.frequency = 50  # Configuración de frecuencia para servos
 servo1 = servo.Servo(pca.channels[0], min_pulse=500, max_pulse=2400)
 servo2 = servo.Servo(pca.channels[1], min_pulse=500, max_pulse=2400)
 
+# Dimensiones del robot (ajustables)
+d1 = 1.0  # Longitud del primer brazo
+d2 = 0.5  # Longitud del segundo brazo
+
 class Ui_Dialog(object):
     def __init__(self):
         self.robot = self.create_robot()
+        self.simulation = PyPlot()  # Crear simulación de Peter Corke
+        self.simulation.launch()
+        self.simulation.add(self.robot)
 
     def create_robot(self):
-        link1 = RevoluteDH(d=0, a=1, alpha=0)
-        link2 = RevoluteDH(d=0, a=1, alpha=0)
+        link1 = RevoluteDH(d=0, a=d1, alpha=0)
+        link2 = RevoluteDH(d=0, a=d2, alpha=0)
         return DHRobot([link1, link2], name='ROBOT')
 
     def set_servo_angle(self, servo_motor, angle):
@@ -51,6 +59,10 @@ class Ui_Dialog(object):
             # Establecer los ángulos intermedios para ambos servos
             self.set_servo_angle(servo1, intermediate_angle1)
             self.set_servo_angle(servo2, intermediate_angle2)
+
+            # Actualizar la simulación del robot
+            self.robot.q = [np.radians(intermediate_angle1), np.radians(intermediate_angle2)]
+            self.simulation.step()
 
             # Actualizar los labels con los valores actuales
             self.label_7.setText(f"{intermediate_angle1:.2f}")
@@ -224,9 +236,8 @@ class Ui_Dialog(object):
         self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
 
     def inverse_kinematics(self, x, y):
-        # Longitudes de los eslabones
-        d1 = 1  # Longitud del primer brazo
-        d2 = 0.5  # Longitud del segundo brazo
+        # Longitudes de los eslabones (ajustables)
+        global d1, d2
 
         # Calcular el valor del coseno de theta2, asegurando que esté en el rango [-1, 1]
         cos_theta2 = (x**2 + y**2 - d1**2 - d2**2) / (2 * d1 * d2)
