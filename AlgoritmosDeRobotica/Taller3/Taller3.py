@@ -289,7 +289,7 @@ class Ui_Dialog(object):
 
     def write_name(self, name):
         print("Iniciando escritura del nombre: ", name)
-        
+
         # Diccionario con la representación simplificada de cada letra
         alphabet_movements = {
             'A': [(45, 90), (90, 45), (90, 90)],
@@ -319,22 +319,51 @@ class Ui_Dialog(object):
             'Y': [(45, 90), (90, 90), (45, 45)],
             'Z': [(90, 90), (45, 45), (90, 45)]
         }
-        
+
         # Iterar sobre cada letra del nombre
-        for letter in name.upper():
+        for index, letter in enumerate(name.upper()):
             if letter in alphabet_movements:
                 movements = alphabet_movements[letter]
                 for angle1, angle2 in movements:
                     self.move_servos_smoothly(angle1, angle2)
                     time.sleep(0.5)
+
+                # Mover el efector a la siguiente posición horizontal para evitar superposiciones
+                if index < len(name) - 1:  # No es necesario mover después de la última letra
+                    self.move_efector_to_next_character()
+
             else:
                 # Movimiento por defecto si la letra no está definida
                 print(f"Letra '{letter}' no definida, saltando...")
                 self.move_servos_smoothly(0, 0)
                 time.sleep(0.5)
-        
+
         # Retornar a la posición inicial al finalizar
         self.move_servos_smoothly(0, 0)
+
+    def move_efector_to_next_character(self):
+        """
+        Mueve el efector final hacia la derecha una cierta distancia para escribir el siguiente carácter.
+        """
+        # Ajustar las coordenadas para el desplazamiento horizontal entre letras
+        x_shift = 0.5  # Desplazamiento horizontal, ajusta este valor según la escala de tu robot
+        y_current = 0  # Suponiendo que el eje Y se mantiene igual
+
+        # Obtener la posición actual del efector
+        x_current = float(self.lineEdit.text()) if self.lineEdit.text() else 0.0
+
+        # Nueva posición X para el próximo carácter
+        x_new = x_current + x_shift
+
+        # Calcular los ángulos inversos para alcanzar la nueva posición
+        theta1, theta2 = self.inverse_kinematics(x_new, y_current)
+
+        # Mover suavemente a la nueva posición
+        self.move_servos_smoothly(theta1, theta2)
+
+        # Actualizar la UI con la nueva posición
+        self.lineEdit.setText(f"{x_new:.2f}")
+
 
     def write_custom_word(self):
         word = self.lineEdit_3.text()
