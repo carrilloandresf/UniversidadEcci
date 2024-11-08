@@ -324,6 +324,7 @@ class Ui_Dialog(object):
         # Iterar sobre cada letra del nombre
         for index, letter in enumerate(name.upper()):
             if letter in alphabet_movements:
+                print(f"Letra '{letter}' definida, escribiendo...")
                 movements = alphabet_movements[letter]
                 for angle1, angle2 in movements:
                     self.move_servos_smoothly(angle1, angle2)
