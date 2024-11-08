@@ -290,6 +290,16 @@ class Ui_Dialog(object):
     def write_name(self, name):
         print("Iniciando escritura del nombre: ", name)
 
+        # Configuración inicial del punto de partida
+        start_x = -1.0
+        start_y = 0.5
+
+        # Mover el efector al punto de inicio antes de comenzar a escribir
+        print(f"Moviendo al punto de inicio: ({start_x}, {start_y})")
+        theta1, theta2 = self.inverse_kinematics(start_x, start_y)
+        self.move_servos_smoothly(theta1, theta2)
+        time.sleep(0.5)
+
         # Diccionario con la representación simplificada de cada letra usando puntos en el plano cartesiano (x, y)
         alphabet_points = {
             'A': [(0.1, 0.2), (0.2, 0.5), (0.3, 0.2), (0.2, 0.35)],
@@ -326,14 +336,14 @@ class Ui_Dialog(object):
                 print(f"Letra '{letter}' definida, escribiendo...")
                 points = alphabet_points[letter]
                 for (x, y) in points:
-                    theta1, theta2 = self.inverse_kinematics(x, y)
+                    theta1, theta2 = self.inverse_kinematics(x + start_x, y + start_y)
                     self.move_servos_smoothly(theta1, theta2)
                     time.sleep(0.5)
 
                 # Mover el efector a la siguiente posición horizontal para evitar superposiciones
                 if index < len(name) - 1:  # No es necesario mover después de la última letra
                     print("Moviendo al siguiente carácter...")
-                    self.move_efector_to_next_character()
+                    self.move_efector_to_next_character(start_x)
                     time.sleep(0.5)  # Espera entre letras
 
             else:
@@ -345,7 +355,7 @@ class Ui_Dialog(object):
         # Retornar a la posición inicial al finalizar
         print("Escritura completa. Retornando a posición inicial...")
         self.move_servos_smoothly(0, 0)
-
+        
     def move_efector_to_next_character(self):
         """
         Mueve el efector final hacia la derecha una cierta distancia para escribir el siguiente carácter.
