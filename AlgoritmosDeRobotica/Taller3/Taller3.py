@@ -282,22 +282,58 @@ class Ui_Dialog(object):
         for s1, s2 in movements:
             print(s1, "|", s2)
             theta1, theta2 = s1, s2
-            self.label_8.setText(f"{theta2:.2f}")
-            self.label_7.setText(f"{theta1:.2f}")
-            print(" -- ", theta1, " | ", theta2)
             self.move_servos_smoothly(theta1, theta2)
 
             # Esperar un segundo antes de pasar al siguiente movimiento
             time.sleep(1)
 
     def write_name(self, name):
-        print("write_name")
-        # Lógica de escritura de nombre con el efector final
-        # Podrías usar un método básico para cada letra en el nombre
-        for letter in name:
-            # Lógica de movimiento específica para cada letra
-            self.move_servos_smoothly(45, 45)
-            time.sleep(1)
+        print("Iniciando escritura del nombre: ", name)
+        
+        # Diccionario con la representación simplificada de cada letra
+        alphabet_movements = {
+            'A': [(45, 90), (90, 45), (90, 90)],
+            'B': [(45, 45), (90, 90), (45, 90), (90, 45)],
+            'C': [(90, 45), (45, 45), (45, 90)],
+            'D': [(45, 45), (90, 90), (90, 45)],
+            'E': [(90, 45), (45, 90), (45, 45)],
+            'F': [(90, 45), (45, 90)],
+            'G': [(90, 45), (45, 45), (45, 90), (90, 90)],
+            'H': [(45, 90), (90, 90), (45, 90)],
+            'I': [(90, 90), (45, 45)],
+            'J': [(45, 45), (90, 90), (45, 90)],
+            'K': [(45, 90), (90, 45), (45, 45)],
+            'L': [(90, 45), (45, 90)],
+            'M': [(45, 90), (90, 45), (90, 90)],
+            'N': [(45, 90), (90, 90)],
+            'O': [(90, 90), (45, 45), (45, 90)],
+            'P': [(45, 45), (90, 90), (45, 90)],
+            'Q': [(90, 90), (45, 45), (45, 90), (90, 45)],
+            'R': [(45, 45), (90, 90), (45, 90), (90, 45)],
+            'S': [(90, 45), (45, 45), (90, 90)],
+            'T': [(90, 90), (45, 45)],
+            'U': [(45, 90), (90, 90), (45, 45)],
+            'V': [(45, 90), (90, 45)],
+            'W': [(45, 90), (90, 45), (90, 90)],
+            'X': [(45, 45), (90, 90), (45, 45)],
+            'Y': [(45, 90), (90, 90), (45, 45)],
+            'Z': [(90, 90), (45, 45), (90, 45)]
+        }
+        
+        # Iterar sobre cada letra del nombre
+        for letter in name.upper():
+            if letter in alphabet_movements:
+                movements = alphabet_movements[letter]
+                for angle1, angle2 in movements:
+                    self.move_servos_smoothly(angle1, angle2)
+                    time.sleep(0.5)
+            else:
+                # Movimiento por defecto si la letra no está definida
+                print(f"Letra '{letter}' no definida, saltando...")
+                self.move_servos_smoothly(0, 0)
+                time.sleep(0.5)
+        
+        # Retornar a la posición inicial al finalizar
         self.move_servos_smoothly(0, 0)
 
     def write_custom_word(self):
