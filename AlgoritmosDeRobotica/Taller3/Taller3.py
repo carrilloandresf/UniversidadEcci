@@ -330,7 +330,11 @@ class Ui_Dialog(object):
             'Z': [(0.1, 0.5), (0.3, 0.5), (0.1, 0.2), (0.3, 0.2)],
         }
 
-         # Iterar sobre cada letra del nombre
+        # Encontrar la dimensión horizontal más grande entre todas las letras
+        max_width = max(point[0] for points in alphabet_points.values() for point in points)
+        letter_spacing = max_width + 0.1  # Agregar un poco más para el espacio entre letras
+
+        # Iterar sobre cada letra del nombre
         for index, letter in enumerate(name.upper()):
             if letter in alphabet_points:
                 print(f"Letra '{letter}' definida, escribiendo...")
@@ -343,7 +347,7 @@ class Ui_Dialog(object):
                 # Mover el efector a la siguiente posición horizontal para evitar superposiciones
                 if index < len(name) - 1:  # No es necesario mover después de la última letra
                     print("Moviendo al siguiente carácter...")
-                    self.move_efector_to_next_character()  # Llamada corregida
+                    start_x += letter_spacing
                     time.sleep(0.5)  # Espera entre letras
 
             else:
