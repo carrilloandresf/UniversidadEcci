@@ -290,49 +290,51 @@ class Ui_Dialog(object):
     def write_name(self, name):
         print("Iniciando escritura del nombre: ", name)
 
-        # Diccionario con la representación simplificada de cada letra
-        # Los movimientos están ajustados para las longitudes d1 = 1.0 y d2 = 0.5
-        alphabet_movements = {
-            'A': [(30, 60), (60, 30), (60, 60)],
-            'B': [(30, 30), (60, 60), (30, 60), (60, 30)],
-            'C': [(60, 30), (30, 30), (30, 60)],
-            'D': [(30, 30), (60, 60), (60, 30)],
-            'E': [(60, 30), (30, 60), (30, 30)],
-            'F': [(60, 30), (30, 60)],
-            'G': [(60, 30), (30, 30), (30, 60), (60, 60)],
-            'H': [(30, 60), (60, 60), (30, 60)],
-            'I': [(60, 60), (30, 30)],
-            'J': [(30, 30), (60, 60), (30, 60)],
-            'K': [(30, 60), (60, 30), (30, 30)],
-            'L': [(60, 30), (30, 60)],
-            'M': [(30, 60), (60, 30), (60, 60)],
-            'N': [(30, 60), (60, 60)],
-            'O': [(60, 60), (30, 30), (30, 60)],
-            'P': [(30, 30), (60, 60), (30, 60)],
-            'Q': [(60, 60), (30, 30), (30, 60), (60, 30)],
-            'R': [(30, 30), (60, 60), (30, 60), (60, 30)],
-            'S': [(60, 30), (30, 30), (60, 60)],
-            'T': [(60, 60), (30, 30)],
-            'U': [(30, 60), (60, 60), (30, 30)],
-            'V': [(30, 60), (60, 30)],
-            'W': [(30, 60), (60, 30), (60, 60)],
-            'X': [(30, 30), (60, 60), (30, 30)],
-            'Y': [(30, 60), (60, 60), (30, 30)],
-            'Z': [(60, 60), (30, 30), (60, 30)]
+        # Diccionario con la representación simplificada de cada letra usando puntos en el plano cartesiano (x, y)
+        alphabet_points = {
+            'A': [(0.1, 0.2), (0.2, 0.5), (0.3, 0.2), (0.2, 0.35)],
+            'B': [(0.1, 0.2), (0.1, 0.5), (0.25, 0.4), (0.1, 0.35), (0.25, 0.3), (0.1, 0.2)],
+            'C': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.2), (0.3, 0.2)],
+            'D': [(0.1, 0.2), (0.1, 0.5), (0.25, 0.4), (0.25, 0.3), (0.1, 0.2)],
+            'E': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.35), (0.2, 0.35), (0.1, 0.35), (0.1, 0.2), (0.3, 0.2)],
+            'F': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.35), (0.2, 0.35), (0.1, 0.35)],
+            'G': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.2), (0.3, 0.2), (0.3, 0.35)],
+            'H': [(0.1, 0.5), (0.1, 0.2), (0.1, 0.35), (0.3, 0.35), (0.3, 0.5), (0.3, 0.2)],
+            'I': [(0.2, 0.5), (0.2, 0.2)],
+            'J': [(0.3, 0.5), (0.3, 0.2), (0.2, 0.2), (0.1, 0.3)],
+            'K': [(0.1, 0.5), (0.1, 0.2), (0.1, 0.35), (0.3, 0.5), (0.1, 0.35), (0.3, 0.2)],
+            'L': [(0.1, 0.5), (0.1, 0.2), (0.3, 0.2)],
+            'M': [(0.1, 0.2), (0.1, 0.5), (0.2, 0.35), (0.3, 0.5), (0.3, 0.2)],
+            'N': [(0.1, 0.2), (0.1, 0.5), (0.3, 0.2), (0.3, 0.5)],
+            'O': [(0.2, 0.5), (0.1, 0.4), (0.1, 0.3), (0.2, 0.2), (0.3, 0.3), (0.3, 0.4), (0.2, 0.5)],
+            'P': [(0.1, 0.2), (0.1, 0.5), (0.25, 0.5), (0.25, 0.35), (0.1, 0.35)],
+            'Q': [(0.2, 0.5), (0.1, 0.4), (0.1, 0.3), (0.2, 0.2), (0.3, 0.3), (0.3, 0.4), (0.2, 0.5), (0.3, 0.2)],
+            'R': [(0.1, 0.2), (0.1, 0.5), (0.25, 0.5), (0.25, 0.35), (0.1, 0.35), (0.3, 0.2)],
+            'S': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.35), (0.3, 0.35), (0.3, 0.2), (0.1, 0.2)],
+            'T': [(0.1, 0.5), (0.3, 0.5), (0.2, 0.5), (0.2, 0.2)],
+            'U': [(0.1, 0.5), (0.1, 0.3), (0.2, 0.2), (0.3, 0.3), (0.3, 0.5)],
+            'V': [(0.1, 0.5), (0.2, 0.2), (0.3, 0.5)],
+            'W': [(0.1, 0.5), (0.1, 0.3), (0.2, 0.4), (0.3, 0.3), (0.3, 0.5)],
+            'X': [(0.1, 0.5), (0.3, 0.2), (0.2, 0.35), (0.1, 0.2), (0.3, 0.5)],
+            'Y': [(0.1, 0.5), (0.2, 0.35), (0.3, 0.5), (0.2, 0.35), (0.2, 0.2)],
+            'Z': [(0.1, 0.5), (0.3, 0.5), (0.1, 0.2), (0.3, 0.2)],
         }
 
         # Iterar sobre cada letra del nombre
         for index, letter in enumerate(name.upper()):
-            if letter in alphabet_movements:
+            if letter in alphabet_points:
                 print(f"Letra '{letter}' definida, escribiendo...")
-                movements = alphabet_movements[letter]
-                for angle1, angle2 in movements:
-                    self.move_servos_smoothly(angle1, angle2)
+                points = alphabet_points[letter]
+                for (x, y) in points:
+                    theta1, theta2 = self.inverse_kinematics(x, y)
+                    self.move_servos_smoothly(theta1, theta2)
                     time.sleep(0.5)
 
                 # Mover el efector a la siguiente posición horizontal para evitar superposiciones
                 if index < len(name) - 1:  # No es necesario mover después de la última letra
+                    print("Moviendo al siguiente carácter...")
                     self.move_efector_to_next_character()
+                    time.sleep(0.5)  # Espera entre letras
 
             else:
                 # Movimiento por defecto si la letra no está definida
@@ -341,6 +343,7 @@ class Ui_Dialog(object):
                 time.sleep(0.5)
 
         # Retornar a la posición inicial al finalizar
+        print("Escritura completa. Retornando a posición inicial...")
         self.move_servos_smoothly(0, 0)
 
     def move_efector_to_next_character(self):
@@ -348,7 +351,7 @@ class Ui_Dialog(object):
         Mueve el efector final hacia la derecha una cierta distancia para escribir el siguiente carácter.
         """
         # Ajustar las coordenadas para el desplazamiento horizontal entre letras
-        x_shift = 0.3  # Desplazamiento horizontal reducido para letras más pequeñas (ajusta según la escala)
+        x_shift = 0.2  # Desplazamiento horizontal reducido para letras más pequeñas (ajusta según la escala)
         y_current = 0  # Suponiendo que el eje Y se mantiene igual
 
         # Obtener la posición actual del efector
@@ -365,7 +368,6 @@ class Ui_Dialog(object):
 
         # Actualizar la UI con la nueva posición
         self.lineEdit.setText(f"{x_new:.2f}")
-
 
     def write_custom_word(self):
         word = self.lineEdit_3.text()
