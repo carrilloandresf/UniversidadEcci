@@ -307,7 +307,7 @@ class Ui_Dialog(object):
             'C': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.2), (0.3, 0.2)],
             'D': [(0.1, 0.2), (0.1, 0.5), (0.25, 0.4), (0.25, 0.3), (0.1, 0.2)],
             'E': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.35), (0.2, 0.35), (0.1, 0.35), (0.1, 0.2), (0.3, 0.2)],
-            'F': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.35), (0.2, 0.35), (0.1, 0.35)],
+            'F': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.35), (0.2, 0.35), (0.1, 0.35), (0.1, 0.2)],
             'G': [(0.3, 0.5), (0.1, 0.5), (0.1, 0.2), (0.3, 0.2), (0.3, 0.35)],
             'H': [(0.1, 0.5), (0.1, 0.2), (0.1, 0.35), (0.3, 0.35), (0.3, 0.5), (0.3, 0.2)],
             'I': [(0.2, 0.5), (0.2, 0.2)],
@@ -365,7 +365,7 @@ class Ui_Dialog(object):
         Mueve el efector final hacia la derecha una cierta distancia para escribir el siguiente carácter.
         """
         # Ajustar las coordenadas para el desplazamiento horizontal entre letras
-        x_shift = 0.2  # Desplazamiento horizontal reducido para letras más pequeñas (ajusta según la escala)
+        x_shift = 0.1  # Desplazamiento horizontal reducido para letras más pequeñas (ajusta según la escala)
         y_current = 0  # Suponiendo que el eje Y se mantiene igual
 
         # Obtener la posición actual del efector
