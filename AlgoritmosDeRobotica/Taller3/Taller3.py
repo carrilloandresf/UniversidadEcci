@@ -394,19 +394,38 @@ class Ui_Dialog(object):
         # Lógica para trazar los logos específicos
         self.move_servos_smoothly(0, 0)
         time.sleep(2)  # Espera para que el usuario coloque el papel
+
+        logo_points = {
+            'Puma': [
+                (-0.5, 0.0), (0.0, 0.3), (0.5, 0.5), (0.7, 0.4), (0.5, 0.2), (0.3, -0.1),
+                (0.0, -0.3), (-0.3, -0.2), (-0.5, 0.0)
+            ],
+            'Toyota': [
+                (0.0, 0.5), (-0.3, 0.3), (-0.3, -0.3), (0.0, -0.5), (0.3, -0.3), (0.3, 0.3), (0.0, 0.5),
+                (0.0, 0.0), (0.3, 0.0), (-0.3, 0.0)
+            ],
+            'Apple': [
+                (0.0, 0.4), (0.2, 0.6), (0.4, 0.6), (0.5, 0.4), (0.4, 0.2), (0.2, 0.0), (0.0, -0.2),
+                (-0.2, 0.0), (-0.4, 0.2), (-0.5, 0.4), (-0.4, 0.6), (-0.2, 0.6), (0.0, 0.4)
+            ],
+            'Pepsi': [
+                (0.0, 0.5), (0.4, 0.4), (0.5, 0.0), (0.4, -0.4), (0.0, -0.5), (-0.4, -0.4), (-0.5, 0.0),
+                (-0.4, 0.4), (0.0, 0.5),
+                (0.0, 0.0), (0.3, 0.2), (-0.3, -0.2)
+            ],
+        }
+
         # Implementar lógica para trazar el logo paso a paso
-        if logo_name == "Puma":
-            # Lógica de trazado para Puma
-            pass
-        elif logo_name == "Toyota":
-            # Lógica de trazado para Toyota
-            pass
-        elif logo_name == "Apple":
-            # Lógica de trazado para Apple
-            pass
-        elif logo_name == "Pepsi":
-            # Lógica de trazado para Pepsi
-            pass
+        if logo_name in logo_points:
+            print(f"Dibujando logo: {logo_name}")
+            points = logo_points[logo_name]
+            for (x, y) in points:
+                theta1, theta2 = self.inverse_kinematics(x, y)
+                self.move_servos_smoothly(theta1, theta2)
+                time.sleep(0.5)
+        else:
+            print(f"Logo '{logo_name}' no está definido.")
+
 
 if __name__ == "__main__":
     import sys
