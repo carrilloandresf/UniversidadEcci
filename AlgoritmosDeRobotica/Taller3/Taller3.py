@@ -332,7 +332,7 @@ class Ui_Dialog(object):
 
         # Encontrar la dimensión horizontal más grande entre todas las letras
         max_width = max(point[0] for points in alphabet_points.values() for point in points)
-        letter_spacing = max_width + 0.05  # Agregar un poco más para el espacio entre letras
+        letter_spacing = max_width # Agregar un poco más para el espacio entre letras
 
         # Iterar sobre cada letra del nombre
         for index, letter in enumerate(name.upper()):
