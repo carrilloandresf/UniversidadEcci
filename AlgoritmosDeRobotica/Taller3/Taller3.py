@@ -330,20 +330,20 @@ class Ui_Dialog(object):
             'Z': [(0.1, 0.5), (0.3, 0.5), (0.1, 0.2), (0.3, 0.2)],
         }
 
-        # Iterar sobre cada letra del nombre
+         # Iterar sobre cada letra del nombre
         for index, letter in enumerate(name.upper()):
             if letter in alphabet_points:
                 print(f"Letra '{letter}' definida, escribiendo...")
                 points = alphabet_points[letter]
                 for (x, y) in points:
-                    theta1, theta2 = self.inverse_kinematics(x + start_x, y + start_y)
+                    theta1, theta2 = self.inverse_kinematics(start_x + x, start_y + y)
                     self.move_servos_smoothly(theta1, theta2)
                     time.sleep(0.5)
 
                 # Mover el efector a la siguiente posición horizontal para evitar superposiciones
                 if index < len(name) - 1:  # No es necesario mover después de la última letra
                     print("Moviendo al siguiente carácter...")
-                    self.move_efector_to_next_character(start_x)
+                    self.move_efector_to_next_character()  # Llamada corregida
                     time.sleep(0.5)  # Espera entre letras
 
             else:
@@ -355,7 +355,7 @@ class Ui_Dialog(object):
         # Retornar a la posición inicial al finalizar
         print("Escritura completa. Retornando a posición inicial...")
         self.move_servos_smoothly(0, 0)
-        
+
     def move_efector_to_next_character(self):
         """
         Mueve el efector final hacia la derecha una cierta distancia para escribir el siguiente carácter.
@@ -365,7 +365,10 @@ class Ui_Dialog(object):
         y_current = 0  # Suponiendo que el eje Y se mantiene igual
 
         # Obtener la posición actual del efector
-        x_current = float(self.lineEdit.text()) if self.lineEdit.text() else 0.0
+        try:
+            x_current = float(self.lineEdit.text()) if self.lineEdit.text() else 0.0
+        except ValueError:
+            x_current = 0.0  # En caso de error, se usa un valor predeterminado
 
         # Nueva posición X para el próximo carácter
         x_new = x_current + x_shift
