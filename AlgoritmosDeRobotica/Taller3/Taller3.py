@@ -459,8 +459,6 @@ class Ui_Dialog(object):
         self.write_name(word)
 
     def draw_logo(self, logo_name):
-        # Lógica para trazar los logos específicos
-        self.move_servos_smoothly(0, 0)
         time.sleep(2)  # Espera para que el usuario coloque el papel
 
         logo_points = {
@@ -818,7 +816,9 @@ class Ui_Dialog(object):
             time.sleep(3)
             points = logo_points[logo_name]
             for (x, y) in points:
+                print(f"Dibujando punto ({x}, {y})")
                 theta1, theta2 = self.inverse_kinematics(x, y)
+                print(f"Moviendo servos a theta1: {theta1}, theta2: {theta2}")
                 self.move_servos(theta1, theta2)
                 time.sleep(0.5)
             print(f"Logo '{logo_name}' dibujado.")
