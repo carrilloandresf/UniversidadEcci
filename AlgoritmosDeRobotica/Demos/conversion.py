@@ -8,30 +8,49 @@ def txt_to_dict(file_path):
     :param file_path: Ruta al archivo txt con las coordenadas.
     :return: Diccionario con las coordenadas en el formato deseado.
     """
-    coordinates = []
-    pattern = re.compile(r'np\.int32\((\d+)\),\s*np\.int32\((\d+)\)')
-    
-    # Variables para determinar el rango máximo y mínimo
-    min_x, max_x, min_y, max_y = float('inf'), float('-inf'), float('inf'), float('-inf')
-    
-    # Leer las coordenadas y calcular los valores mínimos y máximos
-    with open(file_path, 'r') as file:
-        raw_coordinates = []
-        for line in file:
-            match = pattern.search(line.strip())
-            if match:
-                x, y = int(match.group(1)), int(match.group(2))
-                raw_coordinates.append((x, y))
-                min_x, max_x = min(min_x, x), max(max_x, x)
-                min_y, max_y = min(min_y, y), max(max_y, y)
+    try:
+        # Leer el archivo
+        with open(file_path, 'r') as file:
+            raw_coordinates = []
+            pattern = re.compile(r'np\.int32\((\d+)\),\s*np\.int32\((\d+)\)')
+            
+            # Leer las coordenadas usando la expresión regular
+            for line in file:
+                match = pattern.search(line.strip())
+                if match:
+                    x, y = int(match.group(1)), int(match.group(2))
+                    raw_coordinates.append((x, y))
 
-    # Escalado de las coordenadas al rango [0, 1]
-    for x, y in raw_coordinates:
-        scaled_x = (x - min_x) / (max_x - min_x) if max_x != min_x else 0.5
-        scaled_y = (y - min_y) / (max_y - min_y) if max_y != min_y else 0.5
-        coordinates.append((scaled_x, scaled_y))
+        # Si no se encontraron coordenadas, devolver un diccionario vacío
+        if not raw_coordinates:
+            return {'Puma': []}
+        
+        # Determinar los valores mínimos y máximos de x e y
+        x_values, y_values = zip(*raw_coordinates)
+        min_x, max_x = min(x_values), max(x_values)
+        min_y, max_y = min(y_values), max(y_values)
+        
+        # Definir los límites para el escalado
+        target_min_x, target_max_x = -0.9, 0.8
+        target_min_y, target_max_y = 0.5, 1.2
+        
+        # Escalar las coordenadas al rango definido por los límites
+        coordinates = [
+            (
+                target_min_x + (x - min_x) / (max_x - min_x) * (target_max_x - target_min_x) if max_x != min_x else (target_min_x + target_max_x) / 2,
+                target_min_y + (y - min_y) / (max_y - min_y) * (target_max_y - target_min_y) if max_y != min_y else (target_min_y + target_max_y) / 2
+            )
+            for x, y in raw_coordinates
+        ]
+        
+        return {'Puma': coordinates}
 
-    return {'Puma': coordinates}
+    except FileNotFoundError:
+        print(f"Error: No se pudo encontrar el archivo en la ruta especificada: {file_path}")
+        return {'Puma': []}
+    except Exception as e:
+        print(f"Error: {e}")
+        return {'Puma': []}
 
 # Ejemplo de uso
 file_path = 'C:/Users/anfel/Downloads/contour_coords.txt'
