@@ -277,8 +277,9 @@ class Ui_Dialog(object):
         self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
 
     def inverse_kinematics(self, x, y):
-        # Longitudes de los eslabones
-        d1, d2 = self.d1, self.d2
+
+        # Longitudes de los eslabones (ajustables)
+        global d1, d2
 
         # Verificar que el punto esté dentro del espacio de trabajo
         if (x**2 + y**2) > (d1 + d2)**2 or (x**2 + y**2) < abs(d1 - d2)**2:
