@@ -80,7 +80,7 @@ class Ui_Dialog(object):
             # Consider using QTimer for delays to avoid blocking the UI thread
             time.sleep(delay)
 
-    def move_servos(self, target_angle1, target_angle2, steps=1, delay=0.1):
+    def move_servos(self, target_angle1, target_angle2, steps=1, delay=0):
         # Validar que 'steps' sea un entero positivo
         if steps <= 0:
             raise ValueError("Steps must be a positive integer")
