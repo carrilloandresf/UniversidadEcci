@@ -277,8 +277,8 @@ class Ui_Dialog(object):
         self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
 
     def inverse_kinematics(self, x, y):
-        # Longitudes de los eslabones
-        d1, d2 = self.d1, self.d2
+        # Longitudes de los eslabones (ajustables)
+        global d1, d2
 
         # Verificar que el punto esté dentro del espacio de trabajo
         distancia = np.sqrt(x**2 + y**2)
@@ -316,17 +316,47 @@ class Ui_Dialog(object):
 
         # Seleccionar la solución que sea más natural para evitar sobrepasar 180 grados
         # Se asume que el robot trabaja en el rango de 0 a 180 grados para theta1 y theta2
-        if 0 <= theta1_1 <= 180 and 0 <= theta2_1 <= 180:
+        if self.is_valid_solution(theta1_1, theta2_1, x, y):
             theta1, theta2 = theta1_1, theta2_1
-        elif 0 <= theta1_2 <= 180 and 0 <= theta2_2 <= 180:
+        elif self.is_valid_solution(theta1_2, theta2_2, x, y):
             theta1, theta2 = theta1_2, theta2_2
         else:
             # Si ambas soluciones están fuera de los límites, se regresa a la posición inicial
-            print("No se encontró una solución válida en el rango permitido.")
+            print("No se encontró una solución válida en el rango permitido o se detectó una posible colisión.")
             return 0, 0
 
         return theta1, theta2
-    
+
+    def is_valid_solution(self, theta1, theta2, x, y):
+        # Validar que los ángulos estén dentro del rango permitido de 0 a 180 grados
+        if not (0 <= theta1 <= 180 and 0 <= theta2 <= 180):
+            return False
+        
+        # Verificar posibles colisiones
+        if self.check_collision(x, y, theta1, theta2):
+            return False
+
+        return True
+
+    def check_collision(self, x, y, theta1, theta2):
+        # Definir una lógica para evitar colisiones con el propio robot
+        # Por ejemplo, si el punto está muy cerca de la base o sobrepasando ciertos límites
+
+        # Evitar puntos que estén demasiado cerca de la base, donde el lápiz podría chocar
+        min_distancia_base = 1.0  # Ajustar este valor según el diseño del robot
+        distancia = np.sqrt(x**2 + y**2)
+        if distancia < min_distancia_base:
+            print("Posible colisión detectada: el punto está demasiado cerca de la base.")
+            return True
+
+        # Evitar posiciones donde el lápiz podría chocar con los eslabones
+        # Considerar restricciones adicionales si hay áreas críticas de colisión conocidas
+        if theta1 < 15 or theta2 < 15:
+            # Por ejemplo, si los ángulos son demasiado pequeños, podría indicar un riesgo de colisión
+            print("Posible colisión detectada: ángulos demasiado pequeños.")
+            return True
+
+        return False 
     def draw_yin_yang(self):
         print("draw_yin_yang")
         movements = [(0, 0), (90, 0), (180, 0), (180, 90), (180, 180), (0, 180), (0, 90), (0, 0)]
