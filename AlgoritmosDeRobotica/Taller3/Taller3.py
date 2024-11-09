@@ -498,6 +498,7 @@ class Ui_Dialog(object):
                 theta1, theta2 = self.inverse_kinematics(x, y)
                 self.move_servos(theta1, theta2)
                 time.sleep(0.5)
+            print(f"Logo '{logo_name}' dibujado.")
         else:
             print(f"Logo '{logo_name}' no está definido.")
 
