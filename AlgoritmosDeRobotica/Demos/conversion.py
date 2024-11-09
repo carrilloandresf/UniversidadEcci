@@ -50,8 +50,8 @@ def txt_to_dict(file_path, image_shape):
         ]
 
         # Definir los límites para el escalado objetivo (el cuadro objetivo)
-        target_min_x, target_max_x = 0.5, 1.2
-        target_min_y, target_max_y = 0.5, 1.2
+        target_min_x, target_max_x = 0.1, 1
+        target_min_y, target_max_y = 0.6, 1.1
 
         # Escalar las coordenadas normalizadas al cuadro objetivo
         target_width = target_max_x - target_min_x
