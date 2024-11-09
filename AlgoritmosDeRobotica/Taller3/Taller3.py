@@ -277,42 +277,70 @@ class Ui_Dialog(object):
         self.move_servos_smoothly(theta1, theta2)  # Mover suavemente ambos servos
 
     def inverse_kinematics(self, x, y):
-        # Longitudes de los eslabones (ajustables)
-        global d1, d2
+        # Longitudes de los eslabones
+        d1, d2 = self.d1, self.d2
+
+        # Verificar que el punto esté dentro del espacio de trabajo
+        if (x**2 + y**2) > (d1 + d2)**2 or (x**2 + y**2) < abs(d1 - d2)**2:
+            print("El punto está fuera del espacio de trabajo.")
+            return 0, 0
 
         # Calcular el valor del coseno de theta2, asegurando que esté en el rango [-1, 1]
         cos_theta2 = (x**2 + y**2 - d1**2 - d2**2) / (2 * d1 * d2)
-
-        # Limitar el valor de cos_theta2 para evitar errores de dominio
         cos_theta2 = np.clip(cos_theta2, -1, 1)
 
         try:
-            # Calcular theta2 en radianes (hay dos posibles soluciones, se puede usar la que mejor se adapte)
-            theta2_rad = np.arccos(cos_theta2)
+            # Calcular las dos posibles soluciones para theta2
+            theta2_rad_1 = np.arccos(cos_theta2)
+            theta2_rad_2 = -np.arccos(cos_theta2)
 
-            # Calcular theta1 considerando las dos soluciones posibles
-            k1 = d1 + d2 * np.cos(theta2_rad)
-            k2 = d2 * np.sin(theta2_rad)
-            theta1_rad = np.arctan2(y, x) - np.arctan2(k2, k1)
+            # Calcular theta1 para cada solución posible de theta2
+            k1_1 = d1 + d2 * np.cos(theta2_rad_1)
+            k2_1 = d2 * np.sin(theta2_rad_1)
+            theta1_rad_1 = np.arctan2(y, x) - np.arctan2(k2_1, k1_1)
+
+            k1_2 = d1 + d2 * np.cos(theta2_rad_2)
+            k2_2 = d2 * np.sin(theta2_rad_2)
+            theta1_rad_2 = np.arctan2(y, x) - np.arctan2(k2_2, k1_2)
 
             # Convertir ángulos a grados
-            theta1 = np.degrees(theta1_rad)
-            theta2 = np.degrees(theta2_rad)
+            theta1_1 = np.degrees(theta1_rad_1)
+            theta2_1 = np.degrees(theta2_rad_1)
 
-            # Ajustar los ángulos al rango de 0 a 180 grados para que los servos puedan manejarlos
-            theta1 = (theta1 + 360) % 360  # Asegurar que esté en rango positivo
-            if theta1 > 180:
-                theta1 -= 360
+            theta1_2 = np.degrees(theta1_rad_2)
+            theta2_2 = np.degrees(theta2_rad_2)
 
-            # Limitar theta1 y theta2 al rango de trabajo del servo (0 a 180 grados)
-            theta1 = max(0, min(180, theta1))
-            theta2 = max(0, min(180, theta2))
+            # Ajustar los ángulos al rango de 0 a 360 grados para asegurarse de que sean positivos
+            theta1_1 = (theta1_1 + 360) % 360
+            theta1_2 = (theta1_2 + 360) % 360
+
+            # Limitar los ángulos al rango de trabajo del servo (0 a 180 grados)
+            theta1_1 = max(0, min(180, theta1_1))
+            theta2_1 = max(0, min(180, theta2_1))
+
+            theta1_2 = max(0, min(180, theta1_2))
+            theta2_2 = max(0, min(180, theta2_2))
+
+            # Seleccionar la solución que no cause colisión (si es necesario se puede agregar una lógica más compleja)
+            if self.check_collision(x, y, d1, d2, theta1_1, theta2_1):
+                theta1, theta2 = theta1_2, theta2_2
+            else:
+                theta1, theta2 = theta1_1, theta2_1
 
             return theta1, theta2
+
         except ValueError:
             # Si hay un error, retornar ángulos predeterminados o levantar una excepción
             print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
             return 0, 0
+
+    def check_collision(self, x, y, d1, d2, theta1, theta2):
+        # Definir una lógica básica para evitar colisiones con el propio robot
+        # Por ejemplo, si el punto está muy cerca de la base o sobrepasando ciertos límites
+        if x < d1 * 0.2 and y < d1 * 0.2:
+            return True  # Está muy cerca de la base, posible colisión
+        # Se pueden agregar más restricciones según el diseño del robot y el lápiz
+        return False
 
     def draw_yin_yang(self):
         print("draw_yin_yang")
