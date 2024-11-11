@@ -88,7 +88,7 @@ def txt_to_dict(file_path, image_shape):
         return {'Puma': []}
 
 # Ruta de la imagen y dimensiones
-image_path = 'C:/Users/anfel/Downloads/Toyota-logo.jpg'
+image_path = 'C:/Users/anfel/Downloads/apple_logo.png'
 
 # Leer la imagen para obtener sus dimensiones
 print(f"Leyendo imagen desde: {image_path}")

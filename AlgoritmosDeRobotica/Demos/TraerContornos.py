@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 # Ruta de la imagen (ajusta esta ruta a la ubicación de tu imagen)
-image_path = 'C:/Users/anfel/Downloads/Toyota-logo.jpg'
+image_path = 'C:/Users/anfel/Downloads/apple_logo.png'
 
 # Cargar la imagen
 image = cv2.imread(image_path)
