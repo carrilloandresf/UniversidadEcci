@@ -35,7 +35,7 @@ servo2 = servo.Servo(pca.channels[1], min_pulse=500, max_pulse=2400)
 
 # Dimensiones del robot (ajustables)
 d1 = 1.0  # Longitud del primer brazo
-d2 = 0.7  # Longitud del segundo brazo
+d2 = 0.75  # Longitud del segundo brazo
 
 class Ui_Dialog(object):
     def __init__(self):
@@ -458,7 +458,7 @@ class Ui_Dialog(object):
             time.sleep(3)
             points = logo_points[logo_name]
             total_points = len(points)
-            estimated_time_per_step = 0.75  # Aproximadamente 3/4 de segundo por paso
+            estimated_time_per_step = 0.15  # Aproximadamente 3/4 de segundo por paso
 
             for i, (x, y) in enumerate(points):
                 # Calcular avance porcentual y tiempo restante
