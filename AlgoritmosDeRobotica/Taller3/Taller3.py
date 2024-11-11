@@ -35,7 +35,7 @@ servo2 = servo.Servo(pca.channels[1], min_pulse=500, max_pulse=2400)
 
 # Dimensiones del robot (ajustables)
 d1 = 1.0  # Longitud del primer brazo
-d2 = 0.75  # Longitud del segundo brazo
+d2 = 0.65  # Longitud del segundo brazo
 
 class Ui_Dialog(object):
     def __init__(self):
