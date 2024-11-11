@@ -471,11 +471,12 @@ class Ui_Dialog(object):
                 # Mover los servos
                 self.move_servos(theta1, theta2)
                 
-                # Mostrar la barra de progreso en una sola línea
-                sys.stdout.write(f"\rProgreso: [{progress:.2f}%] - Punto ({x}, {y}) - Theta1: {theta1:.2f}, Theta2: {theta2:.2f} - Tiempo restante: {remaining_time:.2f} s")
+                # Mostrar la barra de progreso en una sola línea con una barra visual
+                progress_bar_length = 30
+                filled_length = int(progress_bar_length * (i + 1) // total_points)
+                bar = '=' * filled_length + '-' * (progress_bar_length - filled_length)
+                sys.stdout.write(f"\rProgreso: |{bar}| {progress:.2f}% - Punto ({x}, {y}) - Theta1: {theta1:.2f}, Theta2: {theta2:.2f} - Tiempo restante: {remaining_time:.2f} s")
                 sys.stdout.flush()
-
-                time.sleep(0.75)  # Simular el tiempo de movimiento
 
             print(f"\nLogo '{logo_name}' dibujado.")
         else:
