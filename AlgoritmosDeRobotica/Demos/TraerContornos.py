@@ -24,7 +24,7 @@ _, threshold = cv2.threshold(blurred, 127, 255, cv2.THRESH_BINARY)
 contours, _ = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
 # Definir el factor epsilon para aproximar los contornos
-epsilon_factor = 0.001  # Ajusta este valor para obtener más o menos detalle
+epsilon_factor = 0.0003  # Ajusta este valor para obtener más o menos detalle
 
 # Lista para almacenar las coordenadas de todos los contornos aproximados
 all_contours_coords = []
