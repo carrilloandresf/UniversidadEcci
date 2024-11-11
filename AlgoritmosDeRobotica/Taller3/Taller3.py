@@ -452,22 +452,34 @@ class Ui_Dialog(object):
             'Pepsi': pepsi_data
         }
 
-
         # Implementar lógica para trazar el logo paso a paso
         if logo_name in logo_points:
             print(f"Dibujando logo: {logo_name}")
             time.sleep(3)
             points = logo_points[logo_name]
-            for (x, y) in points:
-                print(f"Dibujando punto ({x}, {y})")
+            total_points = len(points)
+            estimated_time_per_step = 0.75  # Aproximadamente 3/4 de segundo por paso
+
+            for i, (x, y) in enumerate(points):
+                # Calcular avance porcentual y tiempo restante
+                progress = (i + 1) / total_points * 100
+                remaining_time = (total_points - (i + 1)) * estimated_time_per_step
+
+                # Calcular los ángulos
                 theta1, theta2 = self.inverse_kinematics(x, y)
-                print(f"Moviendo servos a theta1: {theta1}, theta2: {theta2}")
+
+                # Mover los servos
                 self.move_servos(theta1, theta2)
-                time.sleep(0.5)
-            print(f"Logo '{logo_name}' dibujado.")
+                
+                # Mostrar la barra de progreso en una sola línea
+                sys.stdout.write(f"\rProgreso: [{progress:.2f}%] - Punto ({x}, {y}) - Theta1: {theta1:.2f}, Theta2: {theta2:.2f} - Tiempo restante: {remaining_time:.2f} s")
+                sys.stdout.flush()
+
+                time.sleep(0.75)  # Simular el tiempo de movimiento
+
+            print(f"\nLogo '{logo_name}' dibujado.")
         else:
             print(f"Logo '{logo_name}' no está definido.")
-
 
 if __name__ == "__main__":
     import sys
