@@ -2,7 +2,7 @@ import cv2
 import os
 
 # Ruta de la imagen (ajusta esta ruta a la ubicación de tu imagen)
-image_path = 'C:/Users/anfel/Downloads/puma_logo.png'
+image_path = 'C:/Users/anfel/Downloads/Toyota-logo.jpg'
 
 # Cargar la imagen
 image = cv2.imread(image_path)
