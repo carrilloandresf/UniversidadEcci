@@ -58,8 +58,8 @@ def txt_to_dict(file_path, image_shape):
         # Definir los límites para el escalado objetivo (el cuadro objetivo)
         #target_min_x, target_max_x = -1.3, -0.35
         #target_min_y, target_max_y = 0.35, 1.3 # para puma
-        target_min_x, target_max_x = -1, -0.35
-        target_min_y, target_max_y = 0.35, 1
+        target_min_x, target_max_x = -1.1, -0.35
+        target_min_y, target_max_y = 0.35, 1.1
 
         # Escalar las coordenadas normalizadas al cuadro objetivo
         target_width = target_max_x - target_min_x
