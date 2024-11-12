@@ -1,6 +1,6 @@
 import spidev
 import RPi.GPIO as GPIO
-from time import sleep
+from time import sleep, time
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -85,7 +85,7 @@ STEP_SEQUENCE = [
 # Número de pasos por revolución para el motor paso a paso
 STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
 
-# Función para inicializar la pantalla LCD
+# Funciones para controlar la pantalla LCD
 def lcd_init():
     lcd_write(0x33, GPIO.LOW)
     lcd_write(0x32, GPIO.LOW)
@@ -121,72 +121,60 @@ def lcd_text(message, line):
     for char in message:
         lcd_write(ord(char), GPIO.HIGH)
 
-# Función para leer un canal del LM35
+# Funciones para leer sensores
 def read_channel(channel):
-    # Comunicación SPI para leer el canal especificado (0 en este caso para el LM35)
     adc = spi.xfer2([1, (8 + channel) << 4, 0])
     data = ((adc[1] & 3) << 8) + adc[2]
     return data
 
 def convert_temp(data, places):
-    voltage = (data * 3.3) / 1023  # Convertir el valor ADC a voltaje
-    temp = voltage * 100  # El LM35 da 10mV por °C
+    voltage = (data * 3.3) / 1023
+    temp = voltage * 100
     return round(temp, places)
 
-# Función para leer el sensor de luz
 def convert_light(data):
     return data
 
-# Función para activar avance del motor DC
+# Funciones para controlar actuadores
 def activar_avance():
-    #lcd_text("Giro: Avance", 0x80)
     GPIO.output(Avance, True)
     GPIO.output(Retroceso, False)
 
-# Función para activar retroceso del motor DC
 def activar_retroceso():
-    #lcd_text("Giro: Retroceso", 0x80)
     GPIO.output(Avance, False)
     GPIO.output(Retroceso, True)
 
-# Función para detener el motor DC
 def detener_motor_dc():
-    #lcd_text("Motor DC Detenido", 0x80)
     GPIO.output(Avance, False)
     GPIO.output(Retroceso, False)
 
-# Función para mover el servomotor a un ángulo dado
 def mover_servo(angulo):
-    duty_cycle = 2 + (angulo / 18)  # Calcular el ciclo de trabajo
-    servo.ChangeDutyCycle(duty_cycle)
-    sleep(0.05)  # Pausar brevemente para permitir el movimiento
+    if 0 <= angulo <= 180:
+        duty_cycle = 2 + (angulo / 18)
+        servo.ChangeDutyCycle(duty_cycle)
+        sleep(0.05)
+    else:
+        print("angulo fuera de rango: debe estar entre 0 y 180 grados")
 
-# Función para activar buzzer por medio segundo
 def activar_buzzer():
     GPIO.output(Buzzer_PIN, True)
-    sleep(0.1)
+    sleep(0.3)
     GPIO.output(Buzzer_PIN, False)
 
 def avanzarMotorPasoAPaso():
+    global step_index
     sequence = STEP_SEQUENCE[step_index]
     for pin in range(4):
         GPIO.output(motor_pins[pin], sequence[pin])
-
-    # Avanzar al siguiente paso en la secuencia
     step_index = (step_index + 1) % len(STEP_SEQUENCE)
-
-    # Pausar brevemente para permitir el movimiento del motor
     sleep(0.01)
 
 def retrocederMotorPasoAPaso():
+    global step_index
     sequence = STEP_SEQUENCE[step_index]
     for pin in range(4):
         GPIO.output(motor_pins[pin], sequence[pin])
-
-    # Avanzar al siguiente paso en la secuencia
     step_index = (step_index - 1) % len(STEP_SEQUENCE)
-
-    # Pausar brevemente para permitir el movimiento del motor
     sleep(0.01)
 
 # Inicializa la pantalla LCD al inicio
@@ -194,22 +182,26 @@ lcd_init()
 
 # Índice de secuencia del motor paso a paso
 step_index = 0
-step_count = 0
 
-lcd_text("Universidad ECCI", 0x80)
+lcd_text("UNIVERSIDAD ECCI", 0x80)
 lcd_text("Sistemas Embebidos", 0xC0)
 
 sleep(1)
 
 try:
     while True:
+        temperature = None
+        light = None
         vEntrada = GPIO.input(in_Entrada)  
         vSalida = GPIO.input(in_Salida)
         vParking1 = GPIO.input(parking_1)
         vParking2 = GPIO.input(parking_2)
         vParking3 = GPIO.input(parking_3)
 
-         # Leer el canal 0 donde está conectado el LM35
+        # Imprimir todas las variables por consola
+        print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
+
+        # Leer el canal 0 donde está conectado el LM35
         temp_data = read_channel(0)
         temperature = convert_temp(temp_data, 2)
 
@@ -217,40 +209,53 @@ try:
         light_data = read_channel(1)
         light = convert_light(light_data)
 
-        # Muestra la temperatura y luz en la pantalla LCD en la parte Inferior de la LCD
-        lcd_text(f"Temp: {temperature:.2f}C | Luz: {light}", 0x00)
+        # Muestra la temperatura y luz en la pantalla LCD en la parte inferior de la LCD
+        lcd_text(f"T:{temperature:.2f}C|L:{light}", 0xC0)
 
         # Contar la cantidad de parqueadores disponibles
-        Parqueadores = vParking1 + vParking2 + vParking3
+        Parqueadores = (1 if vParking1 == 0 else 0) + (1 if vParking2 == 0 else 0) + (1 if vParking3 == 0 else 0)
 
-        # Muestra la cantidad de parqueadores disponibles en la pantalla LCD en la parte Superior de la LCD
-        lcd_text(f"Parqueadores: {Parqueadores}", 0x80)
+        # Muestra la cantidad de parqueadores disponibles en la pantalla LCD en la parte superior de la LCD
+        lcd_text(f"PARQUEADEROS: {Parqueadores}", 0x80)
 
-        # Si hay parqueaderos disponibles y hay un carro en la entrada de parqueadero aperturar con el motor paso a paso la puerta principal dando 4 pasos adelante y luego 4 pasos atras
-        if Parqueadores > 0 and vEntrada == 1:
+        # Si hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, apertura la puerta
+        if GPIO.input(in_Entrada) and Parqueadores > 0:
+            print("Carro en entrada")
             activar_buzzer()
             avanzarMotorPasoAPaso()
-            sleep(1)
+            while GPIO.input(in_Entrada):
+                lcd_text("BIENVENIDO,", 0x80)
+                lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
+                sleep(1)
+            activar_buzzer()
             retrocederMotorPasoAPaso()
-            sleep(1)
+            lcd_text("ESPERE, VEHICULO", 0x80)
+            lcd_text("INGRESANDO...", 0xC0)
+            sleep(2)
+
+        # Si no hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, apertura la puerta
+        if GPIO.input(in_Entrada) and Parqueadores == 0:
             activar_buzzer()
 
-        # Si hay un carro en la salida del parqueadero aperturar con movimiento de servomotor
-        if vSalida == 1:
+        # Si hay un carro en la salida del parqueadero, apertura con servomotor
+        if GPIO.input(in_Salida):
+            print("Carro en salida")
             activar_buzzer()
             mover_servo(90)
-            sleep(1)
+            while GPIO.input(in_Salida):
+                sleep(1)
             mover_servo(0)
-            activar_buzzer()
 
-        # Si la temperatura aumenta activar el motor DC hacia adelante
-        if temperature > 30:
+        # Si la temperatura aumenta, activar el motor DC hacia adelante
+        if temperature is not None and temperature > 30:
+            print("Temperatura alta")
             activar_avance()
         else:
             detener_motor_dc()
 
-        # Si la luz baja activar la luz led
-        if light < 100:
+        # Si la luz baja, activar la luz LED
+        if light is not None and light < 100:
+            print("Luz baja")
             GPIO.output(LED, True)
         else:
             GPIO.output(LED, False)
