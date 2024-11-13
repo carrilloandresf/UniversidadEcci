@@ -86,12 +86,18 @@ def set_step(step):
     for pin in range(4):
         GPIO.output(motor_pins[pin], step[pin])
 
-def mover_motor(steps, delay=0.002, reverse=False):
-    sequence = reversed(step_sequence) if reverse else step_sequence
+def mover_motor_arriba(steps, delay=0.002):
+    # Movimiento hacia arriba (abrir persiana)
     for _ in range(steps):
-        for step in sequence:
-            for pin in range(4):
-                GPIO.output(motor_pins[pin], step[pin])
+        for step in step_sequence:
+            set_step(step)
+            sleep(delay)
+
+def mover_motor_abajo(steps, delay=0.002):
+    # Movimiento hacia abajo (cerrar persiana)
+    for _ in range(steps):
+        for step in reversed(step_sequence):  # Invierte el orden de pasos
+            set_step(step)
             sleep(delay)
 
 
@@ -200,13 +206,13 @@ try:
         if vEntrada and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            mover_motor(300, delay=0.002)
+            mover_motor_arriba(300, delay=0.002)
             while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
             activar_buzzer()
-            mover_motor(300, delay=0.002, reverse=True)
+            mover_motor_abajo(300, delay=0.002)
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
