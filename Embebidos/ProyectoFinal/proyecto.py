@@ -83,7 +83,7 @@ STEP_SEQUENCE = [
 ]
 
 # Número de pasos por revolución para el motor paso a paso
-STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
+STEPS_PER_REVOLUTION = 2048  # Ajusta según tu motor
 
 # Funciones para controlar la pantalla LCD
 def lcd_init():

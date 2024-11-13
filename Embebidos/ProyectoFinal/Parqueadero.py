@@ -88,14 +88,14 @@ def set_step(step):
         GPIO.output(motor_pins[pin], step[pin])
 
 # Función para avanzar el motor paso a paso
-def avanzarMotorPasoAPaso(steps, delay=0.01):
+def avanzarMotorPasoAPaso(steps, delay=0.015):
     for _ in range(steps):
         for step in STEP_SEQUENCE:  # Cambiado a STEP_SEQUENCE
             set_step(step)
             sleep(delay)
 
 # Función para retroceder el motor paso a paso
-def retrocederMotorPasoAPaso(steps, delay=0.01):
+def retrocederMotorPasoAPaso(steps, delay=0.015):
     for _ in range(steps):
         for step in STEP_SEQUENCE:  # Cambiado a STEP_SEQUENCE
             set_step(step)
