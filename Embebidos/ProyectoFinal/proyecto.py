@@ -161,21 +161,23 @@ def activar_buzzer():
     sleep(0.3)
     GPIO.output(Buzzer_PIN, False)
 
-def avanzarMotorPasoAPaso():
+def avanzarMotorPasoAPaso(steps):
     global step_index
-    sequence = STEP_SEQUENCE[step_index]
-    for pin in range(4):
-        GPIO.output(motor_pins[pin], sequence[pin])
-    step_index = (step_index + 1) % len(STEP_SEQUENCE)
-    sleep(0.01)
+    for _ in range(steps):
+        sequence = STEP_SEQUENCE[step_index]
+        for pin in range(4):
+            GPIO.output(motor_pins[pin], sequence[pin])
+        step_index = (step_index + 1) % len(STEP_SEQUENCE)
+        sleep(0.1)
 
-def retrocederMotorPasoAPaso():
+def retrocederMotorPasoAPaso(steps):
     global step_index
-    sequence = STEP_SEQUENCE[step_index]
-    for pin in range(4):
-        GPIO.output(motor_pins[pin], sequence[pin])
-    step_index = (step_index - 1) % len(STEP_SEQUENCE)
-    sleep(0.01)
+    for _ in range(steps):
+        sequence = STEP_SEQUENCE[step_index]
+        for pin in range(4):
+            GPIO.output(motor_pins[pin], sequence[pin])
+        step_index = (step_index - 1) % len(STEP_SEQUENCE)
+        sleep(0.1)
 
 # Inicializa la pantalla LCD al inicio
 lcd_init()
@@ -222,13 +224,13 @@ try:
         if GPIO.input(in_Entrada) and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            avanzarMotorPasoAPaso()
+            avanzarMotorPasoAPaso(4)
             while GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
-                sleep(1)
+                sleep(2)
             activar_buzzer()
-            retrocederMotorPasoAPaso()
+            retrocederMotorPasoAPaso(4)
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
