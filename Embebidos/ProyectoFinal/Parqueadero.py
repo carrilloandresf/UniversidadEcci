@@ -224,7 +224,7 @@ try:
             print("Carro en entrada")
             print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
             activar_buzzer()
-            avanzarMotorPasoAPaso(8)
+            avanzarMotorPasoAPaso(28)
             while not GPIO.input(in_Entrada):
                 print("Carro entrando")
                 print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
@@ -232,7 +232,7 @@ try:
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
             activar_buzzer()
-            retrocederMotorPasoAPaso(8)
+            retrocederMotorPasoAPaso(28)
             print("Esperando vehiculo que entra")
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
