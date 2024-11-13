@@ -70,6 +70,11 @@ GPIO.setup(SERVO_PIN, GPIO.OUT)
 servo = GPIO.PWM(SERVO_PIN, 50)  # 50Hz para el servomotor
 servo.start(0)
 
+# Variables de control de movimiento
+grados_a_girar = 135  # Ángulo deseado en grados
+pasos_por_revolucion = 2048  # Pasos por revolución del motor
+pasos = int(pasos_por_revolucion * (grados_a_girar / 360))  # Cálculo de pasos para el ángulo
+
 # Secuencia de pasos del motor paso a paso
 STEP_SEQUENCE = [
     [1, 0, 0, 0],
@@ -78,20 +83,22 @@ STEP_SEQUENCE = [
     [0, 0, 0, 1]
 ]
 
+def set_step(step):
+    for pin in range(4):
+        GPIO.output(motor_pins[pin], step[pin])
+
 # Función para avanzar el motor paso a paso
 def avanzarMotorPasoAPaso(steps, delay=0.01):
     for _ in range(steps):
-        for step in STEP_SEQUENCE:
-            for pin in range(4):
-                GPIO.output(motor_pins[pin], step[pin])
+        for step in step_sequence:
+            set_step(step)
             sleep(delay)
 
 # Función para retroceder el motor paso a paso
 def retrocederMotorPasoAPaso(steps, delay=0.01):
     for _ in range(steps):
-        for step in reversed(STEP_SEQUENCE):
-            for pin in range(4):
-                GPIO.output(motor_pins[pin], step[pin])
+        for step in step_sequence:
+            set_step(step)
             sleep(delay)
 
 # Funciones para controlar la pantalla LCD
@@ -198,13 +205,13 @@ try:
         if not GPIO.input(in_Entrada) and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            avanzarMotorPasoAPaso(4)
+            avanzarMotorPasoAPaso(pasos)
             while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
             activar_buzzer()
-            retrocederMotorPasoAPaso(4)
+            retrocederMotorPasoAPaso(pasos)
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
