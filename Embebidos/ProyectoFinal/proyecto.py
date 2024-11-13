@@ -83,7 +83,7 @@ STEP_SEQUENCE = [
 ]
 
 # Número de pasos por revolución para el motor paso a paso
-STEPS_PER_REVOLUTION = 2048  # Ajusta según tu motor
+STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
 
 # Funciones para controlar la pantalla LCD
 def lcd_init():
@@ -161,23 +161,21 @@ def activar_buzzer():
     sleep(0.3)
     GPIO.output(Buzzer_PIN, False)
 
-def avanzarMotorPasoAPaso(steps):
+def avanzarMotorPasoAPaso():
     global step_index
-    for _ in range(steps):
-        sequence = STEP_SEQUENCE[step_index]
-        for pin in range(4):
-            GPIO.output(motor_pins[pin], sequence[pin])
-        step_index = (step_index + 1) % len(STEP_SEQUENCE)
-        sleep(0.1)
+    sequence = STEP_SEQUENCE[step_index]
+    for pin in range(4):
+        GPIO.output(motor_pins[pin], sequence[pin])
+    step_index = (step_index + 1) % len(STEP_SEQUENCE)
+    sleep(0.01)
 
-def retrocederMotorPasoAPaso(steps):
+def retrocederMotorPasoAPaso():
     global step_index
-    for _ in range(steps):
-        sequence = STEP_SEQUENCE[step_index]
-        for pin in range(4):
-            GPIO.output(motor_pins[pin], sequence[pin])
-        step_index = (step_index - 1) % len(STEP_SEQUENCE)
-        sleep(0.1)
+    sequence = STEP_SEQUENCE[step_index]
+    for pin in range(4):
+        GPIO.output(motor_pins[pin], sequence[pin])
+    step_index = (step_index - 1) % len(STEP_SEQUENCE)
+    sleep(0.01)
 
 # Inicializa la pantalla LCD al inicio
 lcd_init()
@@ -224,13 +222,13 @@ try:
         if GPIO.input(in_Entrada) and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            avanzarMotorPasoAPaso(4)
+            avanzarMotorPasoAPaso()
             while GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
-                sleep(2)
+                sleep(1)
             activar_buzzer()
-            retrocederMotorPasoAPaso(4)
+            retrocederMotorPasoAPaso()
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
