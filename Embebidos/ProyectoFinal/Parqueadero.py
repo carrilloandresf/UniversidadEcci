@@ -92,14 +92,14 @@ def set_step(step):
         GPIO.output(motor_pins[pin], step[pin])
 
 # Función para avanzar el motor paso a paso
-def avanzarMotorPasoAPaso(steps, delay=0.02):  # Ajuste del delay
+def avanzarMotorPasoAPaso(steps, delay=0.2):  # Ajuste del delay
     for _ in range(steps):
         for step in STEP_SEQUENCE:
             set_step(step)
             sleep(delay)
 
 # Función para retroceder el motor paso a paso
-def retrocederMotorPasoAPaso(steps, delay=0.02):  # Ajuste del delay
+def retrocederMotorPasoAPaso(steps, delay=0.2):  # Ajuste del delay
     for _ in range(steps):
         for step in reversed(STEP_SEQUENCE):
             set_step(step)
@@ -210,13 +210,13 @@ try:
         if vEntrada and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            avanzarMotorPasoAPaso(100)
+            avanzarMotorPasoAPaso(30)
             while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
             activar_buzzer()
-            retrocederMotorPasoAPaso(100)
+            retrocederMotorPasoAPaso(30)
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
