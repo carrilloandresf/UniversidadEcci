@@ -9,7 +9,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from adafruit_servokit import ServoKit
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -17,6 +17,10 @@ class Ui_MainWindow(object):
         MainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
+        # Initialize PCA9685
+        self.kit = ServoKit(channels=16)
+
         self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider.setGeometry(QtCore.QRect(104, 80, 160, 16))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
