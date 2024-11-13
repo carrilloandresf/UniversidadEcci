@@ -218,6 +218,7 @@ try:
 
         # Muestra la cantidad de parqueadores disponibles en la pantalla LCD en la parte superior de la LCD
         lcd_text(f"PARQUEADEROS: {Parqueadores}", 0x80)
+        print(f"PARQUEADEROS: {Parqueadores}")
 
         # Si hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, apertura la puerta
         if GPIO.input(in_Entrada) and Parqueadores > 0:
@@ -225,11 +226,13 @@ try:
             activar_buzzer()
             avanzarMotorPasoAPaso()
             while GPIO.input(in_Entrada):
+                print("Carro entrando")
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
             activar_buzzer()
             retrocederMotorPasoAPaso()
+            print("Esperando vehiculo que entra")
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
@@ -244,6 +247,7 @@ try:
             activar_buzzer()
             mover_servo(90)
             while GPIO.input(in_Salida):
+                print("Carro saliendo")
                 sleep(1)
             mover_servo(0)
 
