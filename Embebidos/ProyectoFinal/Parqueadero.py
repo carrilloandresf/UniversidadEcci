@@ -58,7 +58,7 @@ GPIO.setup(LED, GPIO.OUT)
 # Configurar los pines del motor paso a paso
 for pin in motor_pins:
     GPIO.setup(pin, GPIO.OUT)
-    GPIO.output(pin, GPIO.LOW)
+    GPIO.output(pin, 0)
 
 # Configuración de pines de la pantalla LCD
 lcd_pins = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
@@ -69,11 +69,6 @@ for pin in lcd_pins:
 GPIO.setup(SERVO_PIN, GPIO.OUT)
 servo = GPIO.PWM(SERVO_PIN, 50)  # 50Hz para el servomotor
 servo.start(0)
-
-# Variables de control de movimiento
-grados_a_girar = 135  # Ángulo deseado en grados
-pasos_por_revolucion = 2048  # Pasos por revolución del motor
-pasos = int(pasos_por_revolucion * (grados_a_girar / 360))  # Cálculo de pasos para el ángulo
 
 STEP_SEQUENCE = [
     [1, 0, 0, 0],
@@ -91,19 +86,14 @@ def set_step(step):
     for pin in range(4):
         GPIO.output(motor_pins[pin], step[pin])
 
-# Función para avanzar el motor paso a paso
-def avanzarMotorPasoAPaso(steps, delay=0.2):  # Ajuste del delay
+def mover_motor(steps, delay=0.002, reverse=False):
+    sequence = reversed(step_sequence) if reverse else step_sequence
     for _ in range(steps):
-        for step in STEP_SEQUENCE:
-            set_step(step)
+        for step in sequence:
+            for pin in range(4):
+                GPIO.output(motor_pins[pin], step[pin])
             sleep(delay)
 
-# Función para retroceder el motor paso a paso
-def retrocederMotorPasoAPaso(steps, delay=0.2):  # Ajuste del delay
-    for _ in range(steps):
-        for step in reversed(STEP_SEQUENCE):
-            set_step(step)
-            sleep(delay)
 
 # Funciones para controlar la pantalla LCD
 def lcd_init():
@@ -210,13 +200,13 @@ try:
         if vEntrada and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            avanzarMotorPasoAPaso(30)
+            mover_motor(30, delay=0.002)
             while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
             activar_buzzer()
-            retrocederMotorPasoAPaso(30)
+            mover_motor(30, delay=0.002, reverse=True)
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
