@@ -73,9 +73,13 @@ servo.start(0)
 # Secuencia de pasos del motor paso a paso (ULN2003AN)
 STEP_SEQUENCE = [
     [1, 0, 0, 0],
+    [1, 1, 0, 0],
     [0, 1, 0, 0],
+    [0, 1, 1, 0],
     [0, 0, 1, 0],
-    [0, 0, 0, 1]
+    [0, 0, 1, 1],
+    [0, 0, 0, 1],
+    [1, 0, 0, 1]
 ]
 
 # Número de pasos por revolución para el motor paso a paso
@@ -164,7 +168,7 @@ def avanzarMotorPasoAPaso(steps):
         for pin in range(4):
             GPIO.output(motor_pins[pin], sequence[pin])
         step_index = (step_index + 1) % len(STEP_SEQUENCE)
-        sleep(0.01)
+        sleep(0.1)
 
 def retrocederMotorPasoAPaso(steps):
     global step_index
@@ -173,7 +177,7 @@ def retrocederMotorPasoAPaso(steps):
         for pin in range(4):
             GPIO.output(motor_pins[pin], sequence[pin])
         step_index = (step_index - 1) % len(STEP_SEQUENCE)
-        sleep(0.01)
+        sleep(0.1)
 
 
 # Inicializa la pantalla LCD al inicio
@@ -224,7 +228,7 @@ try:
             print("Carro en entrada")
             print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
             activar_buzzer()
-            avanzarMotorPasoAPaso(28)
+            avanzarMotorPasoAPaso(128)
             while not GPIO.input(in_Entrada):
                 print("Carro entrando")
                 print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
@@ -232,7 +236,7 @@ try:
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
             activar_buzzer()
-            retrocederMotorPasoAPaso(28)
+            retrocederMotorPasoAPaso(128)
             print("Esperando vehiculo que entra")
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
