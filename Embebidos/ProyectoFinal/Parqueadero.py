@@ -223,10 +223,12 @@ try:
         # Si hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, apertura la puerta
         if GPIO.input(in_Entrada) and Parqueadores > 0:
             print("Carro en entrada")
+            print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
             activar_buzzer()
             avanzarMotorPasoAPaso()
             while GPIO.input(in_Entrada):
                 print("Carro entrando")
+                print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
@@ -244,9 +246,11 @@ try:
         # Si hay un carro en la salida del parqueadero, apertura con servomotor
         if GPIO.input(in_Salida):
             print("Carro en salida")
+            print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
             activar_buzzer()
             mover_servo(90)
             while GPIO.input(in_Salida):
+                print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
                 print("Carro saliendo")
                 sleep(1)
             mover_servo(0)
