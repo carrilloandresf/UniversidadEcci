@@ -70,7 +70,7 @@ GPIO.setup(SERVO_PIN, GPIO.OUT)
 servo = GPIO.PWM(SERVO_PIN, 50)  # 50Hz para el servomotor
 servo.start(0)
 
-STEP_SEQUENCE = [
+step_sequence = [
     [1, 0, 0, 0],
     [1, 1, 0, 0],
     [0, 1, 0, 0],
