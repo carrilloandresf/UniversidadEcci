@@ -200,13 +200,13 @@ try:
         if vEntrada and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            mover_motor(30, delay=0.002)
+            mover_motor(300, delay=0.002)
             while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
             activar_buzzer()
-            mover_motor(30, delay=0.002, reverse=True)
+            mover_motor(300, delay=0.002, reverse=True)
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
