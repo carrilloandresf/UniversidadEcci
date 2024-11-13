@@ -76,10 +76,14 @@ pasos_por_revolucion = 2048  # Pasos por revolución del motor
 pasos = int(pasos_por_revolucion * (grados_a_girar / 360))  # Cálculo de pasos para el ángulo
 
 STEP_SEQUENCE = [
-    [1, 0, 0, 1],
-    [1, 0, 1, 0],
+    [1, 0, 0, 0],
+    [1, 1, 0, 0],
+    [0, 1, 0, 0],
     [0, 1, 1, 0],
-    [0, 1, 0, 1]
+    [0, 0, 1, 0],
+    [0, 0, 1, 1],
+    [0, 0, 0, 1],
+    [1, 0, 0, 1]
 ]
 
 
