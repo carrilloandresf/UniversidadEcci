@@ -75,13 +75,13 @@ grados_a_girar = 135  # Ángulo deseado en grados
 pasos_por_revolucion = 2048  # Pasos por revolución del motor
 pasos = int(pasos_por_revolucion * (grados_a_girar / 360))  # Cálculo de pasos para el ángulo
 
-# Secuencia de pasos del motor paso a paso
 STEP_SEQUENCE = [
-    [1, 0, 0, 0],
-    [0, 1, 0, 0],
-    [0, 0, 1, 0],
-    [0, 0, 0, 1]
+    [1, 0, 0, 1],
+    [1, 0, 1, 0],
+    [0, 1, 1, 0],
+    [0, 1, 0, 1]
 ]
+
 
 def set_step(step):
     for pin in range(4):
@@ -168,9 +168,10 @@ def mover_servo(angulo):
     if 0 <= angulo <= 180:
         duty_cycle = 2 + (angulo / 18)
         servo.ChangeDutyCycle(duty_cycle)
-        sleep(0.05)
+        sleep(0.5)  # Mayor tiempo para que el servo tenga tiempo de moverse
+        servo.ChangeDutyCycle(0)  # Desactiva el PWM para reducir calor
     else:
-        print("angulo fuera de rango: debe estar entre 0 y 180 grados")
+        print("Ángulo fuera de rango: debe estar entre 0 y 180 grados")
 
 def activar_buzzer():
     GPIO.output(Buzzer_PIN, True)
@@ -202,7 +203,7 @@ try:
         lcd_text(f"PARQUEADEROS: {Parqueadores}", 0x80)
 
         # Si hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, apertura la puerta
-        if not GPIO.input(in_Entrada) and Parqueadores > 0:
+        if vEntrada and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
             avanzarMotorPasoAPaso(pasos)
@@ -217,11 +218,11 @@ try:
             sleep(2)
 
         # Si no hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, sonar el buzzer
-        if not GPIO.input(in_Entrada) and Parqueadores == 0:
+        if vEntrada and Parqueadores == 0:
             activar_buzzer()
 
         # Si hay un carro en la salida del parqueadero, apertura con servomotor
-        if not GPIO.input(in_Salida):
+        if vSalida:
             print("Carro en salida")
             activar_buzzer()
             mover_servo(90)
