@@ -70,7 +70,7 @@ GPIO.setup(SERVO_PIN, GPIO.OUT)
 servo = GPIO.PWM(SERVO_PIN, 50)  # 50Hz para el servomotor
 servo.start(0)
 
-# Secuencia de pasos del motor paso a paso (ULN2003AN)
+# Secuencia de pasos del motor paso a paso
 STEP_SEQUENCE = [
     [1, 0, 0, 0],
     [0, 1, 0, 0],
@@ -78,21 +78,20 @@ STEP_SEQUENCE = [
     [0, 0, 0, 1]
 ]
 
-# Funciones para controlar el movimiento del motor paso a paso
-def set_step(step):
-    for pin in range(4):
-        GPIO.output(motor_pins[pin], step[pin])
-
+# Función para avanzar el motor paso a paso
 def avanzarMotorPasoAPaso(steps, delay=0.01):
     for _ in range(steps):
         for step in STEP_SEQUENCE:
-            set_step(step)
+            for pin in range(4):
+                GPIO.output(motor_pins[pin], step[pin])
             sleep(delay)
 
+# Función para retroceder el motor paso a paso
 def retrocederMotorPasoAPaso(steps, delay=0.01):
     for _ in range(steps):
         for step in reversed(STEP_SEQUENCE):
-            set_step(step)
+            for pin in range(4):
+                GPIO.output(motor_pins[pin], step[pin])
             sleep(delay)
 
 # Funciones para controlar la pantalla LCD
@@ -182,47 +181,40 @@ sleep(1)
 try:
     while True:
         # Leer sensores de entrada
-        vEntrada = GPIO.input(in_Entrada)  
-        vSalida = GPIO.input(in_Salida)
-        vParking1 = GPIO.input(parking_1)
-        vParking2 = GPIO.input(parking_2)
-        vParking3 = GPIO.input(parking_3)
+        vEntrada = not GPIO.input(in_Entrada)  
+        vSalida = not GPIO.input(in_Salida)
+        vParking1 = not GPIO.input(parking_1)
+        vParking2 = not GPIO.input(parking_2)
+        vParking3 = not GPIO.input(parking_3)
 
         # Imprimir todas las variables por consola
         print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
 
-        # Leer el canal 0 donde está conectado el LM35
-        temp_data = read_channel(0)
-        temperature = convert_temp(temp_data, 2)
-
-        # Leer el canal 1 donde está conectada la Fotoresistencia
-        light_data = read_channel(1)
-        light = convert_light(light_data)
-
-        # Mostrar en la pantalla LCD
-        lcd_text(f"T:{temperature:.2f}C|L:{light}", 0xC0)
+        # Contar la cantidad de parqueadores disponibles
         Parqueadores = (1 if vParking1 == 0 else 0) + (1 if vParking2 == 0 else 0) + (1 if vParking3 == 0 else 0)
         lcd_text(f"PARQUEADEROS: {Parqueadores}", 0x80)
 
-        # Lógica para apertura y cierre de puertas
-        if GPIO.input(in_Entrada) and Parqueadores > 0:
+        # Si hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, apertura la puerta
+        if not GPIO.input(in_Entrada) and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            avanzarMotorPasoAPaso(4)  # Avanza solo 4 pasos
-            while GPIO.input(in_Entrada):
+            avanzarMotorPasoAPaso(4)
+            while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
-                sleep(2)
+                sleep(1)
             activar_buzzer()
-            retrocederMotorPasoAPaso(4)  # Retrocede solo 4 pasos
+            retrocederMotorPasoAPaso(4)
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
 
-        if GPIO.input(in_Entrada) and Parqueadores == 0:
+        # Si no hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, sonar el buzzer
+        if not GPIO.input(in_Entrada) and Parqueadores == 0:
             activar_buzzer()
 
-        if GPIO.input(in_Salida):
+        # Si hay un carro en la salida del parqueadero, apertura con servomotor
+        if not GPIO.input(in_Salida):
             print("Carro en salida")
             activar_buzzer()
             mover_servo(90)
@@ -230,18 +222,7 @@ try:
                 sleep(1)
             mover_servo(0)
 
-        if temperature is not None and temperature > 30:
-            activar_avance()
-        else:
-            detener_motor_dc()
-
-        if light is not None and light < 100:
-            GPIO.output(LED, True)
-        else:
-            GPIO.output(LED, False)
-
 except KeyboardInterrupt:
-    print("Deteniendo programa")
     detener_motor_dc()
     servo.stop()
     GPIO.cleanup()
