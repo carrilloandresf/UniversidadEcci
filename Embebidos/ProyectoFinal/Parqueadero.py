@@ -208,13 +208,13 @@ try:
         if GPIO.input(in_Entrada) and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
-            avanzarMotorPasoAPaso(4)
+            avanzarMotorPasoAPaso(4)  # Avanza solo 4 pasos
             while GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(2)
             activar_buzzer()
-            retrocederMotorPasoAPaso(4)
+            retrocederMotorPasoAPaso(4)  # Retrocede solo 4 pasos
             lcd_text("ESPERE, VEHICULO", 0x80)
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
@@ -241,6 +241,7 @@ try:
             GPIO.output(LED, False)
 
 except KeyboardInterrupt:
+    print("Deteniendo programa")
     detener_motor_dc()
     servo.stop()
     GPIO.cleanup()

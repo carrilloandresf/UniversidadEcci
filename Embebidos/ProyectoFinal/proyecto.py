@@ -21,7 +21,7 @@ parking_3 = 15
 Avance = 17
 Retroceso = 18
 
-# Pines del motor paso a paso
+# Pines del motor paso a paso (nuevo)
 BitMot0 = 12
 BitMot1 = 13
 BitMot2 = 16
@@ -73,27 +73,17 @@ servo.start(0)
 # Secuencia de pasos del motor paso a paso (ULN2003AN)
 STEP_SEQUENCE = [
     [1, 0, 0, 0],
+    [1, 1, 0, 0],
     [0, 1, 0, 0],
+    [0, 1, 1, 0],
     [0, 0, 1, 0],
-    [0, 0, 0, 1]
+    [0, 0, 1, 1],
+    [0, 0, 0, 1],
+    [1, 0, 0, 1]
 ]
 
-# Funciones para controlar el movimiento del motor paso a paso
-def set_step(step):
-    for pin in range(4):
-        GPIO.output(motor_pins[pin], step[pin])
-
-def avanzarMotorPasoAPaso(steps, delay=0.01):
-    for _ in range(steps):
-        for step in STEP_SEQUENCE:
-            set_step(step)
-            sleep(delay)
-
-def retrocederMotorPasoAPaso(steps, delay=0.01):
-    for _ in range(steps):
-        for step in reversed(STEP_SEQUENCE):
-            set_step(step)
-            sleep(delay)
+# Número de pasos por revolución para el motor paso a paso
+STEPS_PER_REVOLUTION = 4096  # Ajusta según tu motor
 
 # Funciones para controlar la pantalla LCD
 def lcd_init():
@@ -171,8 +161,29 @@ def activar_buzzer():
     sleep(0.3)
     GPIO.output(Buzzer_PIN, False)
 
+def avanzarMotorPasoAPaso(steps):
+    global step_index
+    for _ in range(steps):
+        sequence = STEP_SEQUENCE[step_index]
+        for pin in range(4):
+            GPIO.output(motor_pins[pin], sequence[pin])
+        step_index = (step_index + 1) % len(STEP_SEQUENCE)
+        sleep(0.1)
+
+def retrocederMotorPasoAPaso(steps):
+    global step_index
+    for _ in range(steps):
+        sequence = STEP_SEQUENCE[step_index]
+        for pin in range(4):
+            GPIO.output(motor_pins[pin], sequence[pin])
+        step_index = (step_index - 1) % len(STEP_SEQUENCE)
+        sleep(0.1)
+
 # Inicializa la pantalla LCD al inicio
 lcd_init()
+
+# Índice de secuencia del motor paso a paso
+step_index = 0
 
 lcd_text("UNIVERSIDAD ECCI", 0x80)
 lcd_text("Sistemas Embebidos", 0xC0)
@@ -200,12 +211,16 @@ try:
         light_data = read_channel(1)
         light = convert_light(light_data)
 
-        # Mostrar en la pantalla LCD
+        # Muestra la temperatura y luz en la pantalla LCD en la parte inferior de la LCD
         lcd_text(f"T:{temperature:.2f}C|L:{light}", 0xC0)
+
+        # Contar la cantidad de parqueadores disponibles
         Parqueadores = (1 if vParking1 == 0 else 0) + (1 if vParking2 == 0 else 0) + (1 if vParking3 == 0 else 0)
+
+        # Muestra la cantidad de parqueadores disponibles en la pantalla LCD en la parte superior de la LCD
         lcd_text(f"PARQUEADEROS: {Parqueadores}", 0x80)
 
-        # Lógica para apertura y cierre de puertas
+        # Si hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, apertura la puerta
         if GPIO.input(in_Entrada) and Parqueadores > 0:
             print("Carro en entrada")
             activar_buzzer()
@@ -220,9 +235,11 @@ try:
             lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
 
+        # Si no hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, apertura la puerta
         if GPIO.input(in_Entrada) and Parqueadores == 0:
             activar_buzzer()
 
+        # Si hay un carro en la salida del parqueadero, apertura con servomotor
         if GPIO.input(in_Salida):
             print("Carro en salida")
             activar_buzzer()
@@ -231,17 +248,22 @@ try:
                 sleep(1)
             mover_servo(0)
 
+        # Si la temperatura aumenta, activar el motor DC hacia adelante
         if temperature is not None and temperature > 30:
+            print("Temperatura alta")
             activar_avance()
         else:
             detener_motor_dc()
 
+        # Si la luz baja, activar la luz LED
         if light is not None and light < 100:
+            print("Luz baja")
             GPIO.output(LED, True)
         else:
             GPIO.output(LED, False)
 
 except KeyboardInterrupt:
+    print("Deteniendo programa")
     detener_motor_dc()
     servo.stop()
     GPIO.cleanup()
