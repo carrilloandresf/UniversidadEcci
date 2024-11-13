@@ -175,16 +175,33 @@ class Ui_MainWindow(object):
         self.label_12.setText(_translate("MainWindow", "Alert"))
         self.label_13.setText(_translate("MainWindow", "Base"))
 
-    def create_slider_callback(self, servo, slider):
+    def create_slider_callback(self, servo, slider, joint_index):
         def slider_callback():
             value = slider.value()
             self.move_servo(servo, value)
+            self.update_simulation(joint_index, value)
         return slider_callback
 
     def move_servo(self, servo, value):
         # Map the slider value (0-100) to servo angle (0-180)
         angle = (value / 100.0) * 180.0
         servo.angle = angle
+
+    def update_simulation(self, joint_index, value):
+        # Map the slider value (0-100) to joint angle (0-180)
+        angle = (value / 100.0) * 180.0
+        q = self.robot.q
+        q[joint_index] = angle * (3.14 / 180)  # Convert degrees to radians
+        self.robot.q = q
+        self.simulation.step()
+
+    def create_robot(self):
+        # Create a 4-DOF robot with rotating base and three additional rotational joints
+        link1 = RevoluteDH(d=0, a=0, alpha=0)  # Base rotation
+        link2 = RevoluteDH(d=0, a=1, alpha=0)  # Shoulder rotation
+        link3 = RevoluteDH(d=0, a=1, alpha=0)  # Elbow rotation
+        link4 = RevoluteDH(d=0, a=1, alpha=0)  # Wrist rotation
+        return DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
 
 
 if __name__ == "__main__":
