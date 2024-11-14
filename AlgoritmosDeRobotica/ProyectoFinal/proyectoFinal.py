@@ -34,15 +34,16 @@ class Ui_MainWindow(object):
         
         self.centralwidget.setObjectName("centralwidget")
 
+        # Configuración de los sliders y botones
+        self.setup_components(MainWindow)
+        self.initialize_servos()
+        
         # Crear el robot y la simulación
         self.robot = self.create_robot()
         self.simulation = PyPlot()
         self.simulation.limits = [-40, 40, -40, 40, -40, 40]
         QtCore.QTimer.singleShot(0, self.launch_simulation)
 
-        # Configuración de los sliders y botones
-        self.setup_components(MainWindow)
-        self.initialize_servos()
 
         # Conectar botones a las funciones
         self.pushButton.clicked.connect(self.start_automatic_mode)
@@ -381,7 +382,7 @@ class Ui_MainWindow(object):
             print("Movimiento realizado con éxito.")
         else:
             print("No se pudo encontrar una solución de cinemática inversa para las coordenadas dadas.")
-            
+
     # Método de manejo para recibir coordenadas de los LineEdits y llamar a cinemática inversa
     def handle_inverse_kinematics(self):
         try:
