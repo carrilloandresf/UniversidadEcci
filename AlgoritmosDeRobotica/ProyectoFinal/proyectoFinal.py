@@ -262,46 +262,42 @@ class Ui_MainWindow(object):
         Calcula los ángulos de las articulaciones dada la posición deseada (x, y, z).
         L1, L2, L3, L4: Longitudes de los segmentos del brazo.
         """
-        # Ajustar el valor de z con la posición inicial en 36 cuando el gripper está cerrado.
-        z -= (L1 + L2 + L3)  # Restar la longitud total inicial para compensar
+        # Calcular el ángulo q1 (base) basado en las coordenadas (x, y)
+        q1 = math.degrees(math.atan2(y, x))  # ángulo de la base
 
-        # Cálculo de q1 (ángulo de la base)
-        q1 = math.degrees(math.atan2(y, x))
+        # Proyección en el plano y ajuste de alturas relativas
+        r = math.sqrt(x**2 + y**2)  # Distancia radial en el plano XY
+        z_rel = z - L1  # Altura relativa desde la base del robot
 
-        # Proyección en el plano XY
-        r = math.sqrt(x ** 2 + y ** 2)
+        # Distancia al objetivo en el plano del brazo
+        d = math.sqrt(r**2 + z_rel**2)
 
-        # Distancia al punto objetivo
-        d = math.sqrt(r ** 2 + z ** 2)
-
-        # Verificar alcanzabilidad
+        # Verificar alcanzabilidad del punto objetivo
         if d > (L2 + L3) or d < abs(L2 - L3):
             raise ValueError("Posición fuera del alcance del robot")
 
         # Cálculo de q3 usando ley de cosenos para el ángulo del segundo brazo
-        cos_q3 = (d ** 2 - L2 ** 2 - L3 ** 2) / (2 * L2 * L3)
-        cos_q3 = max(-1, min(1, cos_q3))  # Asegurar valor válido
-        q3 = math.degrees(math.acos(cos_q3))
+        cos_q3 = (L2**2 + L3**2 - d**2) / (2 * L2 * L3)
+        cos_q3 = max(-1, min(1, cos_q3))  # Asegurar que el coseno esté en el rango [-1, 1]
+        q3 = math.degrees(math.acos(cos_q3))  # Ángulo en grados
 
-        # Ángulos auxiliares
-        beta = math.atan2(z, r)  # Ángulo de elevación al punto objetivo
-        cos_alfa = (L2 ** 2 + d ** 2 - L3 ** 2) / (2 * L2 * d)
-        cos_alfa = max(-1, min(1, cos_alfa))  # Asegurar valor válido
+        # Ángulo auxiliar alfa entre L2 y d
+        cos_alfa = (L2**2 + d**2 - L3**2) / (2 * L2 * d)
+        cos_alfa = max(-1, min(1, cos_alfa))  # Limitar valor
         alfa = math.acos(cos_alfa)
 
-        # Cálculo de q2
+        # Cálculo de q2 usando el ángulo de elevación beta
+        beta = math.atan2(z_rel, r)
         q2 = math.degrees(beta + alfa)
 
-        # Ajustes finales de ángulos para la orientación en z
-        q4 = 90 - q2 - q3  # Ajuste en q4 para orientar el efector final
-
-        # Normalizar ángulos al rango [0, 180]
+        # Ajustar los ángulos para el gripper cerrado en el centro
         q2 = max(0, min(180, q2))
-        q3 = max(0, min(180, abs(q3)))
-        q4 = max(0, min(180, abs(q4)))
+        q3 = max(0, min(180, q3))
+        q4 = 90  # Ángulo de orientación del gripper, centrado para mantener el gripper cerrado
 
         print(f"q1: {q1}, q2: {q2}, q3: {q3}, q4: {q4}")
         return q1, q2, q3, q4
+
 
 
 
