@@ -211,8 +211,8 @@ class Ui_MainWindow(object):
         self.horizontalSlider_4.setValue(90)
         self.horizontalSlider_5.setValue(90)
 
-        # Actualizar la simulación con las posiciones iniciales
-        self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
+         # Actualizar la simulación con las posiciones iniciales
+        self.robot.q = np.array([math.radians(90)] * 4, dtype=float)
         self.simulation.fig.canvas.draw_idle()
 
     def start_automatic_mode(self):
@@ -274,13 +274,18 @@ class Ui_MainWindow(object):
 
     def set_servo_angle(self, servo_motor, angle, joint_index=None):
         # Limitar el ángulo entre 0 y 180 grados
-        angle = max(0, min(180, angle))
+        angle = float(max(0, min(180, angle)))
         servo_motor.angle = angle
 
         if joint_index is not None:
+            radians_angle = np.radians(angle)
+            # Obtener una copia de self.robot.q
+            q = np.array(self.robot.q, dtype=float)
             # Actualizar el ángulo correspondiente en radianes
-            self.robot.q[joint_index] = np.radians(angle)
-            
+            q[joint_index] = radians_angle
+            # Asignar de nuevo a self.robot.q
+            self.robot.q = q
+
             # Actualizar la simulación
             self.update_simulation()
 
@@ -294,7 +299,7 @@ class Ui_MainWindow(object):
             RevoluteDH(d=0, alpha=0, a=d3, offset=0)
         ]
         robot = DHRobot(R, name='Bender')
-        robot.q = [0, 0, 0, 0]
+        robot.q = np.zeros(4, dtype=float)  # Asegurar que sea un array de floats
         return robot
 
 if __name__ == "__main__":
