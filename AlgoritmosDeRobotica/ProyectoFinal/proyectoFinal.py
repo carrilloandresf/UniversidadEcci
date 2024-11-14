@@ -1,13 +1,33 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from adafruit_pca9685 import PCA9685
-from adafruit_motor import servo
-import board
-import busio
+import time
 from roboticstoolbox import DHRobot, RevoluteDH
-import roboticstoolbox as rtb
+from roboticstoolbox.backends.PyPlot import PyPlot
+import numpy as np
+import board
+from adafruit_motor import servo
+from adafruit_pca9685 import PCA9685
 import math
 from functools import partial
-import matplotlib.pyplot as plt
+
+# Configurar variable de entorno para omitir advertencias de Wayland
+import os
+os.environ["QT_QPA_PLATFORM"] = "xcb"  # Fuerza el uso de X11 en lugar de Wayland
+
+# Configuración de PCA9685 y servos
+i2c = board.I2C()  # usa board.SCL y board.SDA en la Raspberry Pi
+pca = PCA9685(i2c)
+pca.frequency = 50  # Configuración de frecuencia para servos
+
+# Configuración de los servos en los canales 2 a 6
+servo1 = servo.Servo(pca.channels[2], min_pulse=500, max_pulse=2400)
+servo2 = servo.Servo(pca.channels[3], min_pulse=500, max_pulse=2400)
+servo3 = servo.Servo(pca.channels[4], min_pulse=500, max_pulse=2400)
+servo4 = servo.Servo(pca.channels[5], min_pulse=500, max_pulse=2400)
+servo5 = servo.Servo(pca.channels[6], min_pulse=500, max_pulse=2400)
+
+# Dimensiones del robot (ajustables)
+d1 = 1.0  # Longitud del primer brazo
+d2 = 0.47  # Longitud del segundo brazo
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -16,21 +36,9 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        # Initialize PCA9685
-        i2c = busio.I2C(board.SCL, board.SDA)
-        self.pca = PCA9685(i2c)
-        self.pca.frequency = 50
-
-        # Configure Servos starting from channel 2
-        self.servo1 = servo.Servo(self.pca.channels[2], min_pulse=500, max_pulse=2400)
-        self.servo2 = servo.Servo(self.pca.channels[3], min_pulse=500, max_pulse=2400)
-        self.servo3 = servo.Servo(self.pca.channels[4], min_pulse=500, max_pulse=2400)
-        self.servo4 = servo.Servo(self.pca.channels[5], min_pulse=500, max_pulse=2400)
-        self.servo5 = servo.Servo(self.pca.channels[6], min_pulse=500, max_pulse=2400)
-
         # Create robot instance
         self.robot = self.create_robot()
-        self.simulation = rtb.backends.PyPlot()  # Corrected initialization of the PyPlot backend
+        self.simulation = PyPlot()  # Crear simulación de Peter Corke
         self.simulation.launch()
         self.simulation.add(self.robot)
 
@@ -60,35 +68,35 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setValue(50)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
-        self.horizontalSlider.valueChanged.connect(partial(self.slider_callback, self.servo1, 0))
+        self.horizontalSlider.valueChanged.connect(partial(self.slider_callback, servo1, 0))
 
         self.horizontalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_2.setGeometry(QtCore.QRect(104, 110, 160, 16))
         self.horizontalSlider_2.setValue(50)
         self.horizontalSlider_2.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_2.setObjectName("horizontalSlider_2")
-        self.horizontalSlider_2.valueChanged.connect(partial(self.slider_callback, self.servo2, 1))
+        self.horizontalSlider_2.valueChanged.connect(partial(self.slider_callback, servo2, 1))
 
         self.horizontalSlider_3 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_3.setGeometry(QtCore.QRect(104, 140, 160, 16))
         self.horizontalSlider_3.setValue(50)
         self.horizontalSlider_3.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_3.setObjectName("horizontalSlider_3")
-        self.horizontalSlider_3.valueChanged.connect(partial(self.slider_callback, self.servo3, 2))
+        self.horizontalSlider_3.valueChanged.connect(partial(self.slider_callback, servo3, 2))
 
         self.horizontalSlider_4 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_4.setGeometry(QtCore.QRect(104, 170, 160, 16))
         self.horizontalSlider_4.setValue(50)
         self.horizontalSlider_4.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_4.setObjectName("horizontalSlider_4")
-        self.horizontalSlider_4.valueChanged.connect(partial(self.slider_callback, self.servo4, 3))
+        self.horizontalSlider_4.valueChanged.connect(partial(self.slider_callback, servo4, 3))
 
         self.horizontalSlider_5 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_5.setGeometry(QtCore.QRect(104, 200, 160, 16))
         self.horizontalSlider_5.setValue(50)
         self.horizontalSlider_5.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
-        self.horizontalSlider_5.valueChanged.connect(partial(self.slider_callback, self.servo5, 4))
+        self.horizontalSlider_5.valueChanged.connect(partial(self.slider_callback, servo5, 4))
 
         # Additional UI components
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
@@ -180,28 +188,41 @@ class Ui_MainWindow(object):
 
     def start_automatic_mode(self):
         # Move all servos to a specified position (e.g., 90 degrees)
-        self.move_servo(self.servo1, 90)
-        self.move_servo(self.servo2, 90)
-        self.move_servo(self.servo3, 90)
-        self.move_servo(self.servo4, 90)
-        self.move_servo(self.servo5, 90)
+        self.move_servos_smoothly(servo1, 90)
+        self.move_servos_smoothly(servo2, 90)
+        self.move_servos_smoothly(servo3, 90)
+        self.move_servos_smoothly(servo4, 90)
+        self.move_servos_smoothly(servo5, 90)
 
-    def slider_callback(self, servo_motor, joint_index):
-        def callback(value):
-            print(f"Slider value: {value}")
-            self.move_servo(servo_motor, value)
-            self.update_simulation(joint_index, value)
-        # Ensure callback gets executed
-        servo_motor.angle = (value / 100.0) * 180.0  # Set angle based on slider
+    def slider_callback(self, servo_motor, joint_index, value):
+        print(f"Slider value: {value}")
+        self.move_servos_smoothly(servo_motor, value)
         self.update_simulation(joint_index, value)
-        return callback
 
-    def move_servo(self, servo_motor, angle):
-        # Ensure the servo_motor is a Servo instance
-        if not isinstance(servo_motor, servo.Servo):
-            raise TypeError("servo_motor debe ser una instancia de servo.Servo")
+    def move_servos_smoothly(self, servo_motor, target_angle, steps=100, delay=0.01):
+        # Obtener el ángulo actual del servo
+        current_angle = servo_motor.angle if servo_motor.angle is not None else 0
 
-        # Limit angle between 0 and 180 degrees
+        # Calcular la diferencia de ángulo
+        diff = target_angle - current_angle
+
+        # Mover en pequeños pasos para hacer el movimiento más suave
+        for step in range(steps + 1):
+            intermediate_angle = current_angle + (diff / steps) * step
+            self.set_servo_angle(servo_motor, intermediate_angle)
+
+            # Actualizar la simulación
+            if step % 10 == 0:  # Reduce la frecuencia de actualización para mejorar el rendimiento
+                self.update_simulation(0, intermediate_angle)
+
+            # Permitir que Qt procese eventos pendientes para actualizar la UI
+            QtWidgets.QApplication.processEvents()
+
+            # Esperar antes del próximo paso
+            time.sleep(delay)
+
+    def set_servo_angle(self, servo_motor, angle):
+        # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
@@ -217,7 +238,7 @@ class Ui_MainWindow(object):
 
     def create_robot(self):
         # Create a 4-DOF robot with rotating base and three additional rotational joints
-        link1 = RevoluteDH(d=0, a=0, alpha=0)  # Base rotation
+        link1 = RevoluteDH(d=0, a=d1, alpha=0)  # Base rotation
         link2 = RevoluteDH(d=0, a=1, alpha=0)  # Shoulder rotation
         link3 = RevoluteDH(d=0, a=1, alpha=0)  # Elbow rotation
         link4 = RevoluteDH(d=0, a=1, alpha=0)  # Wrist rotation
