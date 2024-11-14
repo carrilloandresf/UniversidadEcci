@@ -307,14 +307,14 @@ class Ui_MainWindow(object):
         robot.q = [0, 0, 0, 0]
         return robot
     
-    # Método para realizar la cinemática inversa
+    # Método para realizar la cinemática inversa usando ikine_LM
     def inverse_kinematics(self, x, y, z):
         # Crear una matriz de transformación homogénea de destino
         T = self.robot.fkine([0, 0, 0, 0])  # Usar el fkine para obtener una estructura base
         T.t = [x, y, z]  # Actualizar con las coordenadas deseadas
 
-        # Calcular la cinemática inversa
-        solution = self.robot.ikine(T, ilimit=1000, tol=1e-4)  # Ajusta el límite de iteraciones y tolerancia si es necesario
+        # Calcular la cinemática inversa considerando las dimensiones de los brazos
+        solution = self.robot.ikine_LM(T, ilimit=1000, tol=1e-4)  # Ajusta el límite de iteraciones y tolerancia si es necesario
 
         # Verificar si se encontró una solución válida
         if solution.success:
@@ -336,7 +336,8 @@ class Ui_MainWindow(object):
             self.update_simulation()
             print("Movimiento realizado con éxito.")
         else:
-            print("No se pudo encontrar una solución de cinemática inversa.")
+            print("No se pudo encontrar una solución de cinemática inversa para las coordenadas dadas.")
+
 
     # Método de manejo para recibir coordenadas de los LineEdits y llamar a cinemática inversa
     def handle_inverse_kinematics(self):
