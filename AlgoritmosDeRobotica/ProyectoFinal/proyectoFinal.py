@@ -37,8 +37,7 @@ class Ui_MainWindow(object):
         # Create robot instance
         self.robot = self.create_robot()
         self.simulation = PyPlot()  # Crear simulación de Peter Corke
-        #self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])  # Ajustar límites de la simulación
-        #self.simulation.add(self.robot)
+        self.simulation.limits = [-40, 40, -40, 40, -40, 40]  # Establecer los límites directamente después de crear `PyPlot`
         QtCore.QTimer.singleShot(0, self.launch_simulation)
 
         # Setup UI components
@@ -200,14 +199,15 @@ class Ui_MainWindow(object):
         self.label_13.setText(_translate("MainWindow", "Base"))
 
     def launch_simulation(self):
-        # Configurar explícitamente los límites en el objeto de simulación
-        self.simulation.limits = [-40, 40, -40, 40, -40, 40]
-        
-        # Lanza la simulación con los límites definidos
+        # Lanza la simulación
         self.simulation.launch()
-        
-        # Agregar el robot a la simulación después de establecer límites
         self.simulation.add(self.robot)
+
+        # Asignar los límites usando los métodos de ejes directamente para asegurar que se apliquen correctamente
+        ax = self.simulation.ax
+        ax.set_xlim(-40, 40)
+        ax.set_ylim(-40, 40)
+        ax.set_zlim(-40, 40)
 
     def initialize_servos(self):
         # Establecer los servos físicos en 90 grados
