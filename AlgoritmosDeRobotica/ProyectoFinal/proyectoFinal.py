@@ -39,6 +39,9 @@ class Ui_MainWindow(object):
         self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])  # Ajustar límites de la simulación
         self.simulation.add(self.robot)
 
+        # Inicializar los ángulos de las articulaciones
+        self.joint_angles = [90, 90, 90, 90]  # Ángulos iniciales en grados
+
         # Setup UI components
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(460, 480, 151, 41))
@@ -217,11 +220,11 @@ class Ui_MainWindow(object):
 
     def start_automatic_mode(self):
         # Move all servos to a specified position (e.g., 90 degrees)
-        self.move_servos_smoothly(servo1, 90, joint_index=None)
-        self.move_servos_smoothly(servo2, 90, joint_index=0)
-        self.move_servos_smoothly(servo3, 90, joint_index=1)
-        self.move_servos_smoothly(servo4, 90, joint_index=2)
-        self.move_servos_smoothly(servo5, 90, joint_index=3)  # Efector final no tiene joint_index
+        self.move_servos_smoothly(servo1, 90, joint_index=0)
+        self.move_servos_smoothly(servo2, 90, joint_index=1)
+        self.move_servos_smoothly(servo3, 90, joint_index=2)
+        self.move_servos_smoothly(servo4, 90, joint_index=3)
+        self.move_servos_smoothly(servo5, 90, joint_index=None)  # Efector final no tiene joint_index
 
     def slider_callback(self, servo_motor, joint_index, value):
         print(f"Slider value: {value}")
@@ -285,10 +288,15 @@ class Ui_MainWindow(object):
         servo_motor.angle = angle
 
         if joint_index is not None:
-            # Actualizar el ángulo en self.robot.q
-            self.robot.q[joint_index] = math.radians(angle)
+            # Actualizar el ángulo en self.joint_angles
+            self.joint_angles[joint_index] = angle
+            # Convertir todos los ángulos a radianes
+            q_radians = [math.radians(ang) for ang in self.joint_angles]
+            # Actualizar los ángulos de las articulaciones en el modelo del robot
+            self.robot.q = q_radians
             # Actualizar la simulación
-            self.update_simulation(joint_index, angle)
+            if hasattr(self, 'simulation') and self.simulation:
+                self.simulation.fig.canvas.draw_idle()
 
 
     def create_robot(self):
