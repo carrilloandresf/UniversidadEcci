@@ -300,7 +300,7 @@ class Ui_MainWindow(object):
         
         # Cálculo de q4 para la orientación de la herramienta
         q4 = orientacion  # Este ángulo puede ser directamente la orientación deseada
-        
+        print(f"q1: {q1}, q2: {q2}, q3: {q3}, q4: {q4}")
         return q1, q2, q3, q4
 
 
