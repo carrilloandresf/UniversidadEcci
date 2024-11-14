@@ -218,7 +218,7 @@ try:
             activar_buzzer()
             mover_motor_up(300, delay=0.002)
 
-            while not GPIO.input(vEntrada):
+            while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 #lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
@@ -240,7 +240,7 @@ try:
             print("Carro en salida")
             activar_buzzer()
             mover_servo(90)
-            while GPIO.input(vSalida):
+            while not GPIO.input(in_Salida):
                 sleep(5)
             mover_servo(0)
 
