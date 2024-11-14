@@ -323,8 +323,7 @@ class Ui_MainWindow(object):
 
     def update_simulation(self):
         if hasattr(self, 'simulation') and self.simulation:
-            self.simulation.fig.canvas.draw()
-            self.simulation.fig.canvas.flush_events()
+            self.simulation.step()
 
     def create_robot(self):
         # Crear articulaciones usando los parámetros de DH
