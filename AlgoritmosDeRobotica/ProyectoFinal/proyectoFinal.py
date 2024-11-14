@@ -155,7 +155,7 @@ class Ui_MainWindow(object):
         self.lineEdit_3 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_3.setGeometry(QtCore.QRect(90, 340, 41, 21))
         self.lineEdit_3.setObjectName("lineEdit_3")
-        
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 19))
@@ -173,6 +173,7 @@ class Ui_MainWindow(object):
 
         # Connect button to start automatic mode
         self.pushButton.clicked.connect(self.start_automatic_mode)
+        self.pushButton_2.clicked.connect(self.MoverACoordenada)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -233,6 +234,75 @@ class Ui_MainWindow(object):
         if hasattr(self, 'simulation') and self.simulation:
             # Llamar a `draw_idle` para actualizar la visualización sin pausar el bucle de eventos
             self.simulation.fig.canvas.draw_idle()
+
+    import math
+
+    def MoverACoordenada(self):
+        global d0, d1, d2, d3
+
+        x = float(self.lineEdit.text())
+        y = float(self.lineEdit_2.text())
+        z = float(self.lineEdit_3.text())
+
+        self.cinematica_inversa(x, y, z, 0, d0, d1, d2, d3)
+
+
+    def cinematica_inversa(x, y, z, orientacion, L1, L2, L3, L4):
+        """
+        Calcula los ángulos de las articulaciones dada la posición deseada (x, y, z) y la orientación deseada.
+        L1, L2, L3, L4: Longitudes de los segmentos del brazo.
+        orientacion: Ángulo de la orientación de la herramienta.
+        """
+        # Cálculo de q1 (ángulo de la base)
+        if x >= 0 and y == 0:
+            q1 = 0
+        elif x < 0 and y == 0:
+            q1 = 180
+        else: 
+            q1 = math.degrees(math.atan2(y, x))
+            
+        # Trabajar con el valor absoluto de x para los cálculos
+        x = abs(x)
+        
+        # Proyección en el plano
+        r = math.sqrt(x*x + y*y)
+        z_rel = z - L1  # Altura relativa a la base
+        
+        # Distancia al punto objetivo
+        d = math.sqrt(r*r + z_rel*z_rel)
+        
+        # Verificar alcanzabilidad
+        if d > (L2 + L3 + L4) or d < abs(L2 - L3):
+            raise ValueError("Posición fuera del alcance del robot")
+        
+        # Cálculo de q3 usando ley de cosenos para el ángulo del segundo brazo
+        cos_q3 = (d*d - L2*L2 - L3*L3) / (2 * L2 * L3)
+        cos_q3 = max(-1, min(1, cos_q3))  # Asegurar valor válido
+        q3 = math.degrees(math.acos(cos_q3))
+        
+        # Ángulos auxiliares
+        beta = math.atan2(z_rel, r)  # Ángulo de elevación al punto objetivo
+        cos_alfa = (L2*L2 + d*d - L3*L3) / (2 * L2 * d)
+        cos_alfa = max(-1, min(1, cos_alfa))  # Asegurar valor válido
+        alfa = math.acos(cos_alfa)
+        
+        # Cálculo de q2
+        q2 = math.degrees(beta + alfa)
+        
+        # Ajustes para x positivo
+        if x > 0:
+            q2 = 180 - q2
+            q3 = -q3
+        
+        # Normalizar ángulos al rango [0, 180]
+        q2 = max(0, min(180, q2))
+        q3 = max(0, min(180, abs(q3)))  # Valor absoluto de q3
+        
+        # Cálculo de q4 para la orientación de la herramienta
+        q4 = orientacion  # Este ángulo puede ser directamente la orientación deseada
+        
+        return q1, q2, q3, q4
+
 
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
