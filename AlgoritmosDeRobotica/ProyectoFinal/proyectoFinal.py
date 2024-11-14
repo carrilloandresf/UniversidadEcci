@@ -230,6 +230,10 @@ class Ui_MainWindow(object):
         print(f"Slider value: {value}")
         self.set_servo_angle(servo_motor, value)
 
+    def slider_callback(self, servo_motor, joint_index, value):
+        print(f"Slider value: {value}")
+        self.set_servo_angle(servo_motor, value)
+
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
         if steps <= 0:
