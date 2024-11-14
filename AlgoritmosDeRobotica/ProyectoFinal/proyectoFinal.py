@@ -30,7 +30,7 @@ class Ui_MainWindow(object):
 
         # Create robot instance
         self.robot = self.create_robot()
-        self.simulation = rtb.backends.PyPlot()  # Corrected initialization of the PyPlot backend
+        self.simulation = rtb.backends.PyPlot(backend='pyplot')  # Corrected initialization of the PyPlot backend
         self.simulation.launch()
         self.simulation.add(self.robot)
 
