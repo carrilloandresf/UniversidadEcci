@@ -230,6 +230,7 @@ class Ui_MainWindow(object):
 
     def update_simulation(self):
         if hasattr(self, 'simulation') and self.simulation:
+            print(f"Updating simulation with q={self.robot.q}")
             self.simulation.step(self.robot.q)
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
