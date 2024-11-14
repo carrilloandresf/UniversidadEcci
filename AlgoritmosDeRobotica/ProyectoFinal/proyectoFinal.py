@@ -60,28 +60,28 @@ class Ui_MainWindow(object):
         self.horizontalSlider_2.setValue(50)
         self.horizontalSlider_2.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_2.setObjectName("horizontalSlider_2")
-        self.horizontalSlider_2.valueChanged.connect(self.create_slider_callback(self.servo2, self.horizontalSlider_2, 1))
+        self.horizontalSlider_2.valueChanged.connect(self.create_slider_callback(self.servo2, self.horizontalSlider_2, 0))
 
         self.horizontalSlider_3 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_3.setGeometry(QtCore.QRect(104, 140, 160, 16))
         self.horizontalSlider_3.setValue(50)
         self.horizontalSlider_3.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_3.setObjectName("horizontalSlider_3")
-        self.horizontalSlider_3.valueChanged.connect(self.create_slider_callback(self.servo3, self.horizontalSlider_3, 2))
+        self.horizontalSlider_3.valueChanged.connect(self.create_slider_callback(self.servo3, self.horizontalSlider_3, 1))
 
         self.horizontalSlider_4 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_4.setGeometry(QtCore.QRect(104, 170, 160, 16))
         self.horizontalSlider_4.setValue(50)
         self.horizontalSlider_4.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_4.setObjectName("horizontalSlider_4")
-        self.horizontalSlider_4.valueChanged.connect(self.create_slider_callback(self.servo4, self.horizontalSlider_4, 3))
+        self.horizontalSlider_4.valueChanged.connect(self.create_slider_callback(self.servo4, self.horizontalSlider_4, 2))
 
         self.horizontalSlider_5 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_5.setGeometry(QtCore.QRect(104, 200, 160, 16))
         self.horizontalSlider_5.setValue(50)
         self.horizontalSlider_5.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
-        self.horizontalSlider_5.valueChanged.connect(self.create_slider_callback(self.servo5, self.horizontalSlider_5, 4))
+        self.horizontalSlider_5.valueChanged.connect(self.create_slider_callback(self.servo5, self.horizontalSlider_5, 3))
 
         # Additional UI components
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
@@ -188,10 +188,14 @@ class Ui_MainWindow(object):
             self.update_simulation(joint_index, value)
         return slider_callback
 
-    def move_servo(self, servo, value):
-        # Map the slider value (0-100) to servo angle (0-180)
-        angle = (value / 100.0) * 180.0
-        servo.angle = angle
+    def move_servo(self, servo_motor, angle):
+        # Asegurarse de que el objeto servo_motor es del tipo correcto
+        if not isinstance(servo_motor, servo.Servo):
+            raise TypeError("servo_motor debe ser una instancia de servo.Servo")
+        
+        # Limitar el ángulo entre 0 y 180 grados
+        angle = max(0, min(180, angle))
+        servo_motor.angle = angle
 
     def update_simulation(self, joint_index, value):
         # Ensure the robot and simulation attributes are defined before calling this
