@@ -182,8 +182,7 @@ class Ui_MainWindow(object):
         self.move_servo(self.servo5, 90)
 
     def slider_callback(self, servo_motor, joint_index):
-        def callback():
-            value = self.horizontalSlider.value()
+        def callback(value):
             print(f"Slider value: {value}")
             self.move_servo(servo_motor, value)
             self.update_simulation(joint_index, value)
