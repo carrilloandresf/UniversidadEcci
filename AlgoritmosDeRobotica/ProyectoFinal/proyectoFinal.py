@@ -230,10 +230,6 @@ class Ui_MainWindow(object):
         print(f"Slider value: {value}")
         self.set_servo_angle(servo_motor, value)
 
-    def slider_callback(self, servo_motor, joint_index, value):
-        print(f"Slider value: {value}")
-        self.set_servo_angle(servo_motor, value)
-
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
         if steps <= 0:
@@ -249,6 +245,18 @@ class Ui_MainWindow(object):
         for step in range(steps + 1):
             intermediate_angle = current_angle + (diff / steps) * step
             self.set_servo_angle(servo_motor, intermediate_angle)
+
+            # Actualizar el valor del slider correspondiente
+            if joint_index == 0:
+                self.horizontalSlider.setValue(int(intermediate_angle))
+            elif joint_index == 1:
+                self.horizontalSlider_2.setValue(int(intermediate_angle))
+            elif joint_index == 2:
+                self.horizontalSlider_3.setValue(int(intermediate_angle))
+            elif joint_index == 3:
+                self.horizontalSlider_4.setValue(int(intermediate_angle))
+            elif joint_index == 4:
+                self.horizontalSlider_5.setValue(int(intermediate_angle))
 
             # Actualizar la simulación con menos frecuencia para optimizar rendimiento
             if joint_index is not None and step % 10 == 0:
