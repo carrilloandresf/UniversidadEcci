@@ -306,7 +306,7 @@ class Ui_MainWindow(object):
         robot = DHRobot(R, name='Bender')
         robot.q = [0, 0, 0, 0]
         return robot
-
+    
     def inverse_kinematics(self, x, y, z):
         # Calcular el alcance teórico máximo del robot
         max_reach = d1 + d2 + d3
@@ -322,11 +322,8 @@ class Ui_MainWindow(object):
         T.t = [x, y, z]  # Actualizar con las coordenadas deseadas
         print("Coordenadas deseadas:", T.t)
 
-        # Proporcionar una estimación inicial cercana para ikine_LM
-        q0 = np.radians([45, 45, 45, 45])  # Ajustar este valor según el espacio de trabajo
-
-        # Calcular la cinemática inversa con punto de partida
-        solution = self.robot.ikine_LM(T, q0=q0, ilimit=1000, tol=1e-4)  # Ajusta el límite de iteraciones y tolerancia si es necesario
+        # Calcular la cinemática inversa considerando las dimensiones de los brazos
+        solution = self.robot.ikine_LM(T, ilimit=1000, tol=1e-4)  # Ajusta el límite de iteraciones y tolerancia si es necesario
         print("Solución obtenida:", solution.q if solution.success else "Sin solución")
 
         # Verificar si se encontró una solución válida
@@ -351,6 +348,7 @@ class Ui_MainWindow(object):
             print("Movimiento realizado con éxito.")
         else:
             print("No se pudo encontrar una solución de cinemática inversa para las coordenadas dadas.")
+
 
 
 
