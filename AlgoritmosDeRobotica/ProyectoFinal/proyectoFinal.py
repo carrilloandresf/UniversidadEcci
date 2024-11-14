@@ -7,11 +7,6 @@ import board
 from adafruit_motor import servo
 from adafruit_pca9685 import PCA9685
 import math
-from functools import partial
-
-# Configurar variable de entorno para omitir advertencias de Wayland
-import os
-os.environ["QT_QPA_PLATFORM"] = "xcb"  # Fuerza el uso de X11 en lugar de Wayland
 
 # Configuración de PCA9685 y servos
 i2c = board.I2C()  # usa board.SCL y board.SDA en la Raspberry Pi
@@ -26,6 +21,7 @@ servo4 = servo.Servo(pca.channels[5], min_pulse=500, max_pulse=2400)
 servo5 = servo.Servo(pca.channels[6], min_pulse=500, max_pulse=2400)
 
 # Dimensiones del robot (ajustables)
+d0 = 0 # Base
 d1 = 12  # Longitud del primer brazo
 d2 = 12  # Longitud del segundo brazo
 d3 = 12  # 13 con gripper cerrado
@@ -230,6 +226,13 @@ class Ui_MainWindow(object):
     def slider_callback(self, servo_motor, joint_index, value):
         print(f"Slider value: {value}")
         self.set_servo_angle(servo_motor, value)
+        if joint_index is not None:
+            self.update_simulation(joint_index, value)
+
+    def update_simulation(self, joint_index, angle):
+        if hasattr(self, 'robot') and 0 <= joint_index < len(self.robot.q):
+            self.robot.q[joint_index] = math.radians(angle)
+            self.simulation.fig.canvas.draw_idle()
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
@@ -290,19 +293,15 @@ class Ui_MainWindow(object):
                     self.simulation.fig.canvas.draw_idle()
 
     def create_robot(self):
-
-        # Crea un robot de 4 DOF con rotación base y tres articulaciones adicionales
-        link1 = RevoluteDH(d=0, a=0, alpha=np.pi/2)  # Base rotation pointing upwards along Z-axis
-        link2 = RevoluteDH(d=0, a=0, alpha=np.pi/2)  # Shoulder rotation
-        link3 = RevoluteDH(d=0, a=0, alpha=-np.pi/2) # Elbow rotation
-        link4 = RevoluteDH(d=0, a=0, alpha=0)         # Wrist rotation
-
-        # Crear el robot con estos eslabones
-        robot = DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
-
-        # Configuración inicial en [0, 0, 0, 0] para que el brazo esté extendido verticalmente hacia arriba
-        robot.q = [0, 0, 0, 0]  
-
+        # Crear articulaciones usando los parámetros de DH
+        R = [
+            RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=0),
+            RevoluteDH(d=0, alpha=0, a=d1, offset=math.pi/2),
+            RevoluteDH(d=0, alpha=0, a=d2, offset=0),
+            RevoluteDH(d=0, alpha=0, a=d3, offset=0)
+        ]
+        robot = DHRobot(R, name='Bender')
+        robot.q = [0, 0, 0, 0]
         return robot
 
 if __name__ == "__main__":
