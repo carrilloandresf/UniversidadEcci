@@ -215,36 +215,32 @@ class Ui_MainWindow(object):
         angle_radians = math.radians(value)  # Convertir a radianes para la simulación
         self.set_servo_angle(servo_motor, value, joint_index, angle_radians)
 
-    def update_simulation(self):
-        if hasattr(self, 'simulation') and self.simulation:
-            self.simulation.step()
-            QtWidgets.QApplication.processEvents()
+def update_simulation(self):
+    if hasattr(self, 'simulation') and self.simulation:
+        self.simulation.step(self.robot.q)
 
-    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
-        current_angle = servo_motor.angle if servo_motor.angle is not None else 90
-        diff = target_angle - current_angle
+
+
+    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):							 
+        current_angle = servo_motor.angle if servo_motor.angle is not None else 90						   
+        diff = target_angle - current_angle											  
         for step in range(steps + 1):
             intermediate_angle = current_angle + (diff / steps) * step
-            angle_radians = math.radians(intermediate_angle)
-            servo_motor.angle = intermediate_angle
-            if joint_index is not None:
-                angles = np.array(self.robot.q)
-                angles[joint_index] = angle_radians
-                self.robot.q = angles
-                if step % 2 == 0:  # Actualizar cada 2 pasos para rendimiento
-                    self.update_simulation()
+            angle_radians = math.radians(intermediate_angle)  # Para simulación
+            self.set_servo_angle(servo_motor, intermediate_angle, joint_index, angle_radians)																		  
             time.sleep(delay)
 
 
 
-    def set_servo_angle(self, servo_motor, angle, joint_index, angle_radians):
+    def set_servo_angle(self, servo_motor, angle, joint_index, angle_radians):											 
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
-        if joint_index is not None:
-            angles = np.array(self.robot.q)
-            angles[joint_index] = angle_radians
+        if joint_index is not None:														   
+            angles = np.array(self.robot.q)													   
+            angles[joint_index] = angle_radians						  
             self.robot.q = angles
             self.update_simulation()
+
 
     def create_robot(self):
         # Crear articulaciones usando los parámetros de DH
