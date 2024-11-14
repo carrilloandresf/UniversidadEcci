@@ -10,7 +10,7 @@ a4 = 4   # Longitud del eslabón final (muñeca)
 
 # Ángulos iniciales para las articulaciones
 q0 = 0            # Rotación de la base
-q1 = math.pi / 2  # Primer brazo en posición vertical (90 grados)
+q1 = 0  # Primer brazo en posición vertical (90 grados)
 q2 = 0            # Segunda articulación del brazo
 q3 = 0            # Muñeca
 
