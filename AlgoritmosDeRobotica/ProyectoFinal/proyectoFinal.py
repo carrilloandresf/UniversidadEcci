@@ -4,6 +4,8 @@ from adafruit_motor import servo
 import board
 import busio
 from roboticstoolbox import DHRobot, RevoluteDH
+import math
+from functools import partial
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -53,35 +55,35 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setValue(50)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
-        self.horizontalSlider.valueChanged.connect(self.create_slider_callback(self.servo1, self.horizontalSlider, 0))
+        self.horizontalSlider.valueChanged.connect(partial(self.slider_callback, self.servo1, 0))
 
         self.horizontalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_2.setGeometry(QtCore.QRect(104, 110, 160, 16))
         self.horizontalSlider_2.setValue(50)
         self.horizontalSlider_2.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_2.setObjectName("horizontalSlider_2")
-        self.horizontalSlider_2.valueChanged.connect(self.create_slider_callback(self.servo2, self.horizontalSlider_2, 0))
+        self.horizontalSlider_2.valueChanged.connect(partial(self.slider_callback, self.servo2, 1))
 
         self.horizontalSlider_3 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_3.setGeometry(QtCore.QRect(104, 140, 160, 16))
         self.horizontalSlider_3.setValue(50)
         self.horizontalSlider_3.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_3.setObjectName("horizontalSlider_3")
-        self.horizontalSlider_3.valueChanged.connect(self.create_slider_callback(self.servo3, self.horizontalSlider_3, 1))
+        self.horizontalSlider_3.valueChanged.connect(partial(self.slider_callback, self.servo3, 2))
 
         self.horizontalSlider_4 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_4.setGeometry(QtCore.QRect(104, 170, 160, 16))
         self.horizontalSlider_4.setValue(50)
         self.horizontalSlider_4.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_4.setObjectName("horizontalSlider_4")
-        self.horizontalSlider_4.valueChanged.connect(self.create_slider_callback(self.servo4, self.horizontalSlider_4, 2))
+        self.horizontalSlider_4.valueChanged.connect(partial(self.slider_callback, self.servo4, 3))
 
         self.horizontalSlider_5 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_5.setGeometry(QtCore.QRect(104, 200, 160, 16))
         self.horizontalSlider_5.setValue(50)
         self.horizontalSlider_5.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
-        self.horizontalSlider_5.valueChanged.connect(self.create_slider_callback(self.servo5, self.horizontalSlider_5, 3))
+        self.horizontalSlider_5.valueChanged.connect(partial(self.slider_callback, self.servo5, 4))
 
         # Additional UI components
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
@@ -145,6 +147,9 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        # Connect button to start automatic mode
+        self.pushButton.clicked.connect(self.start_automatic_mode)
+
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
@@ -157,11 +162,7 @@ class Ui_MainWindow(object):
         self.label_6.setText(_translate("MainWindow", "x"))
         self.label_7.setText(_translate("MainWindow", "y"))
         self.label_8.setText(_translate("MainWindow", "z"))
-        self.label_9.setText(_translate("MainWindow", "Presentado por:\n"
-"Andres Carrillo\n"
-"Daniela Rodriguez\n"
-"Jeisson Gutierrez\n"
-"William Fernandez"))
+        self.label_9.setText(_translate("MainWindow", "Presentado por:\n" "Andres Carrillo\n" "Daniela Rodriguez\n" "Jeisson Gutierrez\n" "William Fernandez"))
         self.groupBox_2.setTitle(_translate("MainWindow", "Modo Semiautomatico"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Modo Automatico"))
         self.pushButton.setText(_translate("MainWindow", "Start"))
@@ -171,41 +172,40 @@ class Ui_MainWindow(object):
         self.label_11.setText(_translate("MainWindow", "Sensor2"))
         self.label_12.setText(_translate("MainWindow", "Alert"))
         self.label_13.setText(_translate("MainWindow", "Base"))
-        self.pushButton.clicked.connect(self.start_automatic_mode)
 
     def start_automatic_mode(self):
-        self.move_servo(2, 50)
-        self.move_servo(3, 50)
-        self.move_servo(4, 50)
-        self.move_servo(5, 50)
-        self.move_servo(6, 50)
+        # Move all servos to a specified position (e.g., 90 degrees)
+        self.move_servo(self.servo1, 90)
+        self.move_servo(self.servo2, 90)
+        self.move_servo(self.servo3, 90)
+        self.move_servo(self.servo4, 90)
+        self.move_servo(self.servo5, 90)
 
-    def create_slider_callback(self, servo, slider, joint_index):
-        def slider_callback():
-            value = slider.value()
+    def slider_callback(self, servo_motor, joint_index):
+        def callback():
+            value = self.horizontalSlider.value()
             print(f"Slider value: {value}")
-            self.move_servo(servo, value)
+            self.move_servo(servo_motor, value)
             self.update_simulation(joint_index, value)
-        return slider_callback
+        return callback
 
     def move_servo(self, servo_motor, angle):
-        # Asegurarse de que el objeto servo_motor es del tipo correcto
+        # Ensure the servo_motor is a Servo instance
         if not isinstance(servo_motor, servo.Servo):
             raise TypeError("servo_motor debe ser una instancia de servo.Servo")
-        
-        # Limitar el ángulo entre 0 y 180 grados
+
+        # Limit angle between 0 and 180 degrees
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
     def update_simulation(self, joint_index, value):
-        # Ensure the robot and simulation attributes are defined before calling this
+        # Update robot simulation if defined
         if hasattr(self, 'robot'):
             angle = (value / 100.0) * 180.0
             q = self.robot.q
-            q[joint_index] = angle * (3.14 / 180)  # Convert degrees to radians
+            q[joint_index] = math.radians(angle)  # Convert degrees to radians
             self.robot.q = q
-            # Call step method if self.simulation is properly defined
-            if hasattr(self, 'simulation'):
+            if hasattr(self, 'simulation') and self.simulation:
                 self.simulation.step()
 
     def create_robot(self):
