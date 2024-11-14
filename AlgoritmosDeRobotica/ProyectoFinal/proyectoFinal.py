@@ -231,6 +231,10 @@ class Ui_MainWindow(object):
         self.move_servos_smoothly(servo_motor, value, joint_index)
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
+        # Validar que 'steps' sea un entero positivo
+        if steps <= 0:
+            raise ValueError("Steps must be a positive integer")
+        
         # Obtener el ángulo actual del servo
         current_angle = servo_motor.angle if servo_motor.angle is not None else 90  # Iniciar en 90 grados si es None
 
@@ -242,14 +246,18 @@ class Ui_MainWindow(object):
             intermediate_angle = current_angle + (diff / steps) * step
             self.set_servo_angle(servo_motor, intermediate_angle)
 
-            # Actualizar la simulación
-            if joint_index is not None:
+            # Actualizar la simulación con menos frecuencia para optimizar rendimiento
+            if joint_index is not None and step % 10 == 0:
                 self.update_simulation(joint_index, intermediate_angle)
+
+            # Actualizar los labels con el valor actual (ejemplo)
+            if step % 10 == 0:  # Ajustar frecuencia de actualización
+                self.label_7.setText(f"{intermediate_angle:.2f}")
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
             QtWidgets.QApplication.processEvents()
 
-            # Esperar antes del próximo paso
+            # Consider using QTimer for delays to avoid blocking the UI thread
             time.sleep(delay)
 
     def set_servo_angle(self, servo_motor, angle):
