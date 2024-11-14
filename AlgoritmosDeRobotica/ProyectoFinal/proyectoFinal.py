@@ -65,35 +65,45 @@ class Ui_MainWindow(object):
         # Create sliders and connect to servos
         self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider.setGeometry(QtCore.QRect(104, 80, 160, 16))
-        self.horizontalSlider.setValue(50)
+        self.horizontalSlider.setMinimum(0)
+        self.horizontalSlider.setMaximum(180)
+        self.horizontalSlider.setValue(90)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
         self.horizontalSlider.valueChanged.connect(lambda value: self.slider_callback(servo1, 0, value))
 
         self.horizontalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_2.setGeometry(QtCore.QRect(104, 110, 160, 16))
-        self.horizontalSlider_2.setValue(50)
+        self.horizontalSlider_2.setMinimum(0)
+        self.horizontalSlider_2.setMaximum(180)
+        self.horizontalSlider_2.setValue(90)
         self.horizontalSlider_2.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_2.setObjectName("horizontalSlider_2")
         self.horizontalSlider_2.valueChanged.connect(lambda value: self.slider_callback(servo2, 1, value))
 
         self.horizontalSlider_3 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_3.setGeometry(QtCore.QRect(104, 140, 160, 16))
-        self.horizontalSlider_3.setValue(50)
+        self.horizontalSlider_3.setMinimum(0)
+        self.horizontalSlider_3.setMaximum(180)
+        self.horizontalSlider_3.setValue(90)
         self.horizontalSlider_3.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_3.setObjectName("horizontalSlider_3")
         self.horizontalSlider_3.valueChanged.connect(lambda value: self.slider_callback(servo3, 2, value))
 
         self.horizontalSlider_4 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_4.setGeometry(QtCore.QRect(104, 170, 160, 16))
-        self.horizontalSlider_4.setValue(50)
+        self.horizontalSlider_4.setMinimum(0)
+        self.horizontalSlider_4.setMaximum(180)
+        self.horizontalSlider_4.setValue(90)
         self.horizontalSlider_4.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_4.setObjectName("horizontalSlider_4")
         self.horizontalSlider_4.valueChanged.connect(lambda value: self.slider_callback(servo4, 3, value))
 
         self.horizontalSlider_5 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_5.setGeometry(QtCore.QRect(104, 200, 160, 16))
-        self.horizontalSlider_5.setValue(50)
+        self.horizontalSlider_5.setMinimum(0)
+        self.horizontalSlider_5.setMaximum(180)
+        self.horizontalSlider_5.setValue(90)
         self.horizontalSlider_5.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
         self.horizontalSlider_5.valueChanged.connect(lambda value: self.slider_callback(servo5, None, value))
@@ -160,12 +170,15 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
+        # Initialize servos to 90 degrees
+        self.initialize_servos()
+
         # Connect button to start automatic mode
         self.pushButton.clicked.connect(self.start_automatic_mode)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Control de Robot"))
         self.label.setText(_translate("MainWindow", "Logo Ecci"))
         self.label_2.setText(_translate("MainWindow", "Art1"))
         self.label_3.setText(_translate("MainWindow", "Art2"))
@@ -186,6 +199,25 @@ class Ui_MainWindow(object):
         self.label_12.setText(_translate("MainWindow", "Alert"))
         self.label_13.setText(_translate("MainWindow", "Base"))
 
+    def initialize_servos(self):
+        # Establecer los servos físicos en 90 grados
+        self.set_servo_angle(servo1, 90)
+        self.set_servo_angle(servo2, 90)
+        self.set_servo_angle(servo3, 90)
+        self.set_servo_angle(servo4, 90)
+        self.set_servo_angle(servo5, 90)
+
+        # Establecer los sliders en 90 grados
+        self.horizontalSlider.setValue(90)
+        self.horizontalSlider_2.setValue(90)
+        self.horizontalSlider_3.setValue(90)
+        self.horizontalSlider_4.setValue(90)
+        self.horizontalSlider_5.setValue(90)
+
+        # Actualizar la simulación con las posiciones iniciales
+        self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
+        self.simulation._update_graphics()
+
     def start_automatic_mode(self):
         # Move all servos to a specified position (e.g., 90 degrees)
         self.move_servos_smoothly(servo1, 90, joint_index=0)
@@ -198,9 +230,9 @@ class Ui_MainWindow(object):
         print(f"Slider value: {value}")
         self.move_servos_smoothly(servo_motor, value, joint_index)
 
-    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=100, delay=0.01):
+    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Obtener el ángulo actual del servo
-        current_angle = servo_motor.angle if servo_motor.angle is not None else 0
+        current_angle = servo_motor.angle if servo_motor.angle is not None else 90  # Iniciar en 90 grados si es None
 
         # Calcular la diferencia de ángulo
         diff = target_angle - current_angle
@@ -211,7 +243,7 @@ class Ui_MainWindow(object):
             self.set_servo_angle(servo_motor, intermediate_angle)
 
             # Actualizar la simulación
-            if joint_index is not None and step % 10 == 0:
+            if joint_index is not None:
                 self.update_simulation(joint_index, intermediate_angle)
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
@@ -233,17 +265,17 @@ class Ui_MainWindow(object):
                 q[joint_index] = math.radians(angle)  # Convert degrees to radians
                 self.robot.q = q
                 if hasattr(self, 'simulation') and self.simulation:
-                    # Replace self.simulation.step() with self.simulation.draw()
-                    self.simulation.draw()  # Actualiza la visualización sin plt.pause()
+                    # Actualiza la visualización sin plt.pause()
+                    self.simulation._update_graphics()
 
     def create_robot(self):
         # Create a 4-DOF robot with rotating base and three additional rotational joints
         link1 = RevoluteDH(d=0, a=0, alpha=-np.pi/2)  # Base rotation adjusted to point upwards along Z-axis
-        link2 = RevoluteDH(d=d1, a=0, alpha=0)  # Shoulder rotation
+        link2 = RevoluteDH(d=0, a=d1, alpha=0)  # Shoulder rotation
         link3 = RevoluteDH(d=0, a=d2, alpha=0)  # Elbow rotation
         link4 = RevoluteDH(d=0, a=0.5, alpha=0)  # Wrist rotation
         robot = DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
-        robot.q = [0, 0, 0, 0]  # Establecer configuración inicial
+        robot.q = [math.radians(90)] * 4  # Establecer configuración inicial a 90 grados
         return robot
 
 if __name__ == "__main__":
