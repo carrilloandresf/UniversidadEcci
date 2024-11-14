@@ -234,9 +234,9 @@ class Ui_MainWindow(object):
             # Convertir el ángulo de grados a radianes y actualizar el joint correspondiente
             self.robot.q[joint_index] = math.radians(angle)
             
-            # Usar solo draw_idle para actualizar la simulación sin bloquear el bucle de eventos
+            # Usar self.simulation.step() para actualizar la simulación
             if hasattr(self, 'simulation') and self.simulation:
-                self.simulation.fig.canvas.draw_idle()
+                self.simulation.step()
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
@@ -252,7 +252,7 @@ class Ui_MainWindow(object):
         # Mover en pequeños pasos para hacer el movimiento más suave
         for step in range(steps + 1):
             intermediate_angle = current_angle + (diff / steps) * step
-            self.set_servo_angle(servo_motor, intermediate_angle)
+            self.set_servo_angle(servo_motor, intermediate_angle, joint_index=joint_index)
 
             # Actualizar el valor del slider correspondiente
             if joint_index == 0:
@@ -266,24 +266,29 @@ class Ui_MainWindow(object):
             elif joint_index == 4:
                 self.horizontalSlider_5.setValue(int(intermediate_angle))
 
-            # Actualizar la simulación con menos frecuencia para optimizar rendimiento
-            if joint_index is not None and step % 10 == 0:
-                self.update_simulation(joint_index, intermediate_angle)
-
             # Actualizar los labels con el valor actual (ejemplo)
-            if step % 10 == 0:  # Ajustar frecuencia de actualización
+            if step % 5 == 0 or step == steps:  # Ajustar frecuencia de actualización
                 self.label_7.setText(f"{intermediate_angle:.2f}")
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
             QtWidgets.QApplication.processEvents()
 
-            # Consider using QTimer for delays to avoid blocking the UI thread
+            # Usar QTimer en lugar de time.sleep para evitar bloquear la UI (opcional)
             time.sleep(delay)
 
-    def set_servo_angle(self, servo_motor, angle):
+
+
+    def set_servo_angle(self, servo_motor, angle, joint_index=None):
         # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
+
+        if joint_index is not None:
+            # Actualizar el ángulo en self.robot.q
+            self.robot.q[joint_index] = math.radians(angle)
+            # Actualizar la simulación
+            self.simulation.step()
+
 
     def create_robot(self):
         # Crear articulaciones usando los parámetros de DH
