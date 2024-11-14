@@ -1,6 +1,11 @@
 import spidev
 import RPi.GPIO as GPIO
 from time import sleep, time
+import board
+import busio
+import adafruit_ahtx0
+from PIL import Image, ImageDraw, ImageFont
+import Adafruit_SSD1306
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -9,6 +14,20 @@ GPIO.setmode(GPIO.BCM)
 spi = spidev.SpiDev()
 spi.open(0, 0)
 spi.max_speed_hz = 1350000
+
+# Configuración del sensor AHTx0 y pantalla OLED
+i2c = busio.I2C(board.SCL, board.SDA)
+sensor = adafruit_ahtx0.AHTx0(i2c)
+RST = None
+disp = Adafruit_SSD1306.SSD1306_128_32(rst=RST, i2c_address=0x3C)
+disp.begin()
+disp.clear()
+disp.display()
+width = disp.width
+height = disp.height
+image = Image.new('1', (width, height))
+draw = ImageDraw.Draw(image)
+font = ImageFont.load_default()
 
 # Definición de pines
 in_Entrada = 4  
@@ -59,6 +78,18 @@ GPIO.setup(LED, GPIO.OUT)
 for pin in motor_pins:
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, 0)
+
+# Función para mostrar temperatura y humedad en OLED
+def display_temp_humidity():
+    temperature = sensor.temperature
+    humidity = sensor.relative_humidity
+    
+    # Limpiar pantalla
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((0, 0), f"Temp: {temperature:.2f} C", font=font, fill=255)
+    draw.text((0, 15), f"Humedad: {humidity:.2f} %", font=font, fill=255)
+    disp.image(image)
+    disp.display()
 
 # Configuración de pines de la pantalla LCD
 lcd_pins = [LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7]
@@ -205,6 +236,9 @@ try:
         vParking2 = not GPIO.input(parking_2)
         vParking3 = not GPIO.input(parking_3)
 
+        # Mostrar datos de temperatura y humedad en OLED
+        display_temp_humidity()
+
         # Imprimir todas las variables por consola
         print(f"Entrada: {vEntrada}, Salida: {vSalida}, Parking1: {vParking1}, Parking2: {vParking2}, Parking3: {vParking3}")
 
@@ -217,14 +251,14 @@ try:
             print("Carro en entrada")
             activar_buzzer()
             mover_motor_up(300, delay=0.002)
-            """
+
             while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
                 lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
-            """
-            sleep(3)
+
             activar_buzzer()
+            sleep(3)
             mover_motor_down(300, delay=0.002)
             print("Devolviendo la persiana")
             lcd_text("ESPERE, VEHICULO", 0x80)
