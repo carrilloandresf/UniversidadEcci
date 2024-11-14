@@ -221,7 +221,7 @@ class Ui_MainWindow(object):
         self.move_servos_smoothly(servo2, 90, joint_index=1)
         self.move_servos_smoothly(servo3, 90, joint_index=2)
         self.move_servos_smoothly(servo4, 90, joint_index=3)
-        self.move_servos_smoothly(servo5, 90, joint_index=None)  # Efector final no tiene joint_index
+        self.move_servos_smoothly(servo5, 90, joint_index=4) 
 
     def slider_callback(self, servo_motor, joint_index, value):
         print(f"Slider value: {value}")
