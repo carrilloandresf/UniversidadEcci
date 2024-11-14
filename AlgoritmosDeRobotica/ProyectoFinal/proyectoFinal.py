@@ -35,9 +35,9 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
 
         # Configuración de los sliders y botones
-        self.setup_components(MainWindow)
+        #self.setup_components(MainWindow)
         self.initialize_servos()
-        
+
         # Crear el robot y la simulación
         self.robot = self.create_robot()
         self.simulation = PyPlot()
