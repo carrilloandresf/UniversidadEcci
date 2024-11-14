@@ -171,6 +171,14 @@ class Ui_MainWindow(object):
         self.label_11.setText(_translate("MainWindow", "Sensor2"))
         self.label_12.setText(_translate("MainWindow", "Alert"))
         self.label_13.setText(_translate("MainWindow", "Base"))
+        self.pushButton.clicked.connect(self.start_automatic_mode)
+
+    def start_automatic_mode(self):
+        self.move_servo(2, 50)
+        self.move_servo(3, 50)
+        self.move_servo(4, 50)
+        self.move_servo(5, 50)
+        self.move_servo(6, 50)
 
     def create_slider_callback(self, servo, slider, joint_index):
         def slider_callback():
@@ -203,12 +211,6 @@ class Ui_MainWindow(object):
         link3 = RevoluteDH(d=0, a=1, alpha=0)  # Elbow rotation
         link4 = RevoluteDH(d=0, a=1, alpha=0)  # Wrist rotation
         return DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
-    
-    move_servo(2, 50)
-    move_servo(3, 50)
-    move_servo(4, 50)
-    move_servo(5, 50)
-    move_servo(6, 50)
 
 if __name__ == "__main__":
     import sys
