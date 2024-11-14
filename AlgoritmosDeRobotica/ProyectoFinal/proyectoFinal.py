@@ -244,14 +244,21 @@ class Ui_MainWindow(object):
         y = float(self.lineEdit_2.text())
         z = float(self.lineEdit_3.text())
 
-        self.cinematica_inversa(x, y, z, 0, d0, d1, d2, d3)
+        # Realizar la cinematica inversa y devolverla a una variable
+        q1, q2, q3, q4 = self.cinematica_inversa(x, y, z, d0, d1, d2, d3)
+
+        # Mover los servos
+        self.move_servos_smoothly(servo1, q1, joint_index=0)
+        self.move_servos_smoothly(servo2, q2, joint_index=1)
+        self.move_servos_smoothly(servo3, q3, joint_index=2)
+        self.move_servos_smoothly(servo4, q4, joint_index=3)
+        self.move_servos_smoothly(servo5, 90, joint_index=None)
 
 
-    def cinematica_inversa(self, x, y, z, orientacion, L1, L2, L3, L4):
+    def cinematica_inversa(self, x, y, z, L1, L2, L3, L4):
         """
-        Calcula los ángulos de las articulaciones dada la posición deseada (x, y, z) y la orientación deseada.
+        Calcula los ángulos de las articulaciones dada la posición deseada (x, y, z).
         L1, L2, L3, L4: Longitudes de los segmentos del brazo.
-        orientacion: Ángulo de la orientación de la herramienta.
         """
         # Cálculo de q1 (ángulo de la base)
         if x >= 0 and y == 0:
@@ -298,11 +305,12 @@ class Ui_MainWindow(object):
         q2 = max(0, min(180, q2))
         q3 = max(0, min(180, abs(q3)))  # Valor absoluto de q3
         
-        # Cálculo de q4 para la orientación de la herramienta
-        q4 = orientacion  # Este ángulo puede ser directamente la orientación deseada
+        # Cálculo de q4 basado en la orientación en función de z
+        # Se calcula para mantener la orientación deseada del efector final.
+        q4 = math.degrees(math.atan2(z_rel, d))
+        
         print(f"q1: {q1}, q2: {q2}, q3: {q3}, q4: {q4}")
         return q1, q2, q3, q4
-
 
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
