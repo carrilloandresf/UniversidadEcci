@@ -5,10 +5,10 @@ from roboticstoolbox import DHRobot, RevoluteDH
 from roboticstoolbox.backends.PyPlot import PyPlot
 
 # Dimensiones del robot (ajustables)
-d0 = 0.5  # Longitud del primer eslabón
-d1 = 1.0  # Longitud del segundo eslabón
-d2 = 0.8  # Longitud del tercer eslabón
-d3 = 0.4  # Longitud del cuarto eslabón
+d0 = 0  # Longitud del primer eslabón
+d1 = 12  # Longitud del segundo eslabón
+d2 = 12  # Longitud del tercer eslabón
+d3 = 12  # Longitud del cuarto eslabón
 
 class Ui_Dialog(object):
     def __init__(self):
