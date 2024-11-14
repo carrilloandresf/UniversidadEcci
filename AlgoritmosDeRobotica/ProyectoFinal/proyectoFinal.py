@@ -67,7 +67,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setValue(90)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
-        self.horizontalSlider.valueChanged.connect(lambda value: self.slider_callback(servo1, none, value))
+        self.horizontalSlider.valueChanged.connect(lambda value: self.slider_callback(servo1, None, value))
 
         self.horizontalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_2.setGeometry(QtCore.QRect(104, 110, 160, 16))
