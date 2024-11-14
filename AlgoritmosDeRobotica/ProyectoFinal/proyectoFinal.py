@@ -34,11 +34,19 @@ class Ui_MainWindow(object):
         
         self.centralwidget.setObjectName("centralwidget")
 
-        # Create robot instance
+        # Crear el robot y la simulación
         self.robot = self.create_robot()
-        self.simulation = PyPlot()  # Crear simulación de Peter Corke
-        self.simulation.limits = [-40, 40, -40, 40, -40, 40]  # Establecer los límites directamente después de crear `PyPlot`
+        self.simulation = PyPlot()
+        self.simulation.limits = [-40, 40, -40, 40, -40, 40]
         QtCore.QTimer.singleShot(0, self.launch_simulation)
+
+        # Configuración de los sliders y botones
+        self.setup_components(MainWindow)
+        self.initialize_servos()
+
+        # Conectar botones a las funciones
+        self.pushButton.clicked.connect(self.start_automatic_mode)
+        self.pushButton_2.clicked.connect(self.handle_inverse_kinematics)
 
         # Setup UI components
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -199,17 +207,11 @@ class Ui_MainWindow(object):
         self.label_13.setText(_translate("MainWindow", "Base"))
 
     def launch_simulation(self):
-        # Inicializa la simulación y define los límites de los ejes
         self.simulation.launch()
         self.simulation.add(self.robot)
-
-        # Establecer los límites de los ejes en `self.simulation`
         self.simulation.ax.set_xlim(-40, 40)
         self.simulation.ax.set_ylim(-40, 40)
         self.simulation.ax.set_zlim(-40, 40)
-
-        # Asegurarse de que `sim_time` esté inicializado
-        self.simulation.sim_time = 0  # Inicializa sim_time para evitar el error
 
     def initialize_servos(self):
         # Establecer los servos físicos en 90 grados
@@ -226,10 +228,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider_4.setValue(90)
         self.horizontalSlider_5.setValue(90)
 
-        # Actualizar la simulación con las posiciones iniciales
-        #self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
-        #self.simulation.fig.canvas.draw_idle()
-        self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
+        self.robot.q = [math.radians(90)] * 4
         self.update_simulation()
 
     def start_automatic_mode(self):
