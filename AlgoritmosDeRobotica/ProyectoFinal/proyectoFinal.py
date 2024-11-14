@@ -230,8 +230,7 @@ class Ui_MainWindow(object):
 
     def update_simulation(self):
         if hasattr(self, 'simulation') and self.simulation:
-            self.simulation.fig.canvas.draw()
-            self.simulation.fig.canvas.flush_events()
+            self.simulation.step(self.robot.q)
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
@@ -279,14 +278,8 @@ class Ui_MainWindow(object):
         servo_motor.angle = angle
 
         if joint_index is not None:
-            # Crear un array numpy de self.robot.q para modificarlo
-            angles = np.array(self.robot.q)
-            
             # Actualizar el ángulo correspondiente en radianes
-            angles[joint_index] = np.radians(angle)
-            
-            # Asignar el array actualizado de nuevo a self.robot.q
-            self.robot.q = angles
+            self.robot.q[joint_index] = np.radians(angle)
             
             # Actualizar la simulación
             self.update_simulation()
