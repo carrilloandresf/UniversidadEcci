@@ -230,7 +230,8 @@ class Ui_MainWindow(object):
 
     def update_simulation(self):
         if hasattr(self, 'simulation') and self.simulation:
-            self.simulation.step(self.robot.q)
+            self.simulation.fig.canvas.draw()
+            self.simulation.fig.canvas.flush_events()
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
