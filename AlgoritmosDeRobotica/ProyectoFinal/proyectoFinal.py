@@ -312,10 +312,10 @@ class Ui_MainWindow(object):
         # Crear una matriz de transformación homogénea de destino
         T = self.robot.fkine([0, 0, 0, 0])  # Usar el fkine para obtener una estructura base
         T.t = [x, y, z]  # Actualizar con las coordenadas deseadas
-
+        print("Coordenadas deseadas:", T.t)
         # Calcular la cinemática inversa considerando las dimensiones de los brazos
         solution = self.robot.ikine_LM(T, ilimit=1000, tol=1e-4)  # Ajusta el límite de iteraciones y tolerancia si es necesario
-
+        print("Solución obtenida:", solution.q)
         # Verificar si se encontró una solución válida
         if solution.success:
             joint_angles = np.degrees(solution.q)  # Convertir de radianes a grados para los servos
