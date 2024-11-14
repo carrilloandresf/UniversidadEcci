@@ -1,3 +1,4 @@
+import time
 from PIL import Image, ImageDraw, ImageFont
 import Adafruit_SSD1306
 import board
@@ -25,6 +26,10 @@ def test_oled():
         disp.image(image)
         disp.display()
         print("Pantalla OLED OK")
+
+        # Mantener el mensaje visible por 10 segundos
+        time.sleep(10)
+
     except Exception as e:
         print(f"Fallo en la pantalla OLED: {e}")
 
