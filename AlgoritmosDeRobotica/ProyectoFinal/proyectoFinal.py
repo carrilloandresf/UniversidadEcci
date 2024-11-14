@@ -247,7 +247,7 @@ class Ui_MainWindow(object):
         self.cinematica_inversa(x, y, z, 0, d0, d1, d2, d3)
 
 
-    def cinematica_inversa(x, y, z, orientacion, L1, L2, L3, L4):
+    def cinematica_inversa(self, x, y, z, orientacion, L1, L2, L3, L4):
         """
         Calcula los ángulos de las articulaciones dada la posición deseada (x, y, z) y la orientación deseada.
         L1, L2, L3, L4: Longitudes de los segmentos del brazo.
