@@ -326,7 +326,7 @@ class Ui_MainWindow(object):
             self.simulation.fig.canvas.draw()
             self.simulation.fig.canvas.flush_events()
 
-    """    def create_robot(self):
+    def create_robot(self):
         # Crear articulaciones usando los parámetros de DH
         R = [
             RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=0),
@@ -337,7 +337,6 @@ class Ui_MainWindow(object):
         robot = DHRobot(R, name='Bender')
         robot.q = [0, 0, 0, 0]
         return robot
-    """
     
     def inverse_kinematics(self, x, y, z):
         # Calcular el alcance teórico máximo del robot
