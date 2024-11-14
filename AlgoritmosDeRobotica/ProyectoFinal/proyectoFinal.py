@@ -213,7 +213,7 @@ class Ui_MainWindow(object):
 
             # Actualizar la simulación
             if step % 10 == 0:  # Reduce la frecuencia de actualización para mejorar el rendimiento
-                self.update_simulation(0, intermediate_angle)
+                self.update_simulation(joint_index, intermediate_angle)
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
             QtWidgets.QApplication.processEvents()
@@ -238,10 +238,10 @@ class Ui_MainWindow(object):
 
     def create_robot(self):
         # Create a 4-DOF robot with rotating base and three additional rotational joints
-        link1 = RevoluteDH(d=0, a=d1, alpha=-np.pi/2)  # Base rotation adjusted to point along the x-axis
-        link2 = RevoluteDH(d=0, a=1, alpha=0)  # Shoulder rotation
-        link3 = RevoluteDH(d=0, a=1, alpha=0)  # Elbow rotation
-        link4 = RevoluteDH(d=0, a=1, alpha=0)  # Wrist rotation
+        link1 = RevoluteDH(d=0, a=0, alpha=-np.pi/2)  # Base rotation adjusted to point upwards along Z-axis
+        link2 = RevoluteDH(d=d1, a=0, alpha=0)  # Shoulder rotation
+        link3 = RevoluteDH(d=0, a=d2, alpha=0)  # Elbow rotation
+        link4 = RevoluteDH(d=0, a=0.5, alpha=0)  # Wrist rotation
         return DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
 
 if __name__ == "__main__":
