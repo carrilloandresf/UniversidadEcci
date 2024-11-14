@@ -292,7 +292,7 @@ class Ui_MainWindow(object):
     def create_robot(self):
 
         # Crea un robot de 4 DOF con rotación base y tres articulaciones adicionales
-        link1 = RevoluteDH(d=0, a=0, alpha=-np.pi/2)  # Base rotation pointing upwards along Z-axis
+        link1 = RevoluteDH(d=1, a=0, alpha=-np.pi/2)  # Base rotation pointing upwards along Z-axis
         link2 = RevoluteDH(d=0, a=d1, alpha=0)        # Shoulder rotation
         link3 = RevoluteDH(d=0, a=d2, alpha=0)        # Elbow rotation
         link4 = RevoluteDH(d=0, a=d3, alpha=0)        # Wrist rotation
