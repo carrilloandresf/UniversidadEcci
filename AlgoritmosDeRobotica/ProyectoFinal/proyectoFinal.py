@@ -217,8 +217,7 @@ class Ui_MainWindow(object):
 
     def update_simulation(self):
         if hasattr(self, 'simulation') and self.simulation:
-            self.simulation.fig.canvas.draw_idle()
-
+            self.simulation.step(self.robot.q)
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):							 
         current_angle = servo_motor.angle if servo_motor.angle is not None else 90						   
