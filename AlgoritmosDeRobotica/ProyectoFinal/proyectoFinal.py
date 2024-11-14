@@ -31,6 +31,7 @@ class Ui_MainWindow(object):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
+        
         self.centralwidget.setObjectName("centralwidget")
 
         # Create robot instance
@@ -105,6 +106,10 @@ class Ui_MainWindow(object):
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
         self.horizontalSlider_5.valueChanged.connect(lambda value: self.slider_callback(servo5, 3, value))
 
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(90, 280, 41, 22))
+        self.lineEdit.setObjectName("lineEdit")
+
         # Additional UI components
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
         self.label_6.setGeometry(QtCore.QRect(70, 280, 21, 16))
@@ -118,9 +123,7 @@ class Ui_MainWindow(object):
         self.label_9 = QtWidgets.QLabel(self.centralwidget)
         self.label_9.setGeometry(QtCore.QRect(50, 450, 131, 91))
         self.label_9.setObjectName("label_9")
-        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(90, 280, 41, 22))
-        self.lineEdit.setObjectName("lineEdit")
+        
         self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_2.setGeometry(QtCore.QRect(90, 310, 41, 22))
         self.lineEdit_2.setObjectName("lineEdit_2")
