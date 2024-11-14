@@ -67,7 +67,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setValue(90)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
-        self.horizontalSlider.valueChanged.connect(lambda value: self.slider_callback(servo1, 0, value))
+        self.horizontalSlider.valueChanged.connect(lambda value: self.slider_callback(servo1, none, value))
 
         self.horizontalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_2.setGeometry(QtCore.QRect(104, 110, 160, 16))
@@ -76,7 +76,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider_2.setValue(90)
         self.horizontalSlider_2.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_2.setObjectName("horizontalSlider_2")
-        self.horizontalSlider_2.valueChanged.connect(lambda value: self.slider_callback(servo2, 1, value))
+        self.horizontalSlider_2.valueChanged.connect(lambda value: self.slider_callback(servo2, 0, value))
 
         self.horizontalSlider_3 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_3.setGeometry(QtCore.QRect(104, 140, 160, 16))
@@ -85,7 +85,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider_3.setValue(90)
         self.horizontalSlider_3.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_3.setObjectName("horizontalSlider_3")
-        self.horizontalSlider_3.valueChanged.connect(lambda value: self.slider_callback(servo3, 2, value))
+        self.horizontalSlider_3.valueChanged.connect(lambda value: self.slider_callback(servo3, 1, value))
 
         self.horizontalSlider_4 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_4.setGeometry(QtCore.QRect(104, 170, 160, 16))
@@ -94,7 +94,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider_4.setValue(90)
         self.horizontalSlider_4.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_4.setObjectName("horizontalSlider_4")
-        self.horizontalSlider_4.valueChanged.connect(lambda value: self.slider_callback(servo4, 3, value))
+        self.horizontalSlider_4.valueChanged.connect(lambda value: self.slider_callback(servo4, 2, value))
 
         self.horizontalSlider_5 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_5.setGeometry(QtCore.QRect(104, 200, 160, 16))
@@ -103,7 +103,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider_5.setValue(90)
         self.horizontalSlider_5.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
-        self.horizontalSlider_5.valueChanged.connect(lambda value: self.slider_callback(servo5, None, value))
+        self.horizontalSlider_5.valueChanged.connect(lambda value: self.slider_callback(servo5, 3, value))
 
         # Additional UI components
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
@@ -217,11 +217,11 @@ class Ui_MainWindow(object):
 
     def start_automatic_mode(self):
         # Move all servos to a specified position (e.g., 90 degrees)
-        self.move_servos_smoothly(servo1, 90, joint_index=0)
-        self.move_servos_smoothly(servo2, 90, joint_index=1)
-        self.move_servos_smoothly(servo3, 90, joint_index=2)
-        self.move_servos_smoothly(servo4, 90, joint_index=3)
-        self.move_servos_smoothly(servo5, 90, joint_index=4) 
+        self.move_servos_smoothly(servo1, 90, joint_index=None)
+        self.move_servos_smoothly(servo2, 90, joint_index=0)
+        self.move_servos_smoothly(servo3, 90, joint_index=1)
+        self.move_servos_smoothly(servo4, 90, joint_index=2)
+        self.move_servos_smoothly(servo5, 90, joint_index=3)  # Efector final no tiene joint_index
 
     def slider_callback(self, servo_motor, joint_index, value):
         print(f"Slider value: {value}")
