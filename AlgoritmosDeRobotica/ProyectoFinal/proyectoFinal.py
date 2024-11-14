@@ -197,23 +197,11 @@ class Ui_MainWindow(object):
         self.label_13.setText(_translate("MainWindow", "Base"))
 
     def initialize_servos(self):
-        # Establecer los servos físicos en 90 grados
-        self.set_servo_angle(servo1, 90)
-        self.set_servo_angle(servo2, 90)
-        self.set_servo_angle(servo3, 90)
-        self.set_servo_angle(servo4, 90)
-        self.set_servo_angle(servo5, 90)
-
-        # Establecer los sliders en 90 grados
-        self.horizontalSlider.setValue(90)
-        self.horizontalSlider_2.setValue(90)
-        self.horizontalSlider_3.setValue(90)
-        self.horizontalSlider_4.setValue(90)
-        self.horizontalSlider_5.setValue(90)
-
-        # Actualizar la simulación con las posiciones iniciales
-        self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
-        self.simulation.fig.canvas.draw_idle()
+        # Inicializar servos y sliders a 90 grados
+        for slider in [self.horizontalSlider, self.horizontalSlider_2, self.horizontalSlider_3, self.horizontalSlider_4, self.horizontalSlider_5]:						
+            slider.setValue(90)														
+        self.robot.q = [math.radians(90)] * 4
+        self.update_simulation()
 
     def start_automatic_mode(self):
         # Move all servos to a specified position (e.g., 90 degrees)
