@@ -271,11 +271,6 @@ class Ui_MainWindow(object):
 
         # Distancia al objetivo en el plano del brazo
         d = math.sqrt(r**2 + z_rel**2)
-        """
-        # Verificar alcanzabilidad del punto objetivo
-        if d > (L2 + L3) or d < abs(L2 - L3):
-            raise ValueError("Posición fuera del alcance del robot")
-        """
 
         # Cálculo de q3 usando ley de cosenos para el ángulo del segundo brazo
         cos_q3 = (L2**2 + L3**2 - d**2) / (2 * L2 * L3)
