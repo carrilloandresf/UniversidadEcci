@@ -232,7 +232,14 @@ class Ui_MainWindow(object):
     def update_simulation(self, joint_index, angle):
         if hasattr(self, 'robot') and 0 <= joint_index < len(self.robot.q):
             self.robot.q[joint_index] = math.radians(angle)
-            self.simulation.fig.canvas.draw_idle()
+            # self.simulation.fig.canvas.draw_idle()
+            # Actualizar la simulación
+            if hasattr(self, 'simulation') and self.simulation:
+                # Usar self.simulation.step() para refrescar el gráfico de la simulación
+                self.simulation.step()  
+                
+                # Actualizar la visualización con draw_idle para asegurar una respuesta continua
+                self.simulation.fig.canvas.draw_idle()
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
@@ -280,17 +287,6 @@ class Ui_MainWindow(object):
         # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
-
-    def update_simulation(self, joint_index, angle):
-        # Update robot simulation if defined
-        if hasattr(self, 'robot'):
-            if joint_index is not None and 0 <= joint_index < len(self.robot.q):
-                q = self.robot.q
-                q[joint_index] = math.radians(angle)  # Convert degrees to radians
-                self.robot.q = q
-                if hasattr(self, 'simulation') and self.simulation:
-                    # Actualiza la visualización sin plt.pause()
-                    self.simulation.fig.canvas.draw_idle()
 
     def create_robot(self):
         # Crear articulaciones usando los parámetros de DH
