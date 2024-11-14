@@ -342,9 +342,11 @@ class Ui_MainWindow(object):
         robot.q = [0, 0, 0, 0]
         return robot
     
-    def inverse_kinematics(self, x, y, z):
+
+    # Definir el nuevo método de cinemática inversa para un robot 4R
+    def inverse_kinematics(self, x, y, z, theta4=0):
         # Calcular el alcance teórico máximo del robot
-        max_reach = d1 + d2 + d3
+        max_reach = d1 + d2 + d3  # Ajusta estos valores si el 4° link tiene longitud adicional
         target_distance = np.sqrt(x**2 + y**2 + z**2)
 
         # Verificar si el objetivo está dentro del alcance
@@ -353,11 +355,11 @@ class Ui_MainWindow(object):
             return
 
         # Crear una matriz de transformación homogénea de destino
-        T = self.robot.fkine([0, 0, 0, 0])  # Usar el fkine para obtener una estructura base
-        T.t = [x, y, z]  # Actualizar con las coordenadas deseadas
+        T = self.robot.fkine([0, 0, 0, 0])  # Inicializar estructura base
+        T.t = [x, y, z]  # Establecer coordenadas deseadas
         print("Coordenadas deseadas:", T.t)
 
-        # Calcular la cinemática inversa
+        # Calcular la cinemática inversa (modificación para robot 4R)
         solution = self.robot.ikine_LM(T, ilimit=1000, tol=1e-4)
         print("Solución obtenida:", solution.q if solution.success else "Sin solución")
 
@@ -367,19 +369,19 @@ class Ui_MainWindow(object):
             print("Ángulos obtenidos:", joint_angles)
 
             # Actualizar sliders y servos con los ángulos obtenidos
-            sliders = [self.horizontalSlider, self.horizontalSlider_2, self.horizontalSlider_3, self.horizontalSlider_4]
-            servos = [servo1, servo2, servo3, servo4]
-            for i in range(4):												
+            sliders = [self.horizontalSlider, self.horizontalSlider_2, self.horizontalSlider_3, self.horizontalSlider_4, self.horizontalSlider_5]
+            servos = [servo1, servo2, servo3, servo4, servo5]
+            for i in range(4):
                 sliders[i].setValue(int(joint_angles[i]))
                 self.set_servo_angle(servos[i], joint_angles[i], joint_index=i)
 
-            # Actualizar la simulación con las posiciones calculadas
+            # Actualizar simulación con las posiciones calculadas
             self.robot.q = np.radians(joint_angles)
             self.update_simulation()
             print("Movimiento realizado con éxito.")
         else:
             print("No se pudo encontrar una solución de cinemática inversa para las coordenadas dadas.")
-
+            
     # Método de manejo para recibir coordenadas de los LineEdits y llamar a cinemática inversa
     def handle_inverse_kinematics(self):
         try:
