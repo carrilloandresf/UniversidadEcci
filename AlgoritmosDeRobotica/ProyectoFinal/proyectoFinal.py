@@ -248,11 +248,11 @@ class Ui_MainWindow(object):
         q1, q2, q3, q4 = self.cinematica_inversa(x, y, z, d0, d1, d2, d3)
 
         # Mover los servos
-        self.move_servos_smoothly(servo1, q1, joint_index=0)
-        self.move_servos_smoothly(servo2, q2, joint_index=1)
+        self.move_servos_smoothly(servo5, q1, joint_index=0)
+        self.move_servos_smoothly(servo4, q2, joint_index=1)
         self.move_servos_smoothly(servo3, q3, joint_index=2)
-        self.move_servos_smoothly(servo4, q4, joint_index=3)
-        self.move_servos_smoothly(servo5, 90, joint_index=None)
+        self.move_servos_smoothly(servo2, q4, joint_index=3)
+        self.move_servos_smoothly(servo1, 90, joint_index=None)
 
         print("Movimiento completado")
 
