@@ -212,72 +212,32 @@ class Ui_MainWindow(object):
         self.move_servos_smoothly(servo5, 90, joint_index=3)  # Efector final no tiene joint_index
 
     def slider_callback(self, servo_motor, joint_index, value):
-        print(f"Slider value: {value}")
-        self.set_servo_angle(servo_motor, value, joint_index)
-
+        angle_radians = math.radians(value)  # Convertir a radianes para la simulación
+        self.set_servo_angle(servo_motor, value, joint_index, angle_radians)
 
     def update_simulation(self):
         if hasattr(self, 'simulation') and self.simulation:
-            # Llamar a `draw_idle` para actualizar la visualización sin pausar el bucle de eventos
             self.simulation.fig.canvas.draw_idle()
 
 
-    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
-        # Validar que 'steps' sea un entero positivo
-        if steps <= 0:
-            raise ValueError("Steps must be a positive integer")
-        
-        # Obtener el ángulo actual del servo
-        current_angle = servo_motor.angle if servo_motor.angle is not None else 90  # Iniciar en 90 grados si es None
-
-        # Calcular la diferencia de ángulo
-        diff = target_angle - current_angle
-
-        # Mover en pequeños pasos para hacer el movimiento más suave
+    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):							 
+        current_angle = servo_motor.angle if servo_motor.angle is not None else 90						   
+        diff = target_angle - current_angle											  
         for step in range(steps + 1):
             intermediate_angle = current_angle + (diff / steps) * step
-            self.set_servo_angle(servo_motor, intermediate_angle, joint_index=joint_index)
-
-            # Actualizar el valor del slider correspondiente
-            if joint_index == 0:
-                self.horizontalSlider.setValue(int(intermediate_angle))
-            elif joint_index == 1:
-                self.horizontalSlider_2.setValue(int(intermediate_angle))
-            elif joint_index == 2:
-                self.horizontalSlider_3.setValue(int(intermediate_angle))
-            elif joint_index == 3:
-                self.horizontalSlider_4.setValue(int(intermediate_angle))
-            elif joint_index == 4:
-                self.horizontalSlider_5.setValue(int(intermediate_angle))
-
-            # Actualizar los labels con el valor actual (ejemplo)
-            if step % 5 == 0 or step == steps:  # Ajustar frecuencia de actualización
-                self.label_7.setText(f"{intermediate_angle:.2f}")
-
-            # Permitir que Qt procese eventos pendientes para actualizar la UI
-            QtWidgets.QApplication.processEvents()
-
-            # Usar QTimer en lugar de time.sleep para evitar bloquear la UI (opcional)
+            angle_radians = math.radians(intermediate_angle)  # Para simulación
+            self.set_servo_angle(servo_motor, intermediate_angle, joint_index, angle_radians)																		  
             time.sleep(delay)
 
 
 
-    def set_servo_angle(self, servo_motor, angle, joint_index=None):
-        # Limitar el ángulo entre 0 y 180 grados
+    def set_servo_angle(self, servo_motor, angle, joint_index, angle_radians):											 
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
-
-        if joint_index is not None:
-            # Crear un array numpy de self.robot.q para modificarlo
-            angles = np.array(self.robot.q)
-            
-            # Actualizar el ángulo correspondiente en radianes
-            angles[joint_index] = np.radians(angle)
-            
-            # Asignar el array actualizado de nuevo a self.robot.q
+        if joint_index is not None:														   
+            angles = np.array(self.robot.q)													   
+            angles[joint_index] = angle_radians						  
             self.robot.q = angles
-            
-            # Actualizar la simulación
             self.update_simulation()
 
 
