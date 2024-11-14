@@ -215,11 +215,9 @@ class Ui_MainWindow(object):
         angle_radians = math.radians(value)  # Convertir a radianes para la simulación
         self.set_servo_angle(servo_motor, value, joint_index, angle_radians)
 
-def update_simulation(self):
-    if hasattr(self, 'simulation') and self.simulation:
-        self.simulation.step(self.robot.q)
-
-
+    def update_simulation(self):
+        if hasattr(self, 'simulation') and self.simulation:
+            self.simulation.step(self.robot.q)
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):							 
         current_angle = servo_motor.angle if servo_motor.angle is not None else 90						   
