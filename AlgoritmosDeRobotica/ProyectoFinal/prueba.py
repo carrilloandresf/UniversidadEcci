@@ -1,46 +1,36 @@
 from roboticstoolbox import DHRobot, RevoluteDH
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.widgets import Slider
+from spatialmath.base import tr2rpy
+import math
 
-# Definir el robot utilizando parámetros DH aproximados
-robot = DHRobot([
-    RevoluteDH(d=0.1, a=0, alpha=np.pi/2),
-    RevoluteDH(d=0, a=0.3, alpha=0),
-    RevoluteDH(d=0, a=0.3, alpha=0),
-    RevoluteDH(d=0.1, a=0, alpha=np.pi/2),
-    RevoluteDH(d=0.1, a=0, alpha=0)
-], name="BrazoRobotico")
+# Definir los parámetros de los enlaces
+a1 = 12
+a2 = 14
+a3 = 6
+a4 = 4
 
-# Posiciones iniciales de las articulaciones
-q_initial = [0, 0, 0, 0, 0]
+# Ángulos iniciales
+q1 = 0
+q2 = 0
 
-# Crear una figura y un eje para la visualización de sliders
-fig, ax = plt.subplots()
-plt.subplots_adjust(left=0.1, bottom=0.4)
+# Crear las articulaciones rotativas con parámetros DH
+R = []
+R.append(RevoluteDH(d=a1, alpha=math.pi/2, a=a2, offset=0))
+R.append(RevoluteDH(d=a3, alpha=0, a=a4, offset=0))
 
-# Dibujar la posición inicial del robot en una ventana separada
-robot.plot(q_initial, block=False)
+# Definir el robot con las articulaciones creadas
+Robot = DHRobot(R, name='Bender')
 
-# Crear sliders para cada articulación
-sliders = []
-slider_axes = []
+# Mostrar la estructura del robot
+print(Robot)
 
-for i in range(5):
-    # Crear un eje para el slider
-    ax_slider = plt.axes([0.1, 0.3 - i * 0.05, 0.8, 0.03])
-    slider = Slider(ax_slider, f'Articulación {i+1}', -np.pi, np.pi, valinit=0)
-    sliders.append(slider)
+# Abrir la interfaz de enseñanza interactiva
+Robot.teach([q1, q2], 'rpy/zyx', limits=[[-30, 30], [-30, 30]])
 
-# Función de actualización cuando se mueve un slider
-def update(val):
-    # Obtener los valores de los sliders y actualizar la posición del robot
-    q = [slider.val for slider in sliders]
-    robot.plot(q, block=False)
+# Cálculo de la matriz de transformación homogénea (MTH) con los ángulos actuales
+MTH = Robot.fkine([q1, q2])
+print("Matriz de Transformación Homogénea (MTH):")
+print(MTH)
 
-# Conectar los sliders con la función de actualización
-for slider in sliders:
-    slider.on_changed(update)
-
-# Mostrar la interfaz interactiva
-plt.show()
+# Calcular y mostrar los ángulos Roll, Pitch y Yaw
+rpy_angles = tr2rpy(MTH.R, 'deg', 'zyx')
+print(f'Roll, Pitch, Yaw = {rpy_angles}')
