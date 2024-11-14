@@ -4,182 +4,253 @@ from roboticstoolbox import DHRobot, RevoluteDH
 from roboticstoolbox.backends.PyPlot import PyPlot
 import numpy as np
 import board
-import sys
 from adafruit_motor import servo
 from adafruit_pca9685 import PCA9685
 import math
-import os
+from functools import partial
 
 # Configurar variable de entorno para omitir advertencias de Wayland
+import os
 os.environ["QT_QPA_PLATFORM"] = "xcb"  # Fuerza el uso de X11 en lugar de Wayland
 
 # Configuración de PCA9685 y servos
-i2c = board.I2C()  # Usa board.SCL y board.SDA en la Raspberry Pi
+i2c = board.I2C()  # usa board.SCL y board.SDA en la Raspberry Pi
 pca = PCA9685(i2c)
 pca.frequency = 50  # Configuración de frecuencia para servos
 
-# Configuración de los servos en los canales correspondientes
-servo_base = servo.Servo(pca.channels[2], min_pulse=500, max_pulse=2400)   # Base rotativa
-servo_shoulder = servo.Servo(pca.channels[3], min_pulse=500, max_pulse=2400)  # Hombro
-servo_elbow = servo.Servo(pca.channels[4], min_pulse=500, max_pulse=2400)   # Codo
-servo_wrist = servo.Servo(pca.channels[5], min_pulse=500, max_pulse=2400)   # Muñeca
-servo_gripper = servo.Servo(pca.channels[6], min_pulse=500, max_pulse=2400)  # Efector final (pinza)
+# Configuración de los servos en los canales 2 a 6
+servo1 = servo.Servo(pca.channels[2], min_pulse=500, max_pulse=2400)
+servo2 = servo.Servo(pca.channels[3], min_pulse=500, max_pulse=2400)
+servo3 = servo.Servo(pca.channels[4], min_pulse=500, max_pulse=2400)
+servo4 = servo.Servo(pca.channels[5], min_pulse=500, max_pulse=2400)
+servo5 = servo.Servo(pca.channels[6], min_pulse=500, max_pulse=2400)
 
-# Dimensiones del robot (ajustables según tu robot real)
-d1 = 1.0   # Longitud del primer eslabón (hombro)
-d2 = 1.0   # Longitud del segundo eslabón (codo)
-d3 = 0.5   # Longitud del tercer eslabón (muñeca)
+# Dimensiones del robot (ajustables)
+d1 = 1.0  # Longitud del primer brazo
+d2 = 0.47  # Longitud del segundo brazo
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
-        MainWindow.setObjectName("Control de Robot")
+        MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        # Crear instancia del robot
+        # Create robot instance
         self.robot = self.create_robot()
-        self.simulation = PyPlot()
-        self.simulation.launch(limits=[-3, 3, -3, 3, -0.5, 3])  # Ajustar límites según sea necesario
+        self.simulation = PyPlot()  # Crear simulación de Peter Corke
+        self.simulation.launch(limits=[-2, 2, -2, 2, -2, 2])  # Ajustar límites de la simulación
         self.simulation.add(self.robot)
 
-        # Configuración de los componentes de la interfaz
+        # Setup UI components
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(460, 480, 151, 41))
+        self.label.setObjectName("label")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(60, 80, 31, 20))
+        self.label_2.setObjectName("label_2")
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(60, 110, 31, 20))
+        self.label_3.setObjectName("label_3")
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(60, 140, 31, 20))
+        self.label_4.setObjectName("label_4")
+        self.label_5 = QtWidgets.QLabel(self.centralwidget)
+        self.label_5.setGeometry(QtCore.QRect(60, 170, 31, 20))
+        self.label_5.setObjectName("label_5")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(30, 30, 300, 250))
-        self.groupBox.setTitle("Control Manual")
+        self.groupBox.setGeometry(QtCore.QRect(30, 40, 241, 191))
+        self.groupBox.setObjectName("groupBox")
 
-        # Labels para los sliders
-        self.label_base = QtWidgets.QLabel(self.groupBox)
-        self.label_base.setGeometry(QtCore.QRect(10, 30, 60, 20))
-        self.label_base.setText("Base")
+        # Create sliders and connect to servos
+        self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
+        self.horizontalSlider.setGeometry(QtCore.QRect(104, 80, 160, 16))
+        self.horizontalSlider.setMinimum(0)
+        self.horizontalSlider.setMaximum(180)
+        self.horizontalSlider.setValue(90)
+        self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalSlider.valueChanged.connect(lambda value: self.slider_callback(servo1, 0, value))
 
-        self.label_shoulder = QtWidgets.QLabel(self.groupBox)
-        self.label_shoulder.setGeometry(QtCore.QRect(10, 70, 60, 20))
-        self.label_shoulder.setText("Hombro")
+        self.horizontalSlider_2 = QtWidgets.QSlider(self.centralwidget)
+        self.horizontalSlider_2.setGeometry(QtCore.QRect(104, 110, 160, 16))
+        self.horizontalSlider_2.setMinimum(0)
+        self.horizontalSlider_2.setMaximum(180)
+        self.horizontalSlider_2.setValue(90)
+        self.horizontalSlider_2.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider_2.setObjectName("horizontalSlider_2")
+        self.horizontalSlider_2.valueChanged.connect(lambda value: self.slider_callback(servo2, 1, value))
 
-        self.label_elbow = QtWidgets.QLabel(self.groupBox)
-        self.label_elbow.setGeometry(QtCore.QRect(10, 110, 60, 20))
-        self.label_elbow.setText("Codo")
+        self.horizontalSlider_3 = QtWidgets.QSlider(self.centralwidget)
+        self.horizontalSlider_3.setGeometry(QtCore.QRect(104, 140, 160, 16))
+        self.horizontalSlider_3.setMinimum(0)
+        self.horizontalSlider_3.setMaximum(180)
+        self.horizontalSlider_3.setValue(90)
+        self.horizontalSlider_3.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider_3.setObjectName("horizontalSlider_3")
+        self.horizontalSlider_3.valueChanged.connect(lambda value: self.slider_callback(servo3, 2, value))
 
-        self.label_wrist = QtWidgets.QLabel(self.groupBox)
-        self.label_wrist.setGeometry(QtCore.QRect(10, 150, 60, 20))
-        self.label_wrist.setText("Muñeca")
+        self.horizontalSlider_4 = QtWidgets.QSlider(self.centralwidget)
+        self.horizontalSlider_4.setGeometry(QtCore.QRect(104, 170, 160, 16))
+        self.horizontalSlider_4.setMinimum(0)
+        self.horizontalSlider_4.setMaximum(180)
+        self.horizontalSlider_4.setValue(90)
+        self.horizontalSlider_4.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider_4.setObjectName("horizontalSlider_4")
+        self.horizontalSlider_4.valueChanged.connect(lambda value: self.slider_callback(servo4, 3, value))
 
-        self.label_gripper = QtWidgets.QLabel(self.groupBox)
-        self.label_gripper.setGeometry(QtCore.QRect(10, 190, 60, 20))
-        self.label_gripper.setText("Pinza")
+        self.horizontalSlider_5 = QtWidgets.QSlider(self.centralwidget)
+        self.horizontalSlider_5.setGeometry(QtCore.QRect(104, 200, 160, 16))
+        self.horizontalSlider_5.setMinimum(0)
+        self.horizontalSlider_5.setMaximum(180)
+        self.horizontalSlider_5.setValue(90)
+        self.horizontalSlider_5.setOrientation(QtCore.Qt.Horizontal)
+        self.horizontalSlider_5.setObjectName("horizontalSlider_5")
+        self.horizontalSlider_5.valueChanged.connect(lambda value: self.slider_callback(servo5, None, value))
 
-        # Sliders para controlar los servos
-        self.slider_base = QtWidgets.QSlider(self.groupBox)
-        self.slider_base.setGeometry(QtCore.QRect(80, 30, 200, 20))
-        self.slider_base.setMinimum(0)
-        self.slider_base.setMaximum(180)
-        self.slider_base.setValue(90)
-        self.slider_base.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_base.valueChanged.connect(lambda value: self.slider_callback(servo_base, 0, value))
-
-        self.slider_shoulder = QtWidgets.QSlider(self.groupBox)
-        self.slider_shoulder.setGeometry(QtCore.QRect(80, 70, 200, 20))
-        self.slider_shoulder.setMinimum(0)
-        self.slider_shoulder.setMaximum(180)
-        self.slider_shoulder.setValue(90)
-        self.slider_shoulder.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_shoulder.valueChanged.connect(lambda value: self.slider_callback(servo_shoulder, 1, value))
-
-        self.slider_elbow = QtWidgets.QSlider(self.groupBox)
-        self.slider_elbow.setGeometry(QtCore.QRect(80, 110, 200, 20))
-        self.slider_elbow.setMinimum(0)
-        self.slider_elbow.setMaximum(180)
-        self.slider_elbow.setValue(90)
-        self.slider_elbow.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_elbow.valueChanged.connect(lambda value: self.slider_callback(servo_elbow, 2, value))
-
-        self.slider_wrist = QtWidgets.QSlider(self.groupBox)
-        self.slider_wrist.setGeometry(QtCore.QRect(80, 150, 200, 20))
-        self.slider_wrist.setMinimum(0)
-        self.slider_wrist.setMaximum(180)
-        self.slider_wrist.setValue(90)
-        self.slider_wrist.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_wrist.valueChanged.connect(lambda value: self.slider_callback(servo_wrist, 3, value))
-
-        self.slider_gripper = QtWidgets.QSlider(self.groupBox)
-        self.slider_gripper.setGeometry(QtCore.QRect(80, 190, 200, 20))
-        self.slider_gripper.setMinimum(0)
-        self.slider_gripper.setMaximum(180)
-        self.slider_gripper.setValue(90)
-        self.slider_gripper.setOrientation(QtCore.Qt.Horizontal)
-        self.slider_gripper.valueChanged.connect(lambda value: self.slider_callback(servo_gripper, None, value))
-
-        # Botón para posición inicial
-        self.btn_home = QtWidgets.QPushButton(self.centralwidget)
-        self.btn_home.setGeometry(QtCore.QRect(30, 300, 120, 30))
-        self.btn_home.setText("Posición Inicial")
-        self.btn_home.clicked.connect(self.move_to_home)
-
-        # Botón para ejecutar movimiento automático (ejemplo)
-        self.btn_automatic = QtWidgets.QPushButton(self.centralwidget)
-        self.btn_automatic.setGeometry(QtCore.QRect(160, 300, 120, 30))
-        self.btn_automatic.setText("Movimiento Automático")
-        self.btn_automatic.clicked.connect(self.start_automatic_movement)
+        # Additional UI components
+        self.label_6 = QtWidgets.QLabel(self.centralwidget)
+        self.label_6.setGeometry(QtCore.QRect(70, 280, 21, 16))
+        self.label_6.setObjectName("label_6")
+        self.label_7 = QtWidgets.QLabel(self.centralwidget)
+        self.label_7.setGeometry(QtCore.QRect(70, 310, 21, 16))
+        self.label_7.setObjectName("label_7")
+        self.label_8 = QtWidgets.QLabel(self.centralwidget)
+        self.label_8.setGeometry(QtCore.QRect(70, 340, 21, 16))
+        self.label_8.setObjectName("label_8")
+        self.label_9 = QtWidgets.QLabel(self.centralwidget)
+        self.label_9.setGeometry(QtCore.QRect(50, 450, 131, 91))
+        self.label_9.setObjectName("label_9")
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setGeometry(QtCore.QRect(90, 280, 41, 22))
+        self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_2.setGeometry(QtCore.QRect(90, 310, 41, 22))
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.lineEdit_3 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_3.setGeometry(QtCore.QRect(90, 340, 41, 21))
+        self.lineEdit_3.setObjectName("lineEdit_3")
+        self.groupBox_2 = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox_2.setGeometry(QtCore.QRect(30, 250, 161, 131))
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.groupBox_3 = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox_3.setGeometry(QtCore.QRect(330, 50, 211, 151))
+        self.groupBox_3.setObjectName("groupBox_3")
+        self.pushButton = QtWidgets.QPushButton(self.groupBox_3)
+        self.pushButton.setGeometry(QtCore.QRect(60, 50, 80, 22))
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton_2 = QtWidgets.QPushButton(self.groupBox_3)
+        self.pushButton_2.setGeometry(QtCore.QRect(60, 90, 80, 22))
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.groupBox_4 = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox_4.setGeometry(QtCore.QRect(330, 220, 211, 81))
+        self.groupBox_4.setObjectName("groupBox_4")
+        self.label_10 = QtWidgets.QLabel(self.groupBox_4)
+        self.label_10.setGeometry(QtCore.QRect(20, 30, 57, 14))
+        self.label_10.setObjectName("label_10")
+        self.label_11 = QtWidgets.QLabel(self.groupBox_4)
+        self.label_11.setGeometry(QtCore.QRect(20, 60, 57, 14))
+        self.label_11.setObjectName("label_11")
+        self.label_12 = QtWidgets.QLabel(self.centralwidget)
+        self.label_12.setGeometry(QtCore.QRect(570, 70, 57, 14))
+        self.label_12.setObjectName("label_12")
+        self.label_13 = QtWidgets.QLabel(self.centralwidget)
+        self.label_13.setGeometry(QtCore.QRect(60, 200, 31, 20))
+        self.label_13.setObjectName("label_13")
 
         MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 19))
+        self.menubar.setObjectName("menubar")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
 
-        # Inicializar servos y simulación
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+        # Initialize servos to 90 degrees
         self.initialize_servos()
+
+        # Connect button to start automatic mode
+        self.pushButton.clicked.connect(self.start_automatic_mode)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Control de Robot"))
+        self.label.setText(_translate("MainWindow", "Logo Ecci"))
+        self.label_2.setText(_translate("MainWindow", "Art1"))
+        self.label_3.setText(_translate("MainWindow", "Art2"))
+        self.label_4.setText(_translate("MainWindow", "Art3"))
+        self.label_5.setText(_translate("MainWindow", "Efec"))
+        self.groupBox.setTitle(_translate("MainWindow", "Modo Manual"))
+        self.label_6.setText(_translate("MainWindow", "x"))
+        self.label_7.setText(_translate("MainWindow", "y"))
+        self.label_8.setText(_translate("MainWindow", "z"))
+        self.label_9.setText(_translate("MainWindow", "Presentado por:\n" "Andres Carrillo\n" "Daniela Rodriguez\n" "Jeisson Gutierrez\n" "William Fernandez"))
+        self.groupBox_2.setTitle(_translate("MainWindow", "Modo Semiautomatico"))
+        self.groupBox_3.setTitle(_translate("MainWindow", "Modo Automatico"))
+        self.pushButton.setText(_translate("MainWindow", "Start"))
+        self.pushButton_2.setText(_translate("MainWindow", "Stop"))
+        self.groupBox_4.setTitle(_translate("MainWindow", "Sensores"))
+        self.label_10.setText(_translate("MainWindow", "Sensor1"))
+        self.label_11.setText(_translate("MainWindow", "Sensor2"))
+        self.label_12.setText(_translate("MainWindow", "Alert"))
+        self.label_13.setText(_translate("MainWindow", "Base"))
 
     def initialize_servos(self):
         # Establecer los servos físicos en 90 grados
-        self.set_servo_angle(servo_base, 90)
-        self.set_servo_angle(servo_shoulder, 90)
-        self.set_servo_angle(servo_elbow, 90)
-        self.set_servo_angle(servo_wrist, 90)
-        self.set_servo_angle(servo_gripper, 90)
+        self.set_servo_angle(servo1, 90)
+        self.set_servo_angle(servo2, 90)
+        self.set_servo_angle(servo3, 90)
+        self.set_servo_angle(servo4, 90)
+        self.set_servo_angle(servo5, 90)
 
         # Establecer los sliders en 90 grados
-        self.slider_base.blockSignals(True)
-        self.slider_shoulder.blockSignals(True)
-        self.slider_elbow.blockSignals(True)
-        self.slider_wrist.blockSignals(True)
-        self.slider_gripper.blockSignals(True)
-
-        self.slider_base.setValue(90)
-        self.slider_shoulder.setValue(90)
-        self.slider_elbow.setValue(90)
-        self.slider_wrist.setValue(90)
-        self.slider_gripper.setValue(90)
-
-        self.slider_base.blockSignals(False)
-        self.slider_shoulder.blockSignals(False)
-        self.slider_elbow.blockSignals(False)
-        self.slider_wrist.blockSignals(False)
-        self.slider_gripper.blockSignals(False)
+        self.horizontalSlider.setValue(90)
+        self.horizontalSlider_2.setValue(90)
+        self.horizontalSlider_3.setValue(90)
+        self.horizontalSlider_4.setValue(90)
+        self.horizontalSlider_5.setValue(90)
 
         # Actualizar la simulación con las posiciones iniciales
-        self.robot.q = [0, 0, 0, 0]  # Ángulos iniciales en radianes
-        self.simulation.draw(self.robot.q)
+        self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
+        self.simulation.fig.canvas.draw_idle()
+
+    def start_automatic_mode(self):
+        # Move all servos to a specified position (e.g., 90 degrees)
+        self.move_servos_smoothly(servo1, 90, joint_index=0)
+        self.move_servos_smoothly(servo2, 90, joint_index=1)
+        self.move_servos_smoothly(servo3, 90, joint_index=2)
+        self.move_servos_smoothly(servo4, 90, joint_index=3)
+        self.move_servos_smoothly(servo5, 90, joint_index=None)  # Efector final no tiene joint_index
 
     def slider_callback(self, servo_motor, joint_index, value):
-        # Mover el servo al ángulo especificado
-        self.move_servo(servo_motor, value, joint_index)
+        print(f"Slider value: {value}")
+        self.move_servos_smoothly(servo_motor, value, joint_index)
 
-    def move_servo(self, servo_motor, target_angle, joint_index=None):
-        # Bloquear señales del slider para evitar bucles infinitos
-        if joint_index is not None:
-            slider = self.get_slider_by_joint_index(joint_index)
-            if slider:
-                slider.blockSignals(True)
+    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
+        # Obtener el ángulo actual del servo
+        current_angle = servo_motor.angle if servo_motor.angle is not None else 90  # Iniciar en 90 grados si es None
 
-        # Establecer el ángulo del servo
-        self.set_servo_angle(servo_motor, target_angle)
+        # Calcular la diferencia de ángulo
+        diff = target_angle - current_angle
 
-        # Actualizar la simulación
-        if joint_index is not None:
-            self.update_simulation(joint_index, target_angle)
+        # Mover en pequeños pasos para hacer el movimiento más suave
+        for step in range(steps + 1):
+            intermediate_angle = current_angle + (diff / steps) * step
+            self.set_servo_angle(servo_motor, intermediate_angle)
 
-        # Desbloquear señales del slider
-        if joint_index is not None:
-            if slider:
-                slider.blockSignals(False)
+            # Actualizar la simulación
+            if joint_index is not None:
+                self.update_simulation(joint_index, intermediate_angle)
+
+            # Permitir que Qt procese eventos pendientes para actualizar la UI
+            QtWidgets.QApplication.processEvents()
+
+            # Esperar antes del próximo paso
+            time.sleep(delay)
 
     def set_servo_angle(self, servo_motor, angle):
         # Limitar el ángulo entre 0 y 180 grados
@@ -187,82 +258,28 @@ class Ui_MainWindow(object):
         servo_motor.angle = angle
 
     def update_simulation(self, joint_index, angle):
-        # Actualizar la simulación del robot
+        # Update robot simulation if defined
         if hasattr(self, 'robot'):
             if joint_index is not None and 0 <= joint_index < len(self.robot.q):
-                q = self.robot.q.copy()
-                # Ajustar el ángulo para que coincida con la orientación de la simulación
-                adjusted_angle = math.radians(angle - 90)
-                q[joint_index] = adjusted_angle
+                q = self.robot.q
+                q[joint_index] = math.radians(angle)  # Convert degrees to radians
                 self.robot.q = q
                 if hasattr(self, 'simulation') and self.simulation:
-                    self.simulation.draw(q=self.robot.q)
-
-    def get_slider_by_joint_index(self, joint_index):
-        # Retornar el slider correspondiente al índice de la articulación
-        if joint_index == 0:
-            return self.slider_base
-        elif joint_index == 1:
-            return self.slider_shoulder
-        elif joint_index == 2:
-            return self.slider_elbow
-        elif joint_index == 3:
-            return self.slider_wrist
-        else:
-            return None
+                    # Actualiza la visualización sin plt.pause()
+                    self.simulation.fig.canvas.draw_idle()
 
     def create_robot(self):
-        # Definir los parámetros DH para representar correctamente el robot
-
-        # Articulación 1: Base rotativa (rotación alrededor del eje Z)
-        link1 = RevoluteDH(d=0, a=0, alpha=0)
-
-        # Articulación 2: Hombro (rotación alrededor del eje Y)
-        link2 = RevoluteDH(d=0, a=0, alpha=-np.pi/2)
-
-        # Articulación 3: Codo (rotación alrededor del eje Y)
-        link3 = RevoluteDH(d=0, a=d2, alpha=0)
-
-        # Articulación 4: Muñeca (rotación alrededor del eje Y)
-        link4 = RevoluteDH(d=0, a=d3, alpha=0)
-
+        # Create a 4-DOF robot with rotating base and three additional rotational joints
+        link1 = RevoluteDH(d=0, a=0, alpha=-np.pi/2)  # Base rotation adjusted to point upwards along Z-axis
+        link2 = RevoluteDH(d=0, a=d1, alpha=0)  # Shoulder rotation
+        link3 = RevoluteDH(d=0, a=d2, alpha=0)  # Elbow rotation
+        link4 = RevoluteDH(d=0, a=0.5, alpha=0)  # Wrist rotation
         robot = DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
-        robot.q = [0, 0, 0, 0]  # Configuración inicial en radianes
+        robot.q = [math.radians(90)] * 4  # Establecer configuración inicial a 90 grados
         return robot
 
-    def move_to_home(self):
-        # Mover el robot a la posición inicial
-        self.move_servo(servo_base, 90, 0)
-        self.move_servo(servo_shoulder, 90, 1)
-        self.move_servo(servo_elbow, 90, 2)
-        self.move_servo(servo_wrist, 90, 3)
-        self.move_servo(servo_gripper, 90, None)
-
-    def start_automatic_movement(self):
-        # Ejemplo de movimiento automático (puedes personalizarlo)
-        # Aquí realizaremos un movimiento simple para demostrar
-
-        # Lista de posiciones (ángulos en grados) para cada articulación
-        positions = [
-            (90, 90, 90, 90),
-            (90, 60, 120, 90),
-            (90, 120, 60, 90),
-            (90, 90, 90, 90)
-        ]
-
-        for pos in positions:
-            # Mover cada articulación a la posición especificada
-            self.move_servo(servo_base, pos[0], 0)
-            self.move_servo(servo_shoulder, pos[1], 1)
-            self.move_servo(servo_elbow, pos[2], 2)
-            self.move_servo(servo_wrist, pos[3], 3)
-            time.sleep(1)  # Esperar un segundo entre movimientos
-
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Control de Robot"))
-
 if __name__ == "__main__":
+    import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
