@@ -46,8 +46,8 @@ def test_oled():
 
 # Función principal para testear ambos componentes
 def main():
-    sensor_ok = test_sensor()
     oled_ok = test_oled()
+    sensor_ok = test_sensor()
 
     if sensor_ok and oled_ok:
         print("Todos los componentes funcionan correctamente.")
