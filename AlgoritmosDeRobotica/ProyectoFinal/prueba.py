@@ -23,8 +23,8 @@ Robot = DHRobot(R, name='Bender')
 # Mostrar la estructura del robot
 print(Robot)
 
-# Abrir la interfaz de enseñanza interactiva
-Robot.teach([q1, q2], 'rpy/zyx', limits=[[-30, 30], [-30, 30]])
+# Abrir la interfaz de enseñanza interactiva con límites adecuados
+Robot.teach([q1, q2], 'rpy/zyx', limits=[-30, 30, -30, 30, -15, 30])
 
 # Cálculo de la matriz de transformación homogénea (MTH) con los ángulos actuales
 MTH = Robot.fkine([q1, q2])
