@@ -40,7 +40,7 @@ class Ui_MainWindow(object):
         # Create robot instance
         self.robot = self.create_robot()
         self.simulation = PyPlot()  # Crear simulación de Peter Corke
-        self.simulation.launch(limits=[-2, 2, -2, 2, -2, 2])  # Ajustar límites de la simulación
+        self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])  # Ajustar límites de la simulación
         self.simulation.add(self.robot)
 
         # Setup UI components
