@@ -230,8 +230,8 @@ class Ui_MainWindow(object):
 
     def update_simulation(self):
         if hasattr(self, 'simulation') and self.simulation:
-            # Llamar a la simulación para que refleje los cambios de ángulo
-            self.simulation.step()
+            # Llamar a `draw_idle` para actualizar la visualización sin pausar el bucle de eventos
+            self.simulation.fig.canvas.draw_idle()
 
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
