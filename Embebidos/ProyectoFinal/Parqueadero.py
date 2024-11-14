@@ -239,13 +239,13 @@ try:
         if vSalida:
             print("Carro en salida")
             activar_buzzer()
-            mover_servo(90)
+            mover_servo(0)
             while not GPIO.input(in_Salida):
                 print("saliendo")
                 sleep(1)
             print("Devolviendo la talanquera")
             sleep(5)
-            mover_servo(0)
+            mover_servo(90)
 
 except KeyboardInterrupt:
     detener_motor_dc()
