@@ -26,8 +26,9 @@ servo4 = servo.Servo(pca.channels[5], min_pulse=500, max_pulse=2400)
 servo5 = servo.Servo(pca.channels[6], min_pulse=500, max_pulse=2400)
 
 # Dimensiones del robot (ajustables)
-d1 = 1.0  # Longitud del primer brazo
-d2 = 0.47  # Longitud del segundo brazo
+d1 = 12  # Longitud del primer brazo
+d2 = 12  # Longitud del segundo brazo
+d3 = 12  # 13 con gripper cerrado
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -289,14 +290,21 @@ class Ui_MainWindow(object):
                     self.simulation.fig.canvas.draw_idle()
 
     def create_robot(self):
-        # Create a 4-DOF robot with rotating base and three additional rotational joints
-        link1 = RevoluteDH(d=0, a=0, alpha=-np.pi/2)  # Base rotation adjusted to point upwards along Z-axis
-        link2 = RevoluteDH(d=0, a=d1, alpha=0)  # Shoulder rotation
-        link3 = RevoluteDH(d=0, a=d2, alpha=0)  # Elbow rotation
-        link4 = RevoluteDH(d=0, a=0.5, alpha=0)  # Wrist rotation
+
+        # Crea un robot de 4 DOF con rotación base y tres articulaciones adicionales
+        link1 = RevoluteDH(d=0, a=0, alpha=-np.pi/2)  # Base rotation pointing upwards along Z-axis
+        link2 = RevoluteDH(d=0, a=d1, alpha=0)        # Shoulder rotation
+        link3 = RevoluteDH(d=0, a=d2, alpha=0)        # Elbow rotation
+        link4 = RevoluteDH(d=0, a=d3, alpha=0)        # Wrist rotation
+
+        # Crear robot con estos eslabones
         robot = DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
-        robot.q = [math.radians(90)] * 4  # Establecer configuración inicial a 90 grados
+
+        # Establece la configuración inicial en 0 grados para todos (verticalmente extendido)
+        robot.q = [0, 0, 0, 0]  # Todos los ángulos en 0 para una posición recta hacia arriba
+
         return robot
+
 
 if __name__ == "__main__":
     import sys
