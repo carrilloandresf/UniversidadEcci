@@ -233,19 +233,17 @@ class Ui_MainWindow(object):
             self.simulation.step(self.robot.q)
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
-        # Validar que 'steps' sea un entero positivo
         if steps <= 0:
             raise ValueError("Steps must be a positive integer")
         
-        # Obtener el ángulo actual del servo
-        current_angle = servo_motor.angle if servo_motor.angle is not None else 90  # Iniciar en 90 grados si es None
-
-        # Calcular la diferencia de ángulo
-        diff = target_angle - current_angle
-
-        # Mover en pequeños pasos para hacer el movimiento más suave
+        current_angle = servo_motor.angle if servo_motor.angle is not None else 90
+        current_angle = float(current_angle)
+        target_angle = float(target_angle)
+        diff = float(target_angle - current_angle)
+        
         for step in range(steps + 1):
             intermediate_angle = current_angle + (diff / steps) * step
+            intermediate_angle = float(intermediate_angle)
             self.set_servo_angle(servo_motor, intermediate_angle, joint_index=joint_index)
 
             # Actualizar el valor del slider correspondiente
@@ -273,12 +271,16 @@ class Ui_MainWindow(object):
 
 
     def set_servo_angle(self, servo_motor, angle, joint_index=None):
+        print(f"set_servo_angle called with angle={angle}, type={type(angle)}")
         # Limitar el ángulo entre 0 y 180 grados
-        angle = float(max(0, min(180, angle)))
+        angle = np.clip(angle, 0, 180)
+        angle = float(angle)
         servo_motor.angle = angle
 
         if joint_index is not None:
             radians_angle = np.radians(angle)
+            radians_angle = float(radians_angle)
+            print(f"radians_angle: {radians_angle}, type: {type(radians_angle)}")
             # Obtener una copia de self.robot.q
             q = np.array(self.robot.q, dtype=float)
             # Actualizar el ángulo correspondiente en radianes
