@@ -262,57 +262,47 @@ class Ui_MainWindow(object):
         Calcula los ángulos de las articulaciones dada la posición deseada (x, y, z).
         L1, L2, L3, L4: Longitudes de los segmentos del brazo.
         """
+        # Ajustar el valor de z con la posición inicial en 36 cuando el gripper está cerrado.
+        z -= (L1 + L2 + L3)  # Restar la longitud total inicial para compensar
+
         # Cálculo de q1 (ángulo de la base)
-        if x >= 0 and y == 0:
-            q1 = 0
-        elif x < 0 and y == 0:
-            q1 = 180
-        else: 
-            q1 = math.degrees(math.atan2(y, x))
-            
-        # Trabajar con el valor absoluto de x para los cálculos
-        x = abs(x)
-        
-        # Proyección en el plano
-        r = math.sqrt(x*x + y*y)
-        z_rel = z - L1  # Altura relativa a la base
-        
+        q1 = math.degrees(math.atan2(y, x))
+
+        # Proyección en el plano XY
+        r = math.sqrt(x ** 2 + y ** 2)
+
         # Distancia al punto objetivo
-        d = math.sqrt(r*r + z_rel*z_rel)
-        
+        d = math.sqrt(r ** 2 + z ** 2)
+
         # Verificar alcanzabilidad
-        if d > (L2 + L3 + L4) or d < abs(L2 - L3):
+        if d > (L2 + L3) or d < abs(L2 - L3):
             raise ValueError("Posición fuera del alcance del robot")
-        
+
         # Cálculo de q3 usando ley de cosenos para el ángulo del segundo brazo
-        cos_q3 = (d*d - L2*L2 - L3*L3) / (2 * L2 * L3)
+        cos_q3 = (d ** 2 - L2 ** 2 - L3 ** 2) / (2 * L2 * L3)
         cos_q3 = max(-1, min(1, cos_q3))  # Asegurar valor válido
         q3 = math.degrees(math.acos(cos_q3))
-        
+
         # Ángulos auxiliares
-        beta = math.atan2(z_rel, r)  # Ángulo de elevación al punto objetivo
-        cos_alfa = (L2*L2 + d*d - L3*L3) / (2 * L2 * d)
+        beta = math.atan2(z, r)  # Ángulo de elevación al punto objetivo
+        cos_alfa = (L2 ** 2 + d ** 2 - L3 ** 2) / (2 * L2 * d)
         cos_alfa = max(-1, min(1, cos_alfa))  # Asegurar valor válido
         alfa = math.acos(cos_alfa)
-        
+
         # Cálculo de q2
         q2 = math.degrees(beta + alfa)
-        
-        # Ajustes para x positivo
-        if x > 0:
-            q2 = 180 - q2
-            q3 = -q3
-        
+
+        # Ajustes finales de ángulos para la orientación en z
+        q4 = 90 - q2 - q3  # Ajuste en q4 para orientar el efector final
+
         # Normalizar ángulos al rango [0, 180]
         q2 = max(0, min(180, q2))
-        q3 = max(0, min(180, abs(q3)))  # Valor absoluto de q3
-        
-        # Cálculo de q4 basado en la orientación en función de z
-        # Se calcula para mantener la orientación deseada del efector final.
-        q4 = math.degrees(math.atan2(z_rel, d))
-        
+        q3 = max(0, min(180, abs(q3)))
+        q4 = max(0, min(180, abs(q4)))
+
         print(f"q1: {q1}, q2: {q2}, q3: {q3}, q4: {q4}")
         return q1, q2, q3, q4
+
 
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
