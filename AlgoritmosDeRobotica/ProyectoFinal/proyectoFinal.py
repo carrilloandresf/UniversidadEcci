@@ -68,35 +68,35 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setValue(50)
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
-        self.horizontalSlider.valueChanged.connect(partial(self.slider_callback, servo1, 0))
+        self.horizontalSlider.valueChanged.connect(lambda value: self.slider_callback(servo1, 0, value))
 
         self.horizontalSlider_2 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_2.setGeometry(QtCore.QRect(104, 110, 160, 16))
         self.horizontalSlider_2.setValue(50)
         self.horizontalSlider_2.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_2.setObjectName("horizontalSlider_2")
-        self.horizontalSlider_2.valueChanged.connect(partial(self.slider_callback, servo2, 1))
+        self.horizontalSlider_2.valueChanged.connect(lambda value: self.slider_callback(servo2, 1, value))
 
         self.horizontalSlider_3 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_3.setGeometry(QtCore.QRect(104, 140, 160, 16))
         self.horizontalSlider_3.setValue(50)
         self.horizontalSlider_3.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_3.setObjectName("horizontalSlider_3")
-        self.horizontalSlider_3.valueChanged.connect(partial(self.slider_callback, servo3, 2))
+        self.horizontalSlider_3.valueChanged.connect(lambda value: self.slider_callback(servo3, 2, value))
 
         self.horizontalSlider_4 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_4.setGeometry(QtCore.QRect(104, 170, 160, 16))
         self.horizontalSlider_4.setValue(50)
         self.horizontalSlider_4.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_4.setObjectName("horizontalSlider_4")
-        self.horizontalSlider_4.valueChanged.connect(partial(self.slider_callback, servo4, 3))
+        self.horizontalSlider_4.valueChanged.connect(lambda value: self.slider_callback(servo4, 3, value))
 
         self.horizontalSlider_5 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_5.setGeometry(QtCore.QRect(104, 200, 160, 16))
         self.horizontalSlider_5.setValue(50)
         self.horizontalSlider_5.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
-        self.horizontalSlider_5.valueChanged.connect(partial(self.slider_callback, servo5, 4))
+        self.horizontalSlider_5.valueChanged.connect(lambda value: self.slider_callback(servo5, 4, value))
 
         # Additional UI components
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
@@ -238,7 +238,7 @@ class Ui_MainWindow(object):
 
     def create_robot(self):
         # Create a 4-DOF robot with rotating base and three additional rotational joints
-        link1 = RevoluteDH(d=0, a=d1, alpha=0)  # Base rotation
+        link1 = RevoluteDH(d=0, a=d1, alpha=-np.pi/2)  # Base rotation adjusted to point along the x-axis
         link2 = RevoluteDH(d=0, a=1, alpha=0)  # Shoulder rotation
         link3 = RevoluteDH(d=0, a=1, alpha=0)  # Elbow rotation
         link4 = RevoluteDH(d=0, a=1, alpha=0)  # Wrist rotation
