@@ -172,6 +172,7 @@ class Ui_MainWindow(object):
 
         # Connect button to start automatic mode
         self.pushButton.clicked.connect(self.start_automatic_mode)
+        self.pushButton_2.clicked.connect(self.handle_inverse_kinematics)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -260,10 +261,11 @@ class Ui_MainWindow(object):
                 self.horizontalSlider_4.setValue(int(intermediate_angle))
             elif joint_index == 4:
                 self.horizontalSlider_5.setValue(int(intermediate_angle))
-
+            """
             # Actualizar los labels con el valor actual (ejemplo)
             if step % 5 == 0 or step == steps:  # Ajustar frecuencia de actualización
                 self.label_7.setText(f"{intermediate_angle:.2f}")
+            """
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
             QtWidgets.QApplication.processEvents()
@@ -303,6 +305,48 @@ class Ui_MainWindow(object):
         robot = DHRobot(R, name='Bender')
         robot.q = [0, 0, 0, 0]
         return robot
+    
+    # Método para realizar la cinemática inversa
+    def inverse_kinematics(self, x, y, z):
+        # Crear una matriz de transformación homogénea de destino
+        T = self.robot.fkine([0, 0, 0, 0])  # Usar el fkine para obtener una estructura base
+        T.t = [x, y, z]  # Actualizar con las coordenadas deseadas
+
+        # Calcular la cinemática inversa
+        solution = self.robot.ikine(T, ilimit=1000, tol=1e-4)  # Ajusta el límite de iteraciones y tolerancia si es necesario
+
+        # Verificar si se encontró una solución válida
+        if solution.success:
+            joint_angles = np.degrees(solution.q)  # Convertir de radianes a grados para los servos
+
+            # Actualizar sliders y servos
+            self.horizontalSlider.setValue(int(joint_angles[0]))
+            self.horizontalSlider_2.setValue(int(joint_angles[1]))
+            self.horizontalSlider_3.setValue(int(joint_angles[2]))
+            self.horizontalSlider_4.setValue(int(joint_angles[3]))
+
+            self.set_servo_angle(servo1, joint_angles[0], joint_index=0)
+            self.set_servo_angle(servo2, joint_angles[1], joint_index=1)
+            self.set_servo_angle(servo3, joint_angles[2], joint_index=2)
+            self.set_servo_angle(servo4, joint_angles[3], joint_index=3)
+            
+            # Actualizar la simulación con las posiciones calculadas
+            self.robot.q = np.radians(joint_angles)  # Convertir a radianes para la simulación
+            self.update_simulation()
+            print("Movimiento realizado con éxito.")
+        else:
+            print("No se pudo encontrar una solución de cinemática inversa.")
+
+    # Método de manejo para recibir coordenadas de los LineEdits y llamar a cinemática inversa
+    def handle_inverse_kinematics(self):
+        try:
+            x = float(self.lineEdit.text())
+            y = float(self.lineEdit_2.text())
+            z = float(self.lineEdit_3.text())
+            print(f"Coordenadas recibidas: x={x}, y={y}, z={z}")
+            self.inverse_kinematics(x, y, z)
+        except ValueError:
+            print("Error: Asegúrate de que las coordenadas estén correctamente ingresadas.")
 
 if __name__ == "__main__":
     import sys
