@@ -303,7 +303,7 @@ class Ui_MainWindow(object):
         # Configuración inicial en [0, 0, 0, 0] para que el brazo esté extendido verticalmente hacia arriba
         robot.q = [0, 0, 0, 0]  
 
-
+        return robot
 
 if __name__ == "__main__":
     import sys
