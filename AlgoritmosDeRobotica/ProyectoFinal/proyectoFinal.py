@@ -216,7 +216,7 @@ class Ui_MainWindow(object):
 
         # Actualizar la simulación con las posiciones iniciales
         self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
-        self.simulation._update_graphics()
+        self.simulation.fig.canvas.draw_idle()
 
     def start_automatic_mode(self):
         # Move all servos to a specified position (e.g., 90 degrees)
@@ -266,7 +266,7 @@ class Ui_MainWindow(object):
                 self.robot.q = q
                 if hasattr(self, 'simulation') and self.simulation:
                     # Actualiza la visualización sin plt.pause()
-                    self.simulation._update_graphics()
+                    self.simulation.fig.canvas.draw_idle()
 
     def create_robot(self):
         # Create a 4-DOF robot with rotating base and three additional rotational joints
