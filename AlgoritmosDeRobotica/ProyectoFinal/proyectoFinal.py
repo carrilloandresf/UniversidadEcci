@@ -233,7 +233,8 @@ class Ui_MainWindow(object):
                 q[joint_index] = math.radians(angle)  # Convert degrees to radians
                 self.robot.q = q
                 if hasattr(self, 'simulation') and self.simulation:
-                    self.simulation.step()
+                    # Replace self.simulation.step() with self.simulation.draw()
+                    self.simulation.draw()  # Actualiza la visualización sin plt.pause()
 
     def create_robot(self):
         # Create a 4-DOF robot with rotating base and three additional rotational joints
