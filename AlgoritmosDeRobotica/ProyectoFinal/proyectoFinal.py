@@ -37,8 +37,9 @@ class Ui_MainWindow(object):
         # Create robot instance
         self.robot = self.create_robot()
         self.simulation = PyPlot()  # Crear simulación de Peter Corke
-        self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])  # Ajustar límites de la simulación
-        self.simulation.add(self.robot)
+        #self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])  # Ajustar límites de la simulación
+        #self.simulation.add(self.robot)
+        QtCore.QTimer.singleShot(0, self.launch_simulation)
 
         # Setup UI components
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -198,6 +199,11 @@ class Ui_MainWindow(object):
         self.label_12.setText(_translate("MainWindow", "Alert"))
         self.label_13.setText(_translate("MainWindow", "Base"))
 
+    def launch_simulation(self):
+        # Corrección para evitar errores en el lanzamiento de la simulación
+        self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])
+        self.simulation.add(self.robot)
+
     def initialize_servos(self):
         # Establecer los servos físicos en 90 grados
         self.set_servo_angle(servo1, 90)
@@ -214,8 +220,10 @@ class Ui_MainWindow(object):
         self.horizontalSlider_5.setValue(90)
 
         # Actualizar la simulación con las posiciones iniciales
+        #self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
+        #self.simulation.fig.canvas.draw_idle()
         self.robot.q = [math.radians(90)] * 4  # 90 grados en radianes para todas las articulaciones
-        self.simulation.fig.canvas.draw_idle()
+        self.update_simulation()
 
     def start_automatic_mode(self):
         # Move all servos to a specified position (e.g., 90 degrees)
@@ -234,7 +242,7 @@ class Ui_MainWindow(object):
         if hasattr(self, 'simulation') and self.simulation:
             self.simulation.fig.canvas.draw()
             self.simulation.fig.canvas.flush_events()
-
+    """
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
         if steps <= 0:
@@ -262,19 +270,38 @@ class Ui_MainWindow(object):
                 self.horizontalSlider_4.setValue(int(intermediate_angle))
             elif joint_index == 4:
                 self.horizontalSlider_5.setValue(int(intermediate_angle))
-            """
-            # Actualizar los labels con el valor actual (ejemplo)
-            if step % 5 == 0 or step == steps:  # Ajustar frecuencia de actualización
-                self.label_7.setText(f"{intermediate_angle:.2f}")
-            """
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
             QtWidgets.QApplication.processEvents()
 
             # Usar QTimer en lugar de time.sleep para evitar bloquear la UI (opcional)
             time.sleep(delay)
+    """
 
+    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=10):
+        # Validar que 'steps' sea un entero positivo
+        if steps <= 0:
+            raise ValueError("Steps must be a positive integer")
+        
+        # Obtener el ángulo actual del servo
+        current_angle = servo_motor.angle if servo_motor.angle is not None else 90  # Iniciar en 90 grados si es None
 
+        # Calcular la diferencia de ángulo
+        diff = target_angle - current_angle
+
+        # Corrección: usar QTimer en lugar de time.sleep para evitar bloqueo de UI
+        self.current_step = 0
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(lambda: self.smooth_step(servo_motor, joint_index, current_angle, diff, steps))
+        self.timer.start(delay)
+
+    def smooth_step(self, servo_motor, joint_index, current_angle, diff, steps):
+        if self.current_step <= steps:
+            intermediate_angle = current_angle + (diff / steps) * self.current_step
+            self.set_servo_angle(servo_motor, intermediate_angle, joint_index)
+            self.current_step += 1
+        else:
+            self.timer.stop()
 
     def set_servo_angle(self, servo_motor, angle, joint_index=None):
         # Limitar el ángulo entre 0 y 180 grados
@@ -294,8 +321,12 @@ class Ui_MainWindow(object):
             # Actualizar la simulación
             self.update_simulation()
 
+    def update_simulation(self):
+        if hasattr(self, 'simulation') and self.simulation:
+            self.simulation.fig.canvas.draw()
+            self.simulation.fig.canvas.flush_events()
 
-    def create_robot(self):
+    """    def create_robot(self):
         # Crear articulaciones usando los parámetros de DH
         R = [
             RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=0),
@@ -306,6 +337,7 @@ class Ui_MainWindow(object):
         robot = DHRobot(R, name='Bender')
         robot.q = [0, 0, 0, 0]
         return robot
+    """
     
     def inverse_kinematics(self, x, y, z):
         # Calcular el alcance teórico máximo del robot
@@ -322,35 +354,28 @@ class Ui_MainWindow(object):
         T.t = [x, y, z]  # Actualizar con las coordenadas deseadas
         print("Coordenadas deseadas:", T.t)
 
-        # Calcular la cinemática inversa considerando las dimensiones de los brazos
-        solution = self.robot.ikine_LM(T, ilimit=1000, tol=1e-4)  # Ajusta el límite de iteraciones y tolerancia si es necesario
+        # Calcular la cinemática inversa
+        solution = self.robot.ikine_LM(T, ilimit=1000, tol=1e-4)
         print("Solución obtenida:", solution.q if solution.success else "Sin solución")
 
-        # Verificar si se encontró una solución válida
+        # Corrección: Verificación y asignación de índices adecuados para sliders y servos
         if solution.success:
-            joint_angles = np.degrees(solution.q)  # Convertir de radianes a grados para los servos
+            joint_angles = np.degrees(solution.q)
             print("Ángulos obtenidos:", joint_angles)
 
-            # Actualizar sliders y servos
-            self.horizontalSlider.setValue(int(joint_angles[0]))
-            self.horizontalSlider_2.setValue(int(joint_angles[1]))
-            self.horizontalSlider_3.setValue(int(joint_angles[2]))
-            self.horizontalSlider_4.setValue(int(joint_angles[3]))
-
-            self.set_servo_angle(servo1, joint_angles[0], joint_index=0)
-            self.set_servo_angle(servo2, joint_angles[1], joint_index=1)
-            self.set_servo_angle(servo3, joint_angles[2], joint_index=2)
-            self.set_servo_angle(servo4, joint_angles[3], joint_index=3)
+            # Actualizar sliders y servos con los ángulos obtenidos
+            sliders = [self.horizontalSlider, self.horizontalSlider_2, self.horizontalSlider_3, self.horizontalSlider_4]
+            servos = [servo1, servo2, servo3, servo4]
+            for i in range(4):												
+                sliders[i].setValue(int(joint_angles[i]))
+                self.set_servo_angle(servos[i], joint_angles[i], joint_index=i)
 
             # Actualizar la simulación con las posiciones calculadas
-            self.robot.q = np.radians(joint_angles)  # Convertir a radianes para la simulación
+            self.robot.q = np.radians(joint_angles)
             self.update_simulation()
             print("Movimiento realizado con éxito.")
         else:
             print("No se pudo encontrar una solución de cinemática inversa para las coordenadas dadas.")
-
-
-
 
     # Método de manejo para recibir coordenadas de los LineEdits y llamar a cinemática inversa
     def handle_inverse_kinematics(self):
