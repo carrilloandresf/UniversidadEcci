@@ -18,6 +18,7 @@ class Ui_Dialog(object):
         self.simulation.add(self.robot)
 
     def create_robot(self):
+        # Crear articulaciones usando los parámetros de DH
         R = [
             RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=0),
             RevoluteDH(d=0, alpha=0, a=d1, offset=math.pi/2),
@@ -120,7 +121,7 @@ class Ui_Dialog(object):
             # Convertir ángulos a grados
             theta1, theta2, theta3, theta4 = map(np.degrees, [theta1, theta2, theta3, theta4])
 
-            # Asegurarse de que los ángulos están en el rango [0, 180]
+            # Limitar los ángulos para evitar posiciones no alcanzables
             theta1 = max(0, min(180, theta1))
             theta2 = max(0, min(180, theta2))
             theta3 = max(0, min(180, theta3))
