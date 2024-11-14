@@ -15,12 +15,12 @@ robot = DHRobot([
 # Posiciones iniciales de las articulaciones
 q_initial = [0, 0, 0, 0, 0]
 
-# Crear una figura y un eje para la visualización
+# Crear una figura y un eje para la visualización de sliders
 fig, ax = plt.subplots()
 plt.subplots_adjust(left=0.1, bottom=0.4)
 
-# Dibujar la posición inicial del robot
-plot = robot.plot(q_initial, ax=ax, block=False)
+# Dibujar la posición inicial del robot en una ventana separada
+robot.plot(q_initial, block=False)
 
 # Crear sliders para cada articulación
 sliders = []
@@ -36,7 +36,7 @@ for i in range(5):
 def update(val):
     # Obtener los valores de los sliders y actualizar la posición del robot
     q = [slider.val for slider in sliders]
-    robot.plot(q, ax=ax, block=False)
+    robot.plot(q, block=False)
 
 # Conectar los sliders con la función de actualización
 for slider in sliders:
