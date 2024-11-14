@@ -3,7 +3,7 @@ from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
 import board
 import busio
-from roboticstoolbox import DHRobot, RevoluteDH, rtb
+from roboticstoolbox import DHRobot, RevoluteDH
 import roboticstoolbox as rtb
 import math
 from functools import partial
@@ -30,7 +30,7 @@ class Ui_MainWindow(object):
 
         # Create robot instance
         self.robot = self.create_robot()
-        self.simulation = rtb.backends.PyPlot()  # Initialize the PyPlot backend
+        self.simulation = rtb.backends.PyPlot()  # Corrected initialization of the PyPlot backend
         self.simulation.launch()
         self.simulation.add(self.robot)
 
