@@ -39,7 +39,7 @@ class Ui_MainWindow(object):
         # Create robot instance
         self.robot = self.create_robot()
         self.simulation = PyPlot()  # Crear simulación de Peter Corke
-        self.simulation.launch()
+        self.simulation.launch(limits=[-2, 2, -2, 2, -2, 2])  # Ajustar límites de la simulación
         self.simulation.add(self.robot)
 
         # Setup UI components
@@ -96,7 +96,7 @@ class Ui_MainWindow(object):
         self.horizontalSlider_5.setValue(50)
         self.horizontalSlider_5.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
-        self.horizontalSlider_5.valueChanged.connect(lambda value: self.slider_callback(servo5, 4, value))
+        self.horizontalSlider_5.valueChanged.connect(lambda value: self.slider_callback(servo5, None, value))
 
         # Additional UI components
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
@@ -188,18 +188,17 @@ class Ui_MainWindow(object):
 
     def start_automatic_mode(self):
         # Move all servos to a specified position (e.g., 90 degrees)
-        self.move_servos_smoothly(servo1, 90)
-        self.move_servos_smoothly(servo2, 90)
-        self.move_servos_smoothly(servo3, 90)
-        self.move_servos_smoothly(servo4, 90)
-        self.move_servos_smoothly(servo5, 90)
+        self.move_servos_smoothly(servo1, 90, joint_index=0)
+        self.move_servos_smoothly(servo2, 90, joint_index=1)
+        self.move_servos_smoothly(servo3, 90, joint_index=2)
+        self.move_servos_smoothly(servo4, 90, joint_index=3)
+        self.move_servos_smoothly(servo5, 90, joint_index=None)  # Efector final no tiene joint_index
 
     def slider_callback(self, servo_motor, joint_index, value):
         print(f"Slider value: {value}")
-        self.move_servos_smoothly(servo_motor, value)
-        self.update_simulation(joint_index, value)
+        self.move_servos_smoothly(servo_motor, value, joint_index)
 
-    def move_servos_smoothly(self, servo_motor, target_angle, steps=100, delay=0.01):
+    def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=100, delay=0.01):
         # Obtener el ángulo actual del servo
         current_angle = servo_motor.angle if servo_motor.angle is not None else 0
 
@@ -212,7 +211,7 @@ class Ui_MainWindow(object):
             self.set_servo_angle(servo_motor, intermediate_angle)
 
             # Actualizar la simulación
-            if step % 10 == 0:  # Reduce la frecuencia de actualización para mejorar el rendimiento
+            if joint_index is not None and step % 10 == 0:
                 self.update_simulation(joint_index, intermediate_angle)
 
             # Permitir que Qt procese eventos pendientes para actualizar la UI
@@ -226,15 +225,15 @@ class Ui_MainWindow(object):
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
 
-    def update_simulation(self, joint_index, value):
+    def update_simulation(self, joint_index, angle):
         # Update robot simulation if defined
         if hasattr(self, 'robot'):
-            angle = (value / 100.0) * 180.0
-            q = self.robot.q
-            q[joint_index] = math.radians(angle)  # Convert degrees to radians
-            self.robot.q = q
-            if hasattr(self, 'simulation') and self.simulation:
-                self.simulation.step()
+            if joint_index is not None and 0 <= joint_index < len(self.robot.q):
+                q = self.robot.q
+                q[joint_index] = math.radians(angle)  # Convert degrees to radians
+                self.robot.q = q
+                if hasattr(self, 'simulation') and self.simulation:
+                    self.simulation.step()
 
     def create_robot(self):
         # Create a 4-DOF robot with rotating base and three additional rotational joints
@@ -242,7 +241,9 @@ class Ui_MainWindow(object):
         link2 = RevoluteDH(d=d1, a=0, alpha=0)  # Shoulder rotation
         link3 = RevoluteDH(d=0, a=d2, alpha=0)  # Elbow rotation
         link4 = RevoluteDH(d=0, a=0.5, alpha=0)  # Wrist rotation
-        return DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
+        robot = DHRobot([link1, link2, link3, link4], name='4DOF_ROBOT')
+        robot.q = [0, 0, 0, 0]  # Establecer configuración inicial
+        return robot
 
 if __name__ == "__main__":
     import sys
