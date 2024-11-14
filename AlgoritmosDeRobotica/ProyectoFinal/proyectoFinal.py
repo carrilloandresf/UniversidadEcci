@@ -27,26 +27,17 @@ d2 = 12  # Longitud del segundo brazo
 d3 = 12  # 13 con gripper cerrado
 
 class Ui_MainWindow(object):
-
-    def __init__(self):
-        self.robot = self.create_robot()
-        self.simulation = PyPlot()  # Crear simulación de Peter Corke
-        self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])
-        self.simulation.add(self.robot)
-
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        """
         # Create robot instance
         self.robot = self.create_robot()
         self.simulation = PyPlot()  # Crear simulación de Peter Corke
         self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])  # Ajustar límites de la simulación
         self.simulation.add(self.robot)
-        """
 
         # Setup UI components
         self.label = QtWidgets.QLabel(self.centralwidget)
