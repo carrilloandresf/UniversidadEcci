@@ -225,9 +225,8 @@ class Ui_MainWindow(object):
 
     def slider_callback(self, servo_motor, joint_index, value):
         print(f"Slider value: {value}")
-        self.set_servo_angle(servo_motor, value)
-        if joint_index is not None:
-            self.update_simulation(joint_index, value)
+        self.set_servo_angle(servo_motor, value, joint_index)
+
 
     def update_simulation(self):
         if hasattr(self, 'simulation') and self.simulation:
