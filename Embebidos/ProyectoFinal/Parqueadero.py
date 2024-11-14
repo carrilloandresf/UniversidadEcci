@@ -192,7 +192,7 @@ def activar_buzzer():
 lcd_init()
 
 lcd_text("UNIVERSIDAD ECCI", 0x80)
-lcd_text("Sistemas Embebidos", 0xC0)
+#lcd_text("Sistemas Embebidos", 0xC0)
 
 sleep(1)
 
@@ -220,15 +220,15 @@ try:
 
             while not GPIO.input(in_Entrada):
                 lcd_text("BIENVENIDO,", 0x80)
-                lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
+                #lcd_text(f"DISPONIBLES: {Parqueadores}", 0xC0)
                 sleep(1)
 
             activar_buzzer()
-            sleep(3)
+            sleep(5)
+            lcd_text("CERRANDO", 0x80)
             mover_motor_down(300, delay=0.002)
             print("Devolviendo la persiana")
-            lcd_text("ESPERE, VEHICULO", 0x80)
-            lcd_text("INGRESANDO...", 0xC0)
+            #lcd_text("INGRESANDO...", 0xC0)
             sleep(2)
 
         # Si no hay parqueaderos disponibles y hay un carro en la entrada de parqueadero, sonar el buzzer
