@@ -254,6 +254,8 @@ class Ui_MainWindow(object):
         self.move_servos_smoothly(servo4, q4, joint_index=3)
         self.move_servos_smoothly(servo5, 90, joint_index=None)
 
+        print("Movimiento completado")
+
 
     def cinematica_inversa(self, x, y, z, L1, L2, L3, L4):
         """
