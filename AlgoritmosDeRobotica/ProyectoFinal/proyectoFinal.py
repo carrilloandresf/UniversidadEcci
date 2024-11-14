@@ -200,8 +200,13 @@ class Ui_MainWindow(object):
         self.label_13.setText(_translate("MainWindow", "Base"))
 
     def launch_simulation(self):
-        # Corrección para evitar errores en el lanzamiento de la simulación
-        self.simulation.launch(limits=[-40, 40, -40, 40, -40, 40])
+        # Configurar explícitamente los límites en el objeto de simulación
+        self.simulation.limits = [-40, 40, -40, 40, -40, 40]
+        
+        # Lanza la simulación con los límites definidos
+        self.simulation.launch()
+        
+        # Agregar el robot a la simulación después de establecer límites
         self.simulation.add(self.robot)
 
     def initialize_servos(self):
