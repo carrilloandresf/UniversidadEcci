@@ -3,9 +3,11 @@ from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
 import board
 import busio
-from roboticstoolbox import DHRobot, RevoluteDH
+from roboticstoolbox import DHRobot, RevoluteDH, rtb
+import roboticstoolbox as rtb
 import math
 from functools import partial
+import matplotlib.pyplot as plt
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -28,6 +30,9 @@ class Ui_MainWindow(object):
 
         # Create robot instance
         self.robot = self.create_robot()
+        self.simulation = rtb.backends.PyPlot()  # Initialize the PyPlot backend
+        self.simulation.launch()
+        self.simulation.add(self.robot)
 
         # Setup UI components
         self.label = QtWidgets.QLabel(self.centralwidget)
@@ -186,6 +191,9 @@ class Ui_MainWindow(object):
             print(f"Slider value: {value}")
             self.move_servo(servo_motor, value)
             self.update_simulation(joint_index, value)
+        # Ensure callback gets executed
+        servo_motor.angle = (value / 100.0) * 180.0  # Set angle based on slider
+        self.update_simulation(joint_index, value)
         return callback
 
     def move_servo(self, servo_motor, angle):
