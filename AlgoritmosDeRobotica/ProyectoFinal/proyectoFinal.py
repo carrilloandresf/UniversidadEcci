@@ -35,6 +35,12 @@ class Ui_MainWindow(object):
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
         self.label_4.setGeometry(QtCore.QRect(60, 140, 31, 20))
         self.label_4.setObjectName("label_4")
+        self.label_5 = QtWidgets.QLabel(self.centralwidget)
+        self.label_5.setGeometry(QtCore.QRect(60, 170, 31, 20))
+        self.label_5.setObjectName("label_5")
+        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox.setGeometry(QtCore.QRect(30, 40, 241, 191))
+        self.groupBox.setObjectName("groupBox")
 
         self.horizontalSlider = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider.setGeometry(QtCore.QRect(104, 80, 160, 16))
@@ -71,12 +77,6 @@ class Ui_MainWindow(object):
         self.horizontalSlider_5.setObjectName("horizontalSlider_5")
         self.horizontalSlider_5.valueChanged.connect(self.create_slider_callback(self.servo5, self.horizontalSlider_5, 4))
 
-        self.label_5 = QtWidgets.QLabel(self.centralwidget)
-        self.label_5.setGeometry(QtCore.QRect(60, 170, 31, 20))
-        self.label_5.setObjectName("label_5")
-        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(30, 40, 241, 191))
-        self.groupBox.setObjectName("groupBox")
 
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
         self.label_6.setGeometry(QtCore.QRect(70, 280, 21, 16))
