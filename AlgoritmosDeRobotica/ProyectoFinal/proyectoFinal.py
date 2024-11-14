@@ -234,9 +234,10 @@ class Ui_MainWindow(object):
             # Convertir el ángulo de grados a radianes y actualizar el joint correspondiente
             self.robot.q[joint_index] = math.radians(angle)
             
-            # Usar self.simulation.step() para actualizar la simulación
+            # Usar draw_idle para actualizar la simulación sin bloquear el bucle de eventos
             if hasattr(self, 'simulation') and self.simulation:
-                self.simulation.step()
+                self.simulation.fig.canvas.draw_idle()
+
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
         # Validar que 'steps' sea un entero positivo
@@ -287,7 +288,7 @@ class Ui_MainWindow(object):
             # Actualizar el ángulo en self.robot.q
             self.robot.q[joint_index] = math.radians(angle)
             # Actualizar la simulación
-            self.simulation.step()
+            self.update_simulation(joint_index, angle)
 
 
     def create_robot(self):
