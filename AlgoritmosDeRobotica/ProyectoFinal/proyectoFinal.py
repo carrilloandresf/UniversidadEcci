@@ -229,20 +229,10 @@ class Ui_MainWindow(object):
         if joint_index is not None:
             self.update_simulation(joint_index, value)
 
-    def update_simulation(self, joint_index, angle):
-        if hasattr(self, 'robot') and 0 <= joint_index < len(self.robot.q):
-            # Crear una copia del array de ángulos actual
-            angles = np.array(self.robot.q)
-            
-            # Convertir el ángulo de grados a radianes y actualizar el índice correspondiente
-            angles[joint_index] = np.radians(angle)
-            
-            # Asignar el array actualizado de ángulos de nuevo a self.robot.q
-            self.robot.q = angles
-            
-            # Actualizar la simulación utilizando draw_idle para no bloquear el bucle de eventos
-            if hasattr(self, 'simulation') and self.simulation:
-                self.simulation.fig.canvas.draw_idle()
+    def update_simulation(self):
+        if hasattr(self, 'simulation') and self.simulation:
+            # Llamar a la simulación para que refleje los cambios de ángulo
+            self.simulation.step()
 
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
@@ -291,10 +281,17 @@ class Ui_MainWindow(object):
         servo_motor.angle = angle
 
         if joint_index is not None:
-            # Actualizar el ángulo en self.robot.q
-            self.robot.q[joint_index] = math.radians(angle)
+            # Crear un array numpy de self.robot.q para modificarlo
+            angles = np.array(self.robot.q)
+            
+            # Actualizar el ángulo correspondiente en radianes
+            angles[joint_index] = np.radians(angle)
+            
+            # Asignar el array actualizado de nuevo a self.robot.q
+            self.robot.q = angles
+            
             # Actualizar la simulación
-            self.update_simulation(joint_index, angle)
+            self.update_simulation()
 
 
     def create_robot(self):
