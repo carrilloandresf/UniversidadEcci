@@ -241,7 +241,10 @@ try:
             activar_buzzer()
             mover_servo(90)
             while not GPIO.input(in_Salida):
-                sleep(5)
+                print("saliendo")
+                sleep(1)
+            print("Devolviendo la talanquera")
+            sleep(5)
             mover_servo(0)
 
 except KeyboardInterrupt:
