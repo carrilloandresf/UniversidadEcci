@@ -60,7 +60,7 @@ class Ui_Dialog(object):
         # Crear articulaciones usando los parámetros de DH, según las longitudes correctas
         R = [
             RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=0),    # Base
-            RevoluteDH(d=0, alpha=0, a=d1, offset=math.pi/2 + math.pi),    # Primer brazo
+            RevoluteDH(d=0, alpha=0, a=d1, offset=0),    # Primer brazo
             RevoluteDH(d=0, alpha=0, a=d2, offset=0),            # Segundo brazo
             RevoluteDH(d=0, alpha=0, a=d3, offset=0)             # Tercer brazo
         ]
