@@ -347,7 +347,8 @@ class Ui_MainWindow(object):
 
 
     def set_servo_angle(self, servo_motor, angle, joint_index=None):
-
+        #imprimir lectura de sensores
+        print("Sensores de parada:", GPIO.input(5), GPIO.input(13), GPIO.input(19))
         if GPIO.input(5) == GPIO.HIGH or GPIO.input(13) == GPIO.HIGH:
             print("Movimiento detenido por sensor de seguridad.")
             return  # Detener movimiento si alguno de los sensores de parada está activo
