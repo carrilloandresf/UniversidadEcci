@@ -28,6 +28,14 @@ d1 = 12.0  # Longitud del primer brazo
 d2 = 12.0  # Longitud del segundo brazo
 d3 = 11.0  # Longitud del tercer brazo (brazo final antes del gripper)
 
+# Offsets iniciales en grados para cada servo, ajustar según la posición de montaje
+offsets = {
+    "base": 0,
+    "shoulder": 0,
+    "elbow": 0,
+    "wrist": 0
+}
+
 class Ui_Dialog(object):
     def __init__(self):
         self.robot = self.create_robot()
@@ -36,12 +44,12 @@ class Ui_Dialog(object):
         self.simulation.add(self.robot)
 
     def create_robot(self):
-        # Crear articulaciones usando los parámetros de DH, según las longitudes correctas
+        # Crear articulaciones usando los parámetros de DH, según las longitudes correctas y aplicando offset si es necesario
         R = [
-            RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=0),    # Base
-            RevoluteDH(d=0, alpha=0, a=d1, offset=math.pi/2),    # Primer brazo
-            RevoluteDH(d=0, alpha=0, a=d2, offset=0),            # Segundo brazo
-            RevoluteDH(d=0, alpha=0, a=d3, offset=0)             # Tercer brazo
+            RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=np.radians(offsets["base"])),    # Base
+            RevoluteDH(d=0, alpha=0, a=d1, offset=np.radians(offsets["shoulder"])),         # Primer brazo
+            RevoluteDH(d=0, alpha=0, a=d2, offset=np.radians(offsets["elbow"])),            # Segundo brazo
+            RevoluteDH(d=0, alpha=0, a=d3, offset=np.radians(offsets["wrist"]))             # Tercer brazo
         ]
         robot = DHRobot(R, name='Bender')
         robot.q = [0, 0, 0, 0]
@@ -63,9 +71,6 @@ class Ui_Dialog(object):
         self.label_y = QtWidgets.QLabel(Dialog)
         self.label_y.setGeometry(QtCore.QRect(30, 60, 50, 20))
         self.label_y.setText("Y:")
-        
-        self.lineEdit_y = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_y.setGeometry(QtCore.QRect(80, 60, 100, 20))
         
         # Label y LineEdit para el eje Z
         self.label_z = QtWidgets.QLabel(Dialog)
@@ -139,8 +144,8 @@ class Ui_Dialog(object):
             theta2 = math.atan2(s, r) - math.atan2(d2 * math.sin(theta3), d1 + d2 * math.cos(theta3))
             theta4 = 0  # Asumimos que theta4 es 0 para mantener el efector alineado
 
-            # Convertir ángulos a grados
-            theta1, theta2, theta3, theta4 = map(np.degrees, [theta1, theta2, theta3, theta4])
+            # Convertir ángulos a grados y aplicar offset
+            theta1, theta2, theta3, theta4 = [angle + offsets[name] for angle, name in zip(map(np.degrees, [theta1, theta2, theta3, theta4]), offsets)]
 
             # Limitar los ángulos para evitar posiciones no alcanzables
             theta1 = max(0, min(180, theta1))
@@ -160,7 +165,6 @@ class Ui_Dialog(object):
         servo_motor.angle = angle
 
     def move_servos_smoothly(self, theta1, theta2, theta3, theta4, steps=50, delay=0.02):
-        # Obtener los ángulos actuales de los servos
         current_angles = {
             "base": servos["base"].angle if servos["base"].angle is not None else 0,
             "shoulder": servos["shoulder"].angle if servos["shoulder"].angle is not None else 0,
@@ -175,19 +179,11 @@ class Ui_Dialog(object):
             "wrist": theta4
         }
 
-        # Mover los servos suavemente en pasos pequeños
         for step in range(steps + 1):
             for servo_name in ["base", "shoulder", "elbow", "wrist"]:
-                # Calcular ángulo intermedio para cada servo
                 intermediate_angle = current_angles[servo_name] + (target_angles[servo_name] - current_angles[servo_name]) * (step / steps)
-                
-                # Ajustar el ángulo del servo
                 self.set_servo_angle(servos[servo_name], intermediate_angle)
-                
-                # Pequeña pausa para movimiento intercalado
                 time.sleep(delay / len(servos))
-
-            # Procesar eventos de Qt para mantener la UI activa
             QtWidgets.QApplication.processEvents()
 
 if __name__ == "__main__":
