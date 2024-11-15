@@ -72,6 +72,9 @@ class Ui_Dialog(object):
         self.label_y.setGeometry(QtCore.QRect(30, 60, 50, 20))
         self.label_y.setText("Y:")
         
+        self.lineEdit_y = QtWidgets.QLineEdit(Dialog)
+        self.lineEdit_y.setGeometry(QtCore.QRect(80, 60, 100, 20))
+        
         # Label y LineEdit para el eje Z
         self.label_z = QtWidgets.QLabel(Dialog)
         self.label_z.setGeometry(QtCore.QRect(30, 90, 50, 20))
