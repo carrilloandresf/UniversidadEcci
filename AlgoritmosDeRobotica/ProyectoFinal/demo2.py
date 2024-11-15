@@ -51,6 +51,11 @@ class Ui_Dialog(object):
         self.simulation.launch()
         self.simulation.add(self.robot)
 
+        # Configuración del QTimer para actualizar la simulación
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.update_simulation)
+        self.timer.start(50)  # Actualiza cada 50 ms
+
     def create_robot(self):
         # Crear articulaciones usando los parámetros de DH, según las longitudes correctas
         R = [
@@ -131,7 +136,6 @@ class Ui_Dialog(object):
             
             # Asignar ángulos y actualizar la simulación
             self.robot.q = [np.radians(theta1), np.radians(theta2), np.radians(theta3), np.radians(theta4)]
-            self.simulation.step()
             
             # Mover servos suavemente
             self.move_servos_smoothly(theta1, theta2, theta3, theta4)
@@ -141,13 +145,20 @@ class Ui_Dialog(object):
 
     def slider_changed(self, joint):
         angle = self.sliders[joint].value()
-        # Sincronizar simulación y servos en tiempo real
-        joint_angles = [self.sliders['base'].value(), self.sliders['shoulder'].value(),
-                        self.sliders['elbow'].value(), self.sliders['wrist'].value()]
+        # Sincronizar ángulos de sliders con la simulación
+        joint_angles = [
+            self.sliders['base'].value(), 
+            self.sliders['shoulder'].value(),
+            self.sliders['elbow'].value(), 
+            self.sliders['wrist'].value()
+        ]
         self.robot.q = [np.radians(a) for a in joint_angles]
-        self.simulation.step()
         # Mover servos correspondientes
         self.set_servo_angle(joint, angle)
+
+    def update_simulation(self):
+        # Actualiza la simulación en intervalos definidos por QTimer
+        self.simulation.step()
 
     def inverse_kinematics(self, x, y, z):
         global d0, d1, d2, d3
