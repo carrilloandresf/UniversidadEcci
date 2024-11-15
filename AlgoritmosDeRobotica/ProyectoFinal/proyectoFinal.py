@@ -7,6 +7,7 @@ import board
 from adafruit_motor import servo
 from adafruit_pca9685 import PCA9685
 import math
+import RPi.GPIO as GPIO
 
 # Configuración de PCA9685 y servos
 i2c = board.I2C()  # usa board.SCL y board.SDA en la Raspberry Pi
@@ -19,6 +20,14 @@ servo2 = servo.Servo(pca.channels[3], min_pulse=500, max_pulse=2400)
 servo3 = servo.Servo(pca.channels[4], min_pulse=500, max_pulse=2400)
 servo4 = servo.Servo(pca.channels[5], min_pulse=500, max_pulse=2400)
 servo5 = servo.Servo(pca.channels[6], min_pulse=500, max_pulse=2400)
+
+
+# Configuración de GPIO para los sensores
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(19, GPIO.IN)  # Sensor CNY en GPIO 19
+GPIO.setup(5, GPIO.IN)   # Sensor de parada en GPIO 5
+GPIO.setup(13, GPIO.IN)  # Otro sensor de parada en GPIO 13
+
 
 # Dimensiones del robot (ajustables)
 d0 = 0 # Base
@@ -298,6 +307,13 @@ class Ui_MainWindow(object):
 
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
+        if GPIO.input(5) == GPIO.HIGH or GPIO.input(13) == GPIO.HIGH:
+            print("Movimiento detenido por sensor de seguridad.")
+            return  # Detener movimiento si alguno de los sensores de parada está activo
+        if GPIO.input(19) == GPIO.HIGH:
+            delay *= 2
+            print("Velocidad reducido")
+            
         # Validar que 'steps' sea un entero positivo
         if steps <= 0:
             raise ValueError("Steps must be a positive integer")
