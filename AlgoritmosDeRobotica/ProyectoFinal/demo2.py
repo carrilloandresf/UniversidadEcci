@@ -65,77 +65,71 @@ class Ui_Dialog(object):
 
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(400, 300)
+        Dialog.resize(400, 450)
         
-        # Label y LineEdit para el eje X
-        self.label_x = QtWidgets.QLabel(Dialog)
-        self.label_x.setGeometry(QtCore.QRect(30, 30, 50, 20))
-        self.label_x.setText("X:")
-        
-        self.lineEdit_x = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_x.setGeometry(QtCore.QRect(80, 30, 100, 20))
-        
-        # Label y LineEdit para el eje Y
-        self.label_y = QtWidgets.QLabel(Dialog)
-        self.label_y.setGeometry(QtCore.QRect(30, 60, 50, 20))
-        self.label_y.setText("Y:")
-        
-        self.lineEdit_y = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_y.setGeometry(QtCore.QRect(80, 60, 100, 20))
-        
-        # Label y LineEdit para el eje Z
-        self.label_z = QtWidgets.QLabel(Dialog)
-        self.label_z.setGeometry(QtCore.QRect(30, 90, 50, 20))
-        self.label_z.setText("Z:")
-        
-        self.lineEdit_z = QtWidgets.QLineEdit(Dialog)
-        self.lineEdit_z.setGeometry(QtCore.QRect(80, 90, 100, 20))
+        # Labels y LineEdits para las coordenadas
+        self.setup_coordinate_input(Dialog)
         
         # Botón para mover el robot
         self.pushButton_move = QtWidgets.QPushButton(Dialog)
         self.pushButton_move.setGeometry(QtCore.QRect(30, 130, 150, 30))
         self.pushButton_move.setText("Mover a Coordenadas")
         self.pushButton_move.clicked.connect(self.move_to_position)
+
+        # Sliders para ángulos de cada articulación
+        self.setup_sliders(Dialog)
         
         # Labels para mostrar ángulos calculados
-        self.label_theta1 = QtWidgets.QLabel(Dialog)
-        self.label_theta1.setGeometry(QtCore.QRect(30, 170, 100, 20))
-        self.label_theta1.setText("Theta1: ###")
-        
-        self.label_theta2 = QtWidgets.QLabel(Dialog)
-        self.label_theta2.setGeometry(QtCore.QRect(30, 200, 100, 20))
-        self.label_theta2.setText("Theta2: ###")
-        
-        self.label_theta3 = QtWidgets.QLabel(Dialog)
-        self.label_theta3.setGeometry(QtCore.QRect(30, 230, 100, 20))
-        self.label_theta3.setText("Theta3: ###")
-        
-        self.label_theta4 = QtWidgets.QLabel(Dialog)
-        self.label_theta4.setGeometry(QtCore.QRect(30, 260, 100, 20))
-        self.label_theta4.setText("Theta4: ###")
+        self.setup_angle_labels(Dialog)
+
+    def setup_coordinate_input(self, Dialog):
+        # Configura las entradas de coordenadas
+        labels = ['X:', 'Y:', 'Z:']
+        self.lineEdits = {}
+        for i, label in enumerate(labels):
+            lbl = QtWidgets.QLabel(Dialog)
+            lbl.setGeometry(QtCore.QRect(30, 30 + 30 * i, 50, 20))
+            lbl.setText(label)
+            self.lineEdits[label] = QtWidgets.QLineEdit(Dialog)
+            self.lineEdits[label].setGeometry(QtCore.QRect(80, 30 + 30 * i, 100, 20))
+
+    def setup_sliders(self, Dialog):
+        # Configura sliders de ángulos de cada articulación
+        joints = ['Base', 'Shoulder', 'Elbow', 'Wrist']
+        self.sliders = {}
+        for i, joint in enumerate(joints):
+            lbl = QtWidgets.QLabel(Dialog)
+            lbl.setGeometry(QtCore.QRect(200, 30 + 30 * i, 50, 20))
+            lbl.setText(f"{joint}:")
+            slider = QtWidgets.QSlider(QtCore.Qt.Horizontal, Dialog)
+            slider.setGeometry(QtCore.QRect(250, 30 + 30 * i, 100, 20))
+            slider.setMinimum(0)
+            slider.setMaximum(180)
+            slider.setValue(90)
+            slider.valueChanged.connect(lambda _, j=joint.lower(): self.slider_changed(j))
+            self.sliders[joint.lower()] = slider
+
+    def setup_angle_labels(self, Dialog):
+        # Configura las etiquetas para los ángulos calculados
+        self.labels_angles = {}
+        labels_text = ['Theta1:', 'Theta2:', 'Theta3:', 'Theta4:']
+        for i, text in enumerate(labels_text):
+            lbl = QtWidgets.QLabel(Dialog)
+            lbl.setGeometry(QtCore.QRect(30, 170 + 30 * i, 100, 20))
+            lbl.setText(text)
+            self.labels_angles[text] = lbl
 
     def move_to_position(self):
         try:
             # Obtener valores de los campos de texto
-            x = float(self.lineEdit_x.text()) if self.lineEdit_x.text() else 0.0
-            y = float(self.lineEdit_y.text()) if self.lineEdit_y.text() else 0.0
-            z = float(self.lineEdit_z.text()) if self.lineEdit_z.text() else 0.0
+            x = float(self.lineEdits['X:'].text()) if self.lineEdits['X:'].text() else 0.0
+            y = float(self.lineEdits['Y:'].text()) if self.lineEdits['Y:'].text() else 0.0
+            z = float(self.lineEdits['Z:'].text()) if self.lineEdits['Z:'].text() else 0.0
             
             # Calcular ángulos inversos (IK)
             theta1, theta2, theta3, theta4 = self.inverse_kinematics(x, y, z)
             
-            # Aplicar offsets para ajustar la posición física a la posición lógica
-            theta2 += offsets["shoulder"]
-            theta3 += offsets["elbow"]
-            theta4 += offsets["wrist"]
-            
-            # Mostrar ángulos en la interfaz
-            self.label_theta1.setText(f"Theta1: {theta1:.2f}")
-            self.label_theta2.setText(f"Theta2: {theta2:.2f}")
-            self.label_theta3.setText(f"Theta3: {theta3:.2f}")
-            self.label_theta4.setText(f"Theta4: {theta4:.2f}")
-            
-            # Asignar ángulos al robot para mover la simulación
+            # Asignar ángulos y actualizar la simulación
             self.robot.q = [np.radians(theta1), np.radians(theta2), np.radians(theta3), np.radians(theta4)]
             self.simulation.step()
             
@@ -144,6 +138,16 @@ class Ui_Dialog(object):
 
         except ValueError:
             print("Error: Entrada no válida en los campos de posición.")
+
+    def slider_changed(self, joint):
+        angle = self.sliders[joint].value()
+        # Sincronizar simulación y servos en tiempo real
+        joint_angles = [self.sliders['base'].value(), self.sliders['shoulder'].value(),
+                        self.sliders['elbow'].value(), self.sliders['wrist'].value()]
+        self.robot.q = [np.radians(a) for a in joint_angles]
+        self.simulation.step()
+        # Mover servos correspondientes
+        self.set_servo_angle(joint, angle)
 
     def inverse_kinematics(self, x, y, z):
         global d0, d1, d2, d3
@@ -199,8 +203,6 @@ class Ui_Dialog(object):
         except ValueError as e:
             print(f"Error en los cálculos de cinemática inversa: {e}")
             return 0, 0, 0, 0
-
-
 
     def set_servo_angle(self, servo_name, angle):
         # Invertir el ángulo si el servo está instalado al revés
