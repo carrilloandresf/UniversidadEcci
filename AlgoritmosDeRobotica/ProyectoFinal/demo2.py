@@ -22,19 +22,20 @@ servos = {
     "gripper": servo.Servo(pca.channels[2], min_pulse=500, max_pulse=2400)
 }
 
+# Variables para invertir el giro de los servos si están instalados al revés
+invert_direction = {
+    "base": False,      # Cambia a True si el servo de la base está al revés
+    "shoulder": False,  # Cambia a True si el servo del primer brazo está al revés
+    "elbow": False,     # Cambia a True si el servo del segundo brazo está al revés
+    "wrist": False,     # Cambia a True si el servo del tercer brazo está al revés
+    "gripper": False    # Cambia a True si el gripper está al revés
+}
+
 # Longitudes ajustadas de los eslabones
 d0 = 1.0   # Base que gira (longitud de 1)
 d1 = 12.0  # Longitud del primer brazo
 d2 = 12.0  # Longitud del segundo brazo
 d3 = 11.0  # Longitud del tercer brazo (brazo final antes del gripper)
-
-# Offsets iniciales en grados para cada servo, ajustar según la posición de montaje
-offsets = {
-    "base": 0,
-    "shoulder": 0,
-    "elbow": 0,
-    "wrist": 0
-}
 
 class Ui_Dialog(object):
     def __init__(self):
@@ -44,12 +45,12 @@ class Ui_Dialog(object):
         self.simulation.add(self.robot)
 
     def create_robot(self):
-        # Crear articulaciones usando los parámetros de DH, según las longitudes correctas y aplicando offset si es necesario
+        # Crear articulaciones usando los parámetros de DH, según las longitudes correctas
         R = [
-            RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=np.radians(offsets["base"])),    # Base
-            RevoluteDH(d=0, alpha=0, a=d1, offset=np.radians(offsets["shoulder"])),         # Primer brazo
-            RevoluteDH(d=0, alpha=0, a=d2, offset=np.radians(offsets["elbow"])),            # Segundo brazo
-            RevoluteDH(d=0, alpha=0, a=d3, offset=np.radians(offsets["wrist"]))             # Tercer brazo
+            RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=0),    # Base
+            RevoluteDH(d=0, alpha=0, a=d1, offset=math.pi/2),    # Primer brazo
+            RevoluteDH(d=0, alpha=0, a=d2, offset=0),            # Segundo brazo
+            RevoluteDH(d=0, alpha=0, a=d3, offset=0)             # Tercer brazo
         ]
         robot = DHRobot(R, name='Bender')
         robot.q = [0, 0, 0, 0]
@@ -147,8 +148,8 @@ class Ui_Dialog(object):
             theta2 = math.atan2(s, r) - math.atan2(d2 * math.sin(theta3), d1 + d2 * math.cos(theta3))
             theta4 = 0  # Asumimos que theta4 es 0 para mantener el efector alineado
 
-            # Convertir ángulos a grados y aplicar offset
-            theta1, theta2, theta3, theta4 = [angle + offsets[name] for angle, name in zip(map(np.degrees, [theta1, theta2, theta3, theta4]), offsets)]
+            # Convertir ángulos a grados
+            theta1, theta2, theta3, theta4 = map(np.degrees, [theta1, theta2, theta3, theta4])
 
             # Limitar los ángulos para evitar posiciones no alcanzables
             theta1 = max(0, min(180, theta1))
@@ -162,12 +163,16 @@ class Ui_Dialog(object):
             print("Error en los cálculos de cinemática inversa: valores fuera de rango.")
             return 0, 0, 0, 0
 
-    def set_servo_angle(self, servo_motor, angle):
-        # Limitar el ángulo entre 0 y 180 grados
+    def set_servo_angle(self, servo_name, angle):
+        # Invertir el ángulo si el servo está instalado al revés
+        if invert_direction[servo_name]:
+            angle = 180 - angle
+        # Limitar el ángulo entre 0 y 180 grados y asignarlo al servo
         angle = max(0, min(180, angle))
-        servo_motor.angle = angle
+        servos[servo_name].angle = angle
 
     def move_servos_smoothly(self, theta1, theta2, theta3, theta4, steps=50, delay=0.02):
+        # Obtener los ángulos actuales de los servos
         current_angles = {
             "base": servos["base"].angle if servos["base"].angle is not None else 0,
             "shoulder": servos["shoulder"].angle if servos["shoulder"].angle is not None else 0,
@@ -182,11 +187,19 @@ class Ui_Dialog(object):
             "wrist": theta4
         }
 
+        # Mover los servos suavemente en pasos pequeños
         for step in range(steps + 1):
             for servo_name in ["base", "shoulder", "elbow", "wrist"]:
+                # Calcular ángulo intermedio para cada servo
                 intermediate_angle = current_angles[servo_name] + (target_angles[servo_name] - current_angles[servo_name]) * (step / steps)
-                self.set_servo_angle(servos[servo_name], intermediate_angle)
+                
+                # Ajustar el ángulo del servo considerando la inversión
+                self.set_servo_angle(servo_name, intermediate_angle)
+                
+                # Pequeña pausa para movimiento intercalado
                 time.sleep(delay / len(servos))
+
+            # Procesar eventos de Qt para mantener la UI activa
             QtWidgets.QApplication.processEvents()
 
 if __name__ == "__main__":
