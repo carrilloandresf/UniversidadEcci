@@ -157,4 +157,44 @@ class Ui_Dialog(object):
     def set_servo_angle(self, servo_motor, angle):
         # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
-        servo_motor
+        servo_motor.angle = angle
+
+    def move_servos_smoothly(self, theta1, theta2, theta3, theta4, steps=50, delay=0.02):
+        # Obtener los ángulos actuales de los servos
+        current_angles = {
+            "base": servos["base"].angle if servos["base"].angle is not None else 0,
+            "shoulder": servos["shoulder"].angle if servos["shoulder"].angle is not None else 0,
+            "elbow": servos["elbow"].angle if servos["elbow"].angle is not None else 0,
+            "wrist": servos["wrist"].angle if servos["wrist"].angle is not None else 0
+        }
+
+        target_angles = {
+            "base": theta1,
+            "shoulder": theta2,
+            "elbow": theta3,
+            "wrist": theta4
+        }
+
+        # Mover los servos suavemente en pasos pequeños
+        for step in range(steps + 1):
+            for servo_name in ["base", "shoulder", "elbow", "wrist"]:
+                # Calcular ángulo intermedio para cada servo
+                intermediate_angle = current_angles[servo_name] + (target_angles[servo_name] - current_angles[servo_name]) * (step / steps)
+                
+                # Ajustar el ángulo del servo
+                self.set_servo_angle(servos[servo_name], intermediate_angle)
+                
+                # Pequeña pausa para movimiento intercalado
+                time.sleep(delay / len(servos))
+
+            # Procesar eventos de Qt para mantener la UI activa
+            QtWidgets.QApplication.processEvents()
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Dialog = QtWidgets.QDialog()
+    ui = Ui_Dialog()
+    ui.setupUi(Dialog)
+    Dialog.show()
+    sys.exit(app.exec_())
