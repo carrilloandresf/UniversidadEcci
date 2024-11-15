@@ -31,6 +31,13 @@ invert_direction = {
     "gripper": False    # Cambia a True si el gripper está al revés
 }
 
+# Offsets de 90 grados para servos en la posición inicial
+offsets = {
+    "shoulder": -90,  # La posición física de 90 grados se considera como 0 en la cinemática inversa
+    "elbow": -90,
+    "wrist": -90
+}
+
 # Longitudes ajustadas de los eslabones
 d0 = 1.0   # Base que gira (longitud de 1)
 d1 = 12.0  # Longitud del primer brazo
@@ -116,6 +123,11 @@ class Ui_Dialog(object):
             
             # Calcular ángulos inversos (IK)
             theta1, theta2, theta3, theta4 = self.inverse_kinematics(x, y, z)
+            
+            # Aplicar offsets para ajustar la posición física a la posición lógica
+            theta2 += offsets["shoulder"]
+            theta3 += offsets["elbow"]
+            theta4 += offsets["wrist"]
             
             # Mostrar ángulos en la interfaz
             self.label_theta1.setText(f"Theta1: {theta1:.2f}")
