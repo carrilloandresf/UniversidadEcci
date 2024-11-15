@@ -307,13 +307,6 @@ class Ui_MainWindow(object):
 
 
     def move_servos_smoothly(self, servo_motor, target_angle, joint_index=None, steps=20, delay=0.01):
-        if GPIO.input(5) == GPIO.HIGH or GPIO.input(13) == GPIO.HIGH:
-            print("Movimiento detenido por sensor de seguridad.")
-            return  # Detener movimiento si alguno de los sensores de parada está activo
-        if GPIO.input(19) == GPIO.HIGH:
-            delay *= 2
-            print("Velocidad reducido")
-            
         # Validar que 'steps' sea un entero positivo
         if steps <= 0:
             raise ValueError("Steps must be a positive integer")
@@ -354,6 +347,14 @@ class Ui_MainWindow(object):
 
 
     def set_servo_angle(self, servo_motor, angle, joint_index=None):
+
+        if GPIO.input(5) == GPIO.HIGH or GPIO.input(13) == GPIO.HIGH:
+            print("Movimiento detenido por sensor de seguridad.")
+            return  # Detener movimiento si alguno de los sensores de parada está activo
+
+        if GPIO.input(19) == GPIO.HIGH:
+            time.sleep(0.5)  # Aumentar el delay para ralentizar si el sensor CNY en GPIO 19 está activo
+
         # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
         servo_motor.angle = angle
