@@ -149,39 +149,42 @@ class Ui_Dialog(object):
         global d0, d1, d2, d3
         try:
             # Paso 1: Calcular theta1 (Rotación de la base)
-            # Utilizamos atan2 para obtener el ángulo en el plano XY
             theta1 = math.atan2(y, x)
-            
-            # Paso 2: Calcular la distancia r en el plano horizontal y la altura s en el eje vertical
-            r = math.sqrt(x**2 + y**2)  # Distancia en el plano XY
-            s = z - d0  # Distancia en Z considerando la altura de la base
-            
-            # Paso 3: Calcular la distancia d entre el punto de destino y el origen del brazo
+
+            # Paso 2: Calcular la distancia horizontal r y la altura s en el eje Z
+            r = math.sqrt(x**2 + y**2)
+            s = z - d0  # Restar la altura de la base
+
+            # Paso 3: Calcular la distancia total d desde el origen al punto (x, y, z)
             d = math.sqrt(r**2 + s**2)
-            
+
             # Verificar que el punto esté dentro del alcance del brazo
             if d > (d1 + d2 + d3):
-                raise ValueError("La posición deseada está fuera del alcance del robot.")
+                print("La posición está fuera del alcance del robot.")
+                return 0, 0, 0, 0
 
-            # Paso 4: Calcular theta2 y theta3 (ángulos de los dos primeros enlaces)
-            
-            # Usamos la ley de cosenos para encontrar theta3
+            # Paso 4: Calcular theta3 usando la ley de cosenos
             cos_theta3 = (d**2 - d1**2 - d2**2) / (2 * d1 * d2)
-            theta3 = math.acos(np.clip(cos_theta3, -1, 1))  # Asegurar que esté en el rango [-1, 1]
+            theta3 = math.acos(np.clip(cos_theta3, -1, 1))  # Ajustar el rango para evitar errores
 
-            # Calculamos theta2 considerando el ángulo adicional debido a theta3
+            # Paso 5: Calcular theta2 considerando el efecto de theta3
             k1 = d1 + d2 * math.cos(theta3)
             k2 = d2 * math.sin(theta3)
             theta2 = math.atan2(s, r) - math.atan2(k2, k1)
-            
-            # Paso 5: Calcular theta4 (Orientación del efector final)
-            # Si queremos que el efector final esté alineado con el plano XY, theta4 puede ser cero.
+
+            # Paso 6: Ajustar theta3 para la configuración física del robot
+            theta3 = math.pi - theta3  # Invertir theta3 para adaptarlo a la geometría del brazo
+
+            # Paso 7: Calcular theta4 para la orientación del efector final
             theta4 = 0  # Asumimos alineación horizontal del efector final
 
             # Convertir ángulos a grados
-            theta1, theta2, theta3, theta4 = map(np.degrees, [theta1, theta2, theta3, theta4])
+            theta1 = np.degrees(theta1)
+            theta2 = np.degrees(theta2)
+            theta3 = np.degrees(theta3)
+            theta4 = np.degrees(theta4)
 
-            # Ajustar ángulos según el offset de 90 grados
+            # Aplicar offsets para ajustar la posición física a la posición lógica
             theta2 -= 90
             theta3 -= 90
 
@@ -196,6 +199,7 @@ class Ui_Dialog(object):
         except ValueError as e:
             print(f"Error en los cálculos de cinemática inversa: {e}")
             return 0, 0, 0, 0
+
 
 
     def set_servo_angle(self, servo_name, angle):
