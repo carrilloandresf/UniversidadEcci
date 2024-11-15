@@ -26,7 +26,7 @@ servos = {
 invert_direction = {
     "base": False,      # Cambia a True si el servo de la base está al revés
     "shoulder": False,  # Cambia a True si el servo del primer brazo está al revés
-    "elbow": False,     # Cambia a True si el servo del segundo brazo está al revés
+    "elbow": True,     # Cambia a True si el servo del segundo brazo está al revés
     "wrist": False,     # Cambia a True si el servo del tercer brazo está al revés
     "gripper": False    # Cambia a True si el gripper está al revés
 }
