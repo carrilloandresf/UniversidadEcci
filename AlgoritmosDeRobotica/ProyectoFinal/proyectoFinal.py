@@ -347,14 +347,22 @@ class Ui_MainWindow(object):
 
 
     def set_servo_angle(self, servo_motor, angle, joint_index=None):
-        #imprimir lectura de sensores
-        print("Sensores de parada:", GPIO.input(5), GPIO.input(13), GPIO.input(19))
-        if GPIO.input(5) == GPIO.HIGH or GPIO.input(13) == GPIO.HIGH:
-            print("Movimiento detenido por sensor de seguridad.")
+        #leer sensores
+        stop1 = not GPIO.input(5)
+        stop2 = not GPIO.input(13)
+        slow = not GPIO.input(19)
+
+        #imprimir sensores
+        print(f"Sensores de parada: {stop1}, {stop2}")
+        print(f"Sensor de seguridad: {slow}")
+
+        if stop1 or stop2:
+            print("Movimiento detenido por sensor de parada.")
             return  # Detener movimiento si alguno de los sensores de parada está activo
 
-        if GPIO.input(19) == GPIO.HIGH:
-            time.sleep(0.5)  # Aumentar el delay para ralentizar si el sensor CNY en GPIO 19 está activo
+        if slow:
+            print("Movimiento detenido por sensor de seguridad.")
+            time.sleep(0.5)
 
         # Limitar el ángulo entre 0 y 180 grados
         angle = max(0, min(180, angle))
