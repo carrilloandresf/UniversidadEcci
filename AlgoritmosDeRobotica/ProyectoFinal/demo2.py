@@ -26,7 +26,7 @@ servos = {
 invert_direction = {
     "base": False,      # Cambia a True si el servo de la base está al revés
     "shoulder": False,  # Cambia a True si el servo del primer brazo está al revés
-    "elbow": False,     # Cambia a True si el servo del segundo brazo está al revés
+    "elbow": True,     # Cambia a True si el servo del segundo brazo está al revés
     "wrist": False,     # Cambia a True si el servo del tercer brazo está al revés
     "gripper": False    # Cambia a True si el gripper está al revés
 }
@@ -34,7 +34,7 @@ invert_direction = {
 # Offsets de 90 grados para servos en la posición inicial
 offsets = {
     "shoulder": 0,  # La posición física de 90 grados se considera como 0 en la cinemática inversa
-    "elbow": 0,
+    "elbow": 90,
     "wrist": 0
 }
 
@@ -59,7 +59,7 @@ class Ui_Dialog(object):
     def create_robot(self):
         # Crear articulaciones usando los parámetros de DH, según las longitudes correctas
         R = [
-            RevoluteDH(d=d0, alpha=math.pi/2, a=0, offset=math.pi/2),    # Base
+            RevoluteDH(d=d0, alpha=math.pi, a=0, offset=math.pi/2),    # Base
             RevoluteDH(d=0, alpha=0, a=d1, offset=0),    # Primer brazo
             RevoluteDH(d=0, alpha=0, a=d2, offset=0),            # Segundo brazo
             RevoluteDH(d=0, alpha=0, a=d3, offset=0)             # Tercer brazo
