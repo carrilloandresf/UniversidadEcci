@@ -33,7 +33,7 @@ invert_direction = {
 
 # Offsets de 90 grados para servos en la posición inicial
 offsets = {
-    "shoulder": 0,  # La posición física de 90 grados se considera como 0 en la cinemática inversa
+    "shoulder": 90,  # La posición física de 90 grados se considera como 0 en la cinemática inversa
     "elbow": 0,
     "wrist": 0
 }
