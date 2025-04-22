@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from time import sleep
+from time import sleep, time  # Aquí estamos importando 'time' también
 
 # Configuración de GPIO
 GPIO.setmode(GPIO.BCM)
@@ -53,9 +53,9 @@ def medir_distancia():
     
     # Medir tiempo del pulso
     while GPIO.input(ULTRASONIDO_ECHO) == 0:
-        pulse_start = time.time()
+        pulse_start = time()  # Aquí usamos 'time()' que ahora está importado
     while GPIO.input(ULTRASONIDO_ECHO) == 1:
-        pulse_end = time.time()
+        pulse_end = time()  # También usamos 'time()' aquí
     
     # Calcular la distancia
     pulse_duration = pulse_end - pulse_start
