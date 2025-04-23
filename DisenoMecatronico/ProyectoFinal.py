@@ -43,7 +43,7 @@ STEP_SEQUENCE = [
 # Número de pasos por revolución para el motor paso a paso
 STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
-STEP_DELAY = 0.001
+STEP_DELAY = 0.001  # Ajustado para el motor
 
 # Función para medir la distancia con el sensor ultrasónico
 def medir_distancia():
@@ -72,8 +72,8 @@ def mover_motor_paso_a_paso_1(steps):
             sleep(STEP_DELAY)
 
 # Función para mover el motor paso a paso 2 (motor de la banda de medicamentos)
-def mover_motor_paso_a_paso_2(steps):
-    for step in range(steps):
+def mover_motor_paso_a_paso_2():
+    while True:  # Este bucle hará que el motor siga girando
         for sequence in STEP_SEQUENCE:
             for pin in range(4):
                 GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
@@ -105,7 +105,7 @@ try:
             sleep(1)
 
             # Mover motor 2 (banda) para llenar el vaso
-            mover_motor_paso_a_paso_2(10)  # Ajusta según la cantidad de medicación que debe despachar
+            mover_motor_paso_a_paso_2()  # Mantiene el motor girando indefinidamente
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             while distancia > 5:  # Ajusta el umbral según el tamaño del vaso
@@ -113,9 +113,12 @@ try:
                 distancia = medir_distancia()
                 sleep(0.5)
 
-            # Detener la banda
+            # Detener la banda cuando el vaso esté lleno
             print("Vaso lleno, deteniendo la banda.")
-            mover_motor_paso_a_paso_2(0)  # Detener el motor de la banda
+            GPIO.output(MOTOR_PINS_2[0], GPIO.LOW)
+            GPIO.output(MOTOR_PINS_2[1], GPIO.LOW)
+            GPIO.output(MOTOR_PINS_2[2], GPIO.LOW)
+            GPIO.output(MOTOR_PINS_2[3], GPIO.LOW)
 
             # Hacer que el motor 1 gire nuevamente
             print("Moviendo el motor 1 para preparar el siguiente vaso.")
