@@ -88,24 +88,23 @@ try:
     while True:
         # Leer el estado del sensor CNY70
         estado_cny70 = detectar_vaso()
-        print(f"Estado de CNY70 (¿Vaso detectado?): {'Sí' if estado_cny70 else 'No'}")
 
         # Lógica del sistema
         if not estado_cny70:  # Si el CNY70 no detecta vaso (el valor es 1)
             print("Esperando a que el vaso se coloque...")
-            mover_motor_paso_a_paso_1(5)  # Mueve el motor 1 hasta que se coloque un vaso
+            mover_motor_paso_a_paso_1(1)  # Mueve el motor 1 hasta que se coloque un vaso
 
         # Si el CNY70 detecta un vaso (el valor es 0)
         elif estado_cny70:
             print("Vaso detectado, comenzando llenado...")
-            sleep(0.5) 
+            sleep(0.2) 
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
             while distancia > 5:  # Ajusta el umbral según el tamaño del vaso
+                mover_motor_paso_a_paso_2(1)
                 print("Esperando que el vaso se llene...")
                 distancia = medir_distancia()  # Medir nuevamente la distancia
-                mover_motor_paso_a_paso_2(5)
                 sleep(0.2)
 
             # Detener la banda cuando el vaso esté lleno
