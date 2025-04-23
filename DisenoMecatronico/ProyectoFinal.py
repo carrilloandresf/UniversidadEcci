@@ -31,13 +31,13 @@ GPIO.setup(ULTRASONIDO_ECHO, GPIO.IN)
 # Secuencia de pasos para los motores paso a paso (ULN2003AN)
 STEP_SEQUENCE = [
     [1, 0, 0, 0],
-    [1, 1, 0, 0],
+    #[1, 1, 0, 0],
     [0, 1, 0, 0],
-    [0, 1, 1, 0],
+    #[0, 1, 1, 0],
     [0, 0, 1, 0],
-    [0, 0, 1, 1],
+    #[0, 0, 1, 1],
     [0, 0, 0, 1],
-    [1, 0, 0, 1]
+    #[1, 0, 0, 1]
 ]
 
 # Número de pasos por revolución para el motor paso a paso
@@ -92,7 +92,7 @@ try:
         # Lógica del sistema
         if not estado_cny70:  # Si el CNY70 no detecta vaso (el valor es 1)
             print("Esperando a que el vaso se coloque...")
-            mover_motor_paso_a_paso_1(1)  # Mueve el motor 1 hasta que se coloque un vaso
+            mover_motor_paso_a_paso_1(10)  # Mueve el motor 1 hasta que se coloque un vaso
 
         # Si el CNY70 detecta un vaso (el valor es 0)
         elif estado_cny70:
@@ -102,7 +102,7 @@ try:
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
             while distancia > 5:  # Ajusta el umbral según el tamaño del vaso
-                mover_motor_paso_a_paso_2(1)
+                mover_motor_paso_a_paso_2(10)
                 print("Esperando que el vaso se llene...")
                 distancia = medir_distancia()  # Medir nuevamente la distancia
                 sleep(0.2)
