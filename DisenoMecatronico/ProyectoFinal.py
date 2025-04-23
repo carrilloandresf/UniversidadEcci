@@ -28,8 +28,8 @@ for pin in MOTOR_PINS_1 + MOTOR_PINS_2:
 GPIO.setup(ULTRASONIDO_TRIG, GPIO.OUT)
 GPIO.setup(ULTRASONIDO_ECHO, GPIO.IN)
 
-# Secuencia de pasos para los motores paso a paso (ULN2003AN)
-STEP_SEQUENCE = [
+# Secuencia de pasos medio paso (Half-Step)
+STEP_SEQUENCE_HALF = [
     [1, 0, 0, 0],
     [1, 1, 0, 0],
     [0, 1, 0, 0],
@@ -43,7 +43,7 @@ STEP_SEQUENCE = [
 # Número de pasos por revolución para el motor paso a paso
 STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
-STEP_DELAY = 0.001  # Ajustado para el motor
+STEP_DELAY = 0.005  # Ajustado para el motor (más lento para suavizar el movimiento)
 
 # Función para medir la distancia con el sensor ultrasónico
 def medir_distancia():
@@ -66,17 +66,18 @@ def medir_distancia():
 # Función para mover el motor paso a paso 1 (motor de los vasos)
 def mover_motor_paso_a_paso_1(steps):
     for step in range(steps):
-        for sequence in STEP_SEQUENCE:
+        for sequence in STEP_SEQUENCE_HALF:  # Usamos la secuencia Half-Step
             for pin in range(4):
                 GPIO.output(MOTOR_PINS_1[pin], sequence[pin])
             sleep(STEP_DELAY)
 
 # Función para mover el motor paso a paso 2 (motor de la banda de medicamentos)
 def mover_motor_paso_a_paso_2():
-    for sequence in STEP_SEQUENCE:
-        for pin in range(4):
-            GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
-        sleep(STEP_DELAY)
+    while True:  # Este bucle hará que el motor siga girando
+        for sequence in STEP_SEQUENCE_HALF:  # Usamos la secuencia Half-Step
+            for pin in range(4):
+                GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
+            sleep(STEP_DELAY)
 
 # Función para revisar si el sensor CNY70 detecta un vaso (con lógica inversa)
 def detectar_vaso():
@@ -119,9 +120,9 @@ try:
 
             # Hacer que el motor 1 gire nuevamente
             print("Moviendo el motor 1 para preparar el siguiente vaso.")
-            mover_motor_paso_a_paso_1(30)  # Gira el motor hasta el siguiente vaso
+            mover_motor_paso_a_paso_1(10)  # Gira el motor hasta el siguiente vaso
 
-        sleep(1)  # Pausa de 1 segundo entre las iteraciones
+        sleep(0.5) 
 
 except KeyboardInterrupt:
     print("Programa detenido por el usuario.")
