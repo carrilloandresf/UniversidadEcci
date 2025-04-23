@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from time import sleep, time  # Aquí estamos importando 'time' también
+from time import sleep, time
 
 # Configuración de GPIO
 GPIO.setmode(GPIO.BCM)
@@ -53,7 +53,7 @@ def medir_distancia():
     
     # Medir tiempo del pulso
     while GPIO.input(ULTRASONIDO_ECHO) == 0:
-        pulse_start = time()  # Aquí usamos 'time()' que ahora está importado
+        pulse_start = time()  # Usamos 'time()' que está importado
     while GPIO.input(ULTRASONIDO_ECHO) == 1:
         pulse_end = time()  # También usamos 'time()' aquí
     
@@ -78,27 +78,28 @@ def mover_motor_paso_a_paso_2(steps):
                 GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
             sleep(STEP_DELAY)
 
-# Función para revisar si el sensor CNY70 detecta un vaso
+# Función para revisar si el sensor CNY70 detecta un vaso (con lógica inversa)
 def detectar_vaso():
-    return GPIO.input(CNY70_PIN)
+    return GPIO.input(CNY70_PIN) == 0  # El CNY70 devuelve 0 cuando detecta un vaso
 
 # Inicializa los pines
 try:
     while True:
-        # Imprimir el estado de los sensores
+        # Leer el estado del sensor CNY70
         estado_cny70 = detectar_vaso()
-        distancia = medir_distancia()
+        print(f"Estado de CNY70 (¿Vaso detectado?): {'Sí' if estado_cny70 else 'No'}")
 
-        print(f"Estado de CNY70 (¿Vaso detectado?): {estado_cny70}")
+        # Medir la distancia con el sensor ultrasónico
+        distancia = medir_distancia()
         print(f"Distancia medida con sensor ultrasónico: {distancia} cm")
 
         # Lógica del sistema
-        if estado_cny70 == 0:  # Si no detecta vaso
+        if not estado_cny70:  # Si el CNY70 no detecta vaso (el valor es 1)
             print("Esperando a que el vaso se coloque...")
-            mover_motor_paso_a_paso_1(1)  # Mover el motor 1 hasta que se coloque un vaso
+            mover_motor_paso_a_paso_1(10)  # Mueve el motor 1 hasta que se coloque un vaso
 
         # Si el CNY70 detecta un vaso
-        elif estado_cny70 == 1:
+        elif estado_cny70:
             print("Vaso detectado, comenzando llenado...")
             sleep(1)
 
@@ -117,7 +118,7 @@ try:
 
             # Hacer que el motor 1 gire nuevamente
             print("Moviendo el motor 1 para preparar el siguiente vaso.")
-            mover_motor_paso_a_paso_1(1)  # Gira el motor hasta el siguiente vaso
+            mover_motor_paso_a_paso_1(10)  # Gira el motor hasta el siguiente vaso
 
         sleep(1)  # Pausa de 1 segundo entre las iteraciones
 
