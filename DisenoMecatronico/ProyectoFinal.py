@@ -73,11 +73,12 @@ def mover_motor_paso_a_paso_1(steps):
             sleep(STEP_DELAY)
 
 # Función para mover el motor paso a paso 2 (motor de la banda de medicamentos)
-def mover_motor_paso_a_paso_2():
-    for sequence in STEP_SEQUENCE_HALF:  # Usamos la secuencia Half-Step
-        for pin in range(4):
-            GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
-        sleep(STEP_DELAY)
+def mover_motor_paso_a_paso_2(steps):
+    for step in range(steps):
+        for sequence in STEP_SEQUENCE_HALF:
+            for pin in range(4):
+                GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
+            sleep(STEP_DELAY)
 
 # Función para revisar si el sensor CNY70 detecta un vaso (con lógica inversa)
 def detectar_vaso():
@@ -103,28 +104,19 @@ try:
         # Si el CNY70 detecta un vaso (el valor es 0)
         elif estado_cny70:
             print("Vaso detectado, comenzando llenado...")
-            sleep(0.2)  # Esperar un poco para estabilizar el proceso
+            sleep(0.1)  # Esperar un poco para estabilizar el proceso
 
             # Mover motor 2 (banda) para llenar el vaso
             print("Iniciando el llenado...")
-            mover_motor_paso_a_paso_2()  # Mantiene el motor girando indefinidamente
+            mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
-            while distancia > 5:  # Ajusta el umbral según el tamaño del vaso
-                print("Esperando que el vaso se llene...")
-                distancia = medir_distancia()  # Medir nuevamente la distancia
-                sleep(0.5)  # Pausa para medir la distancia periódicamente
+            if distancia < 5:
+                print("Acomodando vaso")
+                mover_motor_paso_a_paso_1(10)
 
-            # Detener la banda cuando el vaso esté lleno
-            print("Vaso lleno, deteniendo la banda.")
-            detener_motor_banda()  # Detener motor 2
-
-            # Hacer que el motor 1 gire nuevamente
-            print("Moviendo el motor 1 para preparar el siguiente vaso.")
-            mover_motor_paso_a_paso_1(10)  # Gira el motor hasta el siguiente vaso
-
-        sleep(0.5)  # Pausa de 0.5 segundos entre las iteraciones
+        sleep(0.2)  
 
 except KeyboardInterrupt:
     print("Programa detenido por el usuario.")
