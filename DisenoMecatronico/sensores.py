@@ -45,7 +45,7 @@ def mover_motor(pins):
         sleep(STEP_DELAY)
 
 def detectar_vaso():
-    return GPIO.input(CNY70_PIN)
+    return GPIO.input(CNY70_PIN) == 0 
 
 def medir_distancia():
     GPIO.output(ULTRASONIDO_TRIG, True)
