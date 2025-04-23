@@ -44,7 +44,7 @@ STEP_SEQUENCE_HALF = [
 STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
 STEP_DELAY = 0.005  # Ajustado para el motor (más lento para suavizar el movimiento)
-STEP_DELAY2 = 0.001
+STEP_DELAY2 = 0.01
 
 # Función para medir la distancia con el sensor ultrasónico
 def medir_distancia():
