@@ -43,7 +43,7 @@ STEP_SEQUENCE_HALF = [
 # Número de pasos por revolución para el motor paso a paso
 STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
-STEP_DELAY = 0.001  # Ajustado para el motor (más lento para suavizar el movimiento)
+STEP_DELAY = 0.005  # Ajustado para el motor (más lento para suavizar el movimiento)
 
 # Función para medir la distancia con el sensor ultrasónico
 def medir_distancia():
@@ -115,8 +115,9 @@ try:
             if distancia <= 5:
                 print("Acomodando vaso")
                 mover_motor_paso_a_paso_1(20)
+                sleep(1)
 
-        sleep(0.01)  
+        sleep(0.01)  # Pausa más corta para mayor fluidez y control de la ejecución
 
 except KeyboardInterrupt:
     print("Programa detenido por el usuario.")
