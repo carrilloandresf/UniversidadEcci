@@ -43,7 +43,7 @@ STEP_SEQUENCE_HALF = [
 # Número de pasos por revolución para el motor paso a paso
 STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
-STEP_DELAY = 0.005  # Ajustado para el motor (más lento para suavizar el movimiento)
+STEP_DELAY = 0.001  # Ajustado para el motor (más lento para suavizar el movimiento)
 
 # Función para medir la distancia con el sensor ultrasónico
 def medir_distancia():
@@ -64,7 +64,7 @@ def medir_distancia():
     print(f"la distancia es: " + str(distance))  # Imprimir la distancia medida
     return distance
 
-# Función para mover el motor paso a paso 1 (motor de los vasos)
+# Función para mover el motor paso a paso 1 (motor de los vasos) de manera suave
 def mover_motor_paso_a_paso_1(steps):
     for step in range(steps):
         for sequence in STEP_SEQUENCE_HALF:  # Usamos la secuencia Half-Step
@@ -72,7 +72,7 @@ def mover_motor_paso_a_paso_1(steps):
                 GPIO.output(MOTOR_PINS_1[pin], sequence[pin])
             sleep(STEP_DELAY)
 
-# Función para mover el motor paso a paso 2 (motor de la banda de medicamentos)
+# Función para mover el motor paso a paso 2 (motor de la banda de medicamentos) de manera suave
 def mover_motor_paso_a_paso_2(steps):
     for step in range(steps):
         for sequence in STEP_SEQUENCE_HALF:
@@ -112,7 +112,7 @@ try:
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
-            if distancia < 5:
+            if distancia <= 5:
                 print("Acomodando vaso")
                 mover_motor_paso_a_paso_1(20)
 
