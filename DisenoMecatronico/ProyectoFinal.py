@@ -46,6 +46,9 @@ STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 STEP_DELAY = 0.005  # Ajustado para el motor (más lento para suavizar el movimiento)
 STEP_DELAY2 = 0.01
 
+def imprimir_sobre_linea(texto):
+    print(f"\r{texto}", end='', flush=True)
+
 # Función para medir la distancia con el sensor ultrasónico
 def medir_distancia():
     # Enviar pulso de activación
@@ -62,7 +65,7 @@ def medir_distancia():
     # Calcular la distancia
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150  # Calcular en cm
-    print(f"la distancia es: " + str(distance))  # Imprimir la distancia medida
+    imprimir_sobre_linea(f"la distancia es: " + str(distance))  # Imprimir la distancia medida
     return distance
 
 # Función para mover el motor paso a paso 1 (motor de los vasos) de manera suave
@@ -95,23 +98,23 @@ try:
     while True:
         # Leer el estado del sensor CNY70
         estado_cny70 = detectar_vaso()
-        print(f"Vaso de llenado: {'Sí' if estado_cny70 else 'No'}")
+        imprimir_sobre_linea(f"Vaso de llenado: {'Sí' if estado_cny70 else 'No'}")
 
         # Lógica del sistema
         if not estado_cny70:  # Si el CNY70 no detecta vaso (el valor es 1)
-            print("Esperando a que el vaso se coloque...")
+            imprimir_sobre_linea("Esperando a que el vaso se coloque...")
             mover_motor_paso_a_paso_1(10)  # Mueve el motor 1 hasta que se coloque un vaso
 
         # Si el CNY70 detecta un vaso (el valor es 0)
         elif estado_cny70:
             # Mover motor 2 (banda) para llenar el vaso
-            print("Iniciando el llenado...")
+            imprimir_sobre_linea("Iniciando el llenado...")
             mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
             if distancia <= 5:
-                print("Acomodando vaso")
+                imprimir_sobre_linea("Acomodando vaso")
                 mover_motor_paso_a_paso_1(30)
                 sleep(1)
 
