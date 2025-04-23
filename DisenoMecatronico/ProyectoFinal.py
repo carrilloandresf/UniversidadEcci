@@ -61,7 +61,7 @@ def medir_distancia():
     # Calcular la distancia
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150  # Calcular en cm
-    print(f"la distancia es: " + str(distance))
+    print(f"la distancia es: " + str(distance))  # Imprimir la distancia medida
     return distance
 
 # Función para mover el motor paso a paso 1 (motor de los vasos)
@@ -74,15 +74,19 @@ def mover_motor_paso_a_paso_1(steps):
 
 # Función para mover el motor paso a paso 2 (motor de la banda de medicamentos)
 def mover_motor_paso_a_paso_2():
-    while True:  # Este bucle hará que el motor siga girando
-        for sequence in STEP_SEQUENCE_HALF:  # Usamos la secuencia Half-Step
-            for pin in range(4):
-                GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
-            sleep(STEP_DELAY)
+    for sequence in STEP_SEQUENCE_HALF:  # Usamos la secuencia Half-Step
+        for pin in range(4):
+            GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
+        sleep(STEP_DELAY)
 
 # Función para revisar si el sensor CNY70 detecta un vaso (con lógica inversa)
 def detectar_vaso():
     return GPIO.input(CNY70_PIN) == 0  # El CNY70 devuelve 0 cuando detecta un vaso
+
+# Función para detener el motor de la banda (motor 2)
+def detener_motor_banda():
+    for pin in MOTOR_PINS_2:
+        GPIO.output(pin, GPIO.LOW)
 
 # Inicializa los pines
 try:
@@ -114,16 +118,13 @@ try:
 
             # Detener la banda cuando el vaso esté lleno
             print("Vaso lleno, deteniendo la banda.")
-            GPIO.output(MOTOR_PINS_2[0], GPIO.LOW)
-            GPIO.output(MOTOR_PINS_2[1], GPIO.LOW)
-            GPIO.output(MOTOR_PINS_2[2], GPIO.LOW)
-            GPIO.output(MOTOR_PINS_2[3], GPIO.LOW)
+            detener_motor_banda()  # Detener motor 2
 
             # Hacer que el motor 1 gire nuevamente
             print("Moviendo el motor 1 para preparar el siguiente vaso.")
             mover_motor_paso_a_paso_1(10)  # Gira el motor hasta el siguiente vaso
 
-        sleep(0.5) 
+        sleep(0.5)  # Pausa de 0.5 segundos entre las iteraciones
 
 except KeyboardInterrupt:
     print("Programa detenido por el usuario.")
