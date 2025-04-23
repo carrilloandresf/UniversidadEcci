@@ -61,7 +61,7 @@ def medir_distancia():
     # Calcular la distancia
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150  # Calcular en cm
-    print(distance)
+    print(f"la distancia es: " + distance)
     return distance
 
 # Función para mover el motor paso a paso 1 (motor de los vasos)
