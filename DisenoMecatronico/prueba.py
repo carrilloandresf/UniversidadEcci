@@ -31,13 +31,13 @@ GPIO.setup(ULTRASONIDO_ECHO, GPIO.IN)
 # Secuencia de pasos para los motores paso a paso (ULN2003AN)
 STEP_SEQUENCE = [
     [1, 0, 0, 0],
-    #[1, 1, 0, 0],
+    [1, 1, 0, 0],
     [0, 1, 0, 0],
-    #[0, 1, 1, 0],
+    [0, 1, 1, 0],
     [0, 0, 1, 0],
-    #[0, 0, 1, 1],
+    [0, 0, 1, 1],
     [0, 0, 0, 1],
-    #[1, 0, 0, 1]
+    [1, 0, 0, 1]
 ]
 
 # Número de pasos por revolución para el motor paso a paso
