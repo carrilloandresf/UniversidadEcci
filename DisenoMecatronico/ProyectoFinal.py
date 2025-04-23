@@ -44,6 +44,7 @@ STEP_SEQUENCE_HALF = [
 STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
 STEP_DELAY = 0.005  # Ajustado para el motor (más lento para suavizar el movimiento)
+STEP_DELAY2 = 0.001
 
 # Función para medir la distancia con el sensor ultrasónico
 def medir_distancia():
@@ -78,7 +79,7 @@ def mover_motor_paso_a_paso_2(steps):
         for sequence in STEP_SEQUENCE_HALF:
             for pin in range(4):
                 GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
-            sleep(STEP_DELAY)
+            sleep(STEP_DELAY2)
 
 # Función para revisar si el sensor CNY70 detecta un vaso (con lógica inversa)
 def detectar_vaso():
@@ -103,9 +104,6 @@ try:
 
         # Si el CNY70 detecta un vaso (el valor es 0)
         elif estado_cny70:
-            print("Vaso detectado, comenzando llenado...")
-            sleep(0.1)  # Esperar un poco para estabilizar el proceso
-
             # Mover motor 2 (banda) para llenar el vaso
             print("Iniciando el llenado...")
             mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
@@ -114,7 +112,7 @@ try:
             distancia = medir_distancia()
             if distancia <= 5:
                 print("Acomodando vaso")
-                mover_motor_paso_a_paso_1(20)
+                mover_motor_paso_a_paso_1(30)
                 sleep(1)
 
         sleep(0.01)  # Pausa más corta para mayor fluidez y control de la ejecución
