@@ -116,7 +116,7 @@ try:
                 print("Acomodando vaso")
                 mover_motor_paso_a_paso_1(20)
 
-        sleep(0.2)  
+        sleep(0.01)  
 
 except KeyboardInterrupt:
     print("Programa detenido por el usuario.")
