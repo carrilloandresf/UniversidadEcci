@@ -94,7 +94,7 @@ try:
     while True:
         # Leer el estado del sensor CNY70
         estado_cny70 = detectar_vaso()
-        print(f"Estado de CNY70 (¿Vaso detectado?): {'Sí' if estado_cny70 else 'No'}")
+        print(f"Vaso de llenado: {'Sí' if estado_cny70 else 'No'}")
 
         # Lógica del sistema
         if not estado_cny70:  # Si el CNY70 no detecta vaso (el valor es 1)
@@ -114,7 +114,7 @@ try:
             distancia = medir_distancia()
             if distancia < 5:
                 print("Acomodando vaso")
-                mover_motor_paso_a_paso_1(10)
+                mover_motor_paso_a_paso_1(20)
 
         sleep(0.2)  
 
