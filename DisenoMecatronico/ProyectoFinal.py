@@ -43,8 +43,7 @@ STEP_SEQUENCE = [
 # Número de pasos por revolución para el motor paso a paso
 STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
-# **Ajustar el tiempo de espera (STEP_DELAY) para el giro más rápido**
-STEP_DELAY = 0.01 / 3  # Ajustado para que gire 3 veces más rápido
+STEP_DELAY = 0.001
 
 # Función para medir la distancia con el sensor ultrasónico
 def medir_distancia():
