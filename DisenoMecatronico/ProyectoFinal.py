@@ -48,7 +48,7 @@ def imprimir_sobre_linea(texto):
     print(f"\r{texto}", end='', flush=True)
 
 # Función para medir la distancia con el sensor ultrasónico
-def medir_distancia(intentos=5):
+def medir_distancia(intentos=10):
     distancias = []
     for _ in range(intentos):
         # Enviar pulso de activación
@@ -122,7 +122,7 @@ try:
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
             if distancia <= 7.5:
-                imprimir_sobre_linea(f"Acomodando vaso... distancia detectada {distancia:.2f} cm           ")
+                imprimir_sobre_linea(f"Acomodando vaso... distancia detectada {distancia:.2f}   cm                  ")
                 sleep(2.5)
                 mover_motor_paso_a_paso_1(100)
                 continue  
