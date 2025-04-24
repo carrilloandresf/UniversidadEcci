@@ -9,7 +9,7 @@ GPIO.setwarnings(False)
 MOTOR_PINS_1 = [12, 13, 16, 19]
 
 # Pines del motor paso a paso 2 (motor de la banda para despachar medicamentos)
-MOTOR_PINS_2 = [17, 22, 26, 27]
+MOTOR_PINS_2 = [27, 26, 22, 17]
 
 # Pines de los sensores
 CNY70_PIN = 21
