@@ -107,7 +107,7 @@ try:
         # Si el CNY70 detecta un vaso (el valor es 0)
         elif estado_cny70:
             if FLAT == 0:
-                mover_motor_paso_a_paso_1(2)
+                mover_motor_paso_a_paso_1(3)
                 FLAT = 1
             # Mover motor 2 (banda) para llenar el vaso
             imprimir_sobre_linea("Llenando...")
