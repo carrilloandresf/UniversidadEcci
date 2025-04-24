@@ -29,15 +29,11 @@ GPIO.setup(ULTRASONIDO_TRIG, GPIO.OUT)
 GPIO.setup(ULTRASONIDO_ECHO, GPIO.IN)
 
 # Secuencia de pasos medio paso (Half-Step)
-STEP_SEQUENCE_HALF = [
-    [1, 0, 0, 0],
+STEP_SEQUENCE_FULL = [
+    [1, 0, 0, 1],
     [1, 1, 0, 0],
-    [0, 1, 0, 0],
     [0, 1, 1, 0],
-    [0, 0, 1, 0],
-    [0, 0, 1, 1],
-    [0, 0, 0, 1],
-    [1, 0, 0, 1]
+    [0, 0, 1, 1]
 ]
 
 # Número de pasos por revolución para el motor paso a paso
@@ -71,7 +67,7 @@ def medir_distancia():
 # Función para mover el motor paso a paso 1 (motor de los vasos) de manera suave
 def mover_motor_paso_a_paso_1(steps):
     for step in range(steps):
-        for sequence in STEP_SEQUENCE_HALF:  # Usamos la secuencia Half-Step
+        for sequence in STEP_SEQUENCE_FULL:  # Usamos la secuencia Half-Step
             for pin in range(4):
                 GPIO.output(MOTOR_PINS_1[pin], sequence[pin])
             sleep(STEP_DELAY)
@@ -79,7 +75,7 @@ def mover_motor_paso_a_paso_1(steps):
 # Función para mover el motor paso a paso 2 (motor de la banda de medicamentos) de manera suave
 def mover_motor_paso_a_paso_2(steps):
     for step in range(steps):
-        for sequence in STEP_SEQUENCE_HALF:
+        for sequence in STEP_SEQUENCE_FULL:
             for pin in range(4):
                 GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
             sleep(STEP_DELAY2)
@@ -115,7 +111,7 @@ try:
             distancia = medir_distancia()
             if distancia <= 5:
                 imprimir_sobre_linea("Acomodando vaso")
-                mover_motor_paso_a_paso_1(30)
+                mover_motor_paso_a_paso_1(100)
                 sleep(1)
 
         sleep(0.01)  # Pausa más corta para mayor fluidez y control de la ejecución
