@@ -78,7 +78,7 @@ def mover_motor_paso_a_paso_2(steps):
         for sequence in STEP_SEQUENCE_FULL:
             for pin in range(4):
                 GPIO.output(MOTOR_PINS_2[pin], sequence[pin])
-            sleep(STEP_DELAY)
+            sleep(STEP_DELAY2)
 
 # Función para revisar si el sensor CNY70 detecta un vaso (con lógica inversa)
 def detectar_vaso():
@@ -111,8 +111,9 @@ try:
             distancia = medir_distancia()
             if distancia <= 7:
                 imprimir_sobre_linea("Acomodando vaso...         ")
+                sleep(2.5)
                 mover_motor_paso_a_paso_1(100)
-                sleep(1)
+                
 
         sleep(0.01)  # Pausa más corta para mayor fluidez y control de la ejecución
 
