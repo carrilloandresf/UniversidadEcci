@@ -61,7 +61,7 @@ def medir_distancia():
     # Calcular la distancia
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150  # Calcular en cm
-    imprimir_sobre_linea(f"                                 la distancia es: {distance:.2f} cm   ")  # Imprimir la distancia medida
+    imprimir_sobre_linea(f"                                   la distancia es: {distance:.2f} cm   ")  # Imprimir la distancia medida
     return distance
 
 # Función para mover el motor paso a paso 1 (motor de los vasos) de manera suave
@@ -94,11 +94,11 @@ try:
     while True:
         # Leer el estado del sensor CNY70
         estado_cny70 = detectar_vaso()
-        imprimir_sobre_linea(f"Vaso de llenado: {'Sí' if estado_cny70 else 'No'}")
+        imprimir_sobre_linea(f"Vaso de llenado: {'Sí' if estado_cny70 else 'No'}              ")
 
         # Lógica del sistema
         if not estado_cny70:  # Si el CNY70 no detecta vaso (el valor es 1)
-            imprimir_sobre_linea("Esperando a que el vaso se coloque...")
+            imprimir_sobre_linea("Esperando a que el vaso se coloque...                            ")
             mover_motor_paso_a_paso_1(10)  # Mueve el motor 1 hasta que se coloque un vaso
 
         # Si el CNY70 detecta un vaso (el valor es 0)
@@ -110,7 +110,7 @@ try:
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
             if distancia <= 7:
-                imprimir_sobre_linea("Acomodando vaso...         ")
+                imprimir_sobre_linea("Acomodando vaso...                                                    ")
                 sleep(2.5)
                 mover_motor_paso_a_paso_1(100)
                 
