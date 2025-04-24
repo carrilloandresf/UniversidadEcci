@@ -40,7 +40,7 @@ STEP_SEQUENCE_FULL = [
 STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 
 STEP_DELAY = 0.005  # Ajustado para el motor (más lento para suavizar el movimiento)
-STEP_DELAY2 = 0.01
+STEP_DELAY2 = 0.03
 
 def imprimir_sobre_linea(texto):
     print(f"\r{texto}", end='', flush=True)

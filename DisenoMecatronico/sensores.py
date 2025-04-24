@@ -25,21 +25,17 @@ GPIO.setup(ULTRASONIDO_TRIG, GPIO.OUT)
 GPIO.setup(ULTRASONIDO_ECHO, GPIO.IN)
 
 # Secuencia del motor paso a paso
-STEP_SEQUENCE = [
-    [1, 0, 0, 0],
+STEP_SEQUENCE_FULL = [
+    [1, 0, 0, 1],
     [1, 1, 0, 0],
-    [0, 1, 0, 0],
     [0, 1, 1, 0],
-    [0, 0, 1, 0],
-    [0, 0, 1, 1],
-    [0, 0, 0, 1],
-    [1, 0, 0, 1]
+    [0, 0, 1, 1]
 ]
 
 STEP_DELAY = 0.01
 
 def mover_motor(pins):
-    for sequence in STEP_SEQUENCE:
+    for sequence in STEP_SEQUENCE_FULL:
         for i in range(4):
             GPIO.output(pins[i], sequence[i])
         sleep(STEP_DELAY)
