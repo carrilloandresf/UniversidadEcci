@@ -42,6 +42,8 @@ STEPS_PER_REVOLUTION = 4096 / 8  # Ajusta según tu motor
 STEP_DELAY = 0.005  # Ajustado para el motor (más lento para suavizar el movimiento)
 STEP_DELAY2 = 0.03
 
+FLAT = 0
+
 def imprimir_sobre_linea(texto):
     print(f"\r{texto}", end='', flush=True)
 
@@ -98,13 +100,16 @@ try:
 
         # Lógica del sistema
         if not estado_cny70:  # Si el CNY70 no detecta vaso (el valor es 1)
+            FLAT = 0
             imprimir_sobre_linea("Esperando a que el vaso se coloque...                            ")
             mover_motor_paso_a_paso_1(10)  # Mueve el motor 1 hasta que se coloque un vaso
 
         # Si el CNY70 detecta un vaso (el valor es 0)
         elif estado_cny70:
+            if FLAT == 0:
+                mover_motor_paso_a_paso_1(1)
+                FLAT == 1
             # Mover motor 2 (banda) para llenar el vaso
-            mover_motor_paso_a_paso_1(1)
             imprimir_sobre_linea("Llenando...                                                              ")
             mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
 
