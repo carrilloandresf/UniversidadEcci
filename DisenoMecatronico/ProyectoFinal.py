@@ -108,7 +108,7 @@ try:
         elif estado_cny70:
             if FLAT == 0:
                 mover_motor_paso_a_paso_1(1)
-                FLAT == 1
+                FLAT = 1
             # Mover motor 2 (banda) para llenar el vaso
             imprimir_sobre_linea("Llenando...                                                              ")
             mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
