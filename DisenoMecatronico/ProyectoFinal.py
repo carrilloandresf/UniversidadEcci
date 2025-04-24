@@ -66,7 +66,7 @@ def medir_distancia(intentos=7):
         pulse_duration = pulse_end - pulse_start
         distance = pulse_duration * 17150  # Calcular en cm
         distancias.append(distance)
-        sleep(0.1)  # Pausa para evitar lecturas consecutivas rápidas que puedan interferir
+        sleep(0.2)  # Pausa para evitar lecturas consecutivas rápidas que puedan interferir
     
     # Promediar las distancias medidas
     distancia_promediada = sum(distancias) / len(distancias)
@@ -76,7 +76,7 @@ def medir_distancia(intentos=7):
 # Función para mover el motor paso a paso 1 (motor de los vasos) de manera suave
 def mover_motor_paso_a_paso_1(steps):
     for step in range(steps):
-        for sequence in STEP_SEQUENCE_FULL:  # Usamos la secuencia Half-Step
+        for sequence in STEP_SEQUENCE_FULL:
             for pin in range(4):
                 GPIO.output(MOTOR_PINS_1[pin], sequence[pin])
             sleep(STEP_DELAY)
@@ -103,7 +103,6 @@ try:
     while True:
         # Leer el estado del sensor CNY70
         estado_cny70 = detectar_vaso()
-        imprimir_sobre_linea(f"Vaso de llenado: {'Sí' if estado_cny70 else 'No'}              ")
 
         # Lógica del sistema
         if not estado_cny70:  # Si el CNY70 no detecta vaso (el valor es 1)
@@ -127,7 +126,7 @@ try:
                 mover_motor_paso_a_paso_1(100)
                 continue  
 
-            mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
+            mover_motor_paso_a_paso_2(30)  # Mantiene el motor girando indefinidamente
 
         sleep(0.01)  # Pausa más corta para mayor fluidez y control de la ejecución
 
