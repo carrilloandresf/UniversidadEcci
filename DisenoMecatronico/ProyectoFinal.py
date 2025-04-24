@@ -61,7 +61,7 @@ def medir_distancia():
     # Calcular la distancia
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150  # Calcular en cm
-    imprimir_sobre_linea(f"                             la distancia es: " + str(distance))  # Imprimir la distancia medida
+    imprimir_sobre_linea(f"                                 la distancia es: {distance:.2f} cm   ")  # Imprimir la distancia medida
     return distance
 
 # Función para mover el motor paso a paso 1 (motor de los vasos) de manera suave
@@ -109,8 +109,8 @@ try:
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
-            if distancia <= 5:
-                imprimir_sobre_linea("Acomodando vaso         ")
+            if distancia <= 7:
+                imprimir_sobre_linea("Acomodando vaso...         ")
                 mover_motor_paso_a_paso_1(100)
                 sleep(1)
 
