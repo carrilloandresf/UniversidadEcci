@@ -107,16 +107,16 @@ try:
         # Si el CNY70 detecta un vaso (el valor es 0)
         elif estado_cny70:
             if FLAT == 0:
-                mover_motor_paso_a_paso_1(1)
+                mover_motor_paso_a_paso_1(2)
                 FLAT = 1
             # Mover motor 2 (banda) para llenar el vaso
-            imprimir_sobre_linea("Llenando...                                                              ")
+            imprimir_sobre_linea("Llenando...")
             mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
             if distancia <= 7:
-                imprimir_sobre_linea("Acomodando vaso...                                                    ")
+                imprimir_sobre_linea("Acomodando vaso...                                                         ")
                 sleep(2.5)
                 mover_motor_paso_a_paso_1(100)
                 
