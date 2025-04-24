@@ -48,23 +48,30 @@ def imprimir_sobre_linea(texto):
     print(f"\r{texto}", end='', flush=True)
 
 # Función para medir la distancia con el sensor ultrasónico
-def medir_distancia():
-    # Enviar pulso de activación
-    GPIO.output(ULTRASONIDO_TRIG, True)
-    sleep(0.00001)
-    GPIO.output(ULTRASONIDO_TRIG, False)
+def medir_distancia(intentos=5):
+    distancias = []
+    for _ in range(intentos):
+        # Enviar pulso de activación
+        GPIO.output(ULTRASONIDO_TRIG, True)
+        sleep(0.00001)
+        GPIO.output(ULTRASONIDO_TRIG, False)
+        
+        # Medir tiempo del pulso
+        while GPIO.input(ULTRASONIDO_ECHO) == 0:
+            pulse_start = time()  # Usamos 'time()' que está importado
+        while GPIO.input(ULTRASONIDO_ECHO) == 1:
+            pulse_end = time()  # También usamos 'time()' aquí
+        
+        # Calcular la distancia
+        pulse_duration = pulse_end - pulse_start
+        distance = pulse_duration * 17150  # Calcular en cm
+        distancias.append(distance)
+        sleep(0.1)  # Pausa para evitar lecturas consecutivas rápidas que puedan interferir
     
-    # Medir tiempo del pulso
-    while GPIO.input(ULTRASONIDO_ECHO) == 0:
-        pulse_start = time()  # Usamos 'time()' que está importado
-    while GPIO.input(ULTRASONIDO_ECHO) == 1:
-        pulse_end = time()  # También usamos 'time()' aquí
-    
-    # Calcular la distancia
-    pulse_duration = pulse_end - pulse_start
-    distance = pulse_duration * 17150  # Calcular en cm
-    imprimir_sobre_linea(f"                la distancia es: {distance:.2f} cm   ")  # Imprimir la distancia medida
-    return distance
+    # Promediar las distancias medidas
+    distancia_promediada = sum(distancias) / len(distancias)
+    imprimir_sobre_linea(f"                                      Distancia promedio: {distancia_promediada:.2f} cm   ")
+    return distancia_promediada
 
 # Función para mover el motor paso a paso 1 (motor de los vasos) de manera suave
 def mover_motor_paso_a_paso_1(steps):
@@ -110,7 +117,7 @@ try:
                 mover_motor_paso_a_paso_1(4)
                 FLAT = 1
             # Mover motor 2 (banda) para llenar el vaso
-            imprimir_sobre_linea("Llenando...")
+            imprimir_sobre_linea("Llenando...        ")
             mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
