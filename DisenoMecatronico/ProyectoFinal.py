@@ -121,13 +121,13 @@ try:
 
             # Esperar que el sensor ultrasónico detecte que el vaso está lleno
             distancia = medir_distancia()
-            if distancia <= 8:
+            if distancia <= 7.7:
                 imprimir_sobre_linea("Acomodando vaso...                                                         ")
                 sleep(2.5)
                 mover_motor_paso_a_paso_1(100)
+                break  
 
             mover_motor_paso_a_paso_2(10)  # Mantiene el motor girando indefinidamente
-                
 
         sleep(0.01)  # Pausa más corta para mayor fluidez y control de la ejecución
 
